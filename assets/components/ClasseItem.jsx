@@ -12,17 +12,17 @@ const ClasseItem = ({ rank, classe, isTopThree }) => {
   };
 
   return (
-    <tr className={`border-b hover:bg-blue-200 ${isTopThree ? "text-2xl" : "text-xl"}`}>
-      <td
-        className={`px-6 py-4 text-center font-bold rounded-full ${getRankColor()}`}
-      >
-        {rank}
-      </td>
-      <td className="px-6 py-4">{nom}</td>
-      <td className="px-6 py-4 text-center">{etudiants}</td>
-      <td className="px-6 py-4 text-center font-semibold">{tours}</td>
-    </tr>
-  );
+      <tr className={`border-b ${isTopThree ? "text-2xl" : "text-xl"}`}>
+        <td className="py-5 px-5">
+          <div className={`text-center font-bold rounded-full ${getRankColor()}`}>
+            {rank}
+          </div>
+        </td>
+        <td className="text-center">{nom}</td>
+        <td className="text-center">{etudiants}</td>
+        <td className="text-center font-semibold">{tours}</td>
+      </tr>
+    );
 };
 
 export default ClasseItem;

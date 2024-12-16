@@ -14,7 +14,7 @@ const Classement = ({ data }) => {
       <div className="overflow-x-auto">
         <table className="table-auto w-full text-left border-collapse">
           <ClasseHeader />
-          <tbody>
+          <tbody className="">
             {sortedData.map((classe, index) => (
               <ClasseItem
                 key={index}
