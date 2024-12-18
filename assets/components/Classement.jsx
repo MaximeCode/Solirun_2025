@@ -1,6 +1,7 @@
 import React from "react";
 import ClasseHeader from "./ClasseHeader";
 import ClasseItem from "./ClasseItem";
+import Clock from './Clock';
 
 const Classement = ({ data }) => {
   // Trier les données par le nombre de tours (décroissant)
@@ -8,6 +9,7 @@ const Classement = ({ data }) => {
 
   return (
     <div className="bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg rounded-xl p-8 mx-auto">
+      <Clock />
       <h2 className="text-4xl font-extrabold text-center mb-8 font-outline-2">
         Classement des Classes
       </h2>
