@@ -1,38 +1,64 @@
 'use client'
 
-import React from "react";
-import Classement from "../../Components/Ranking";
+import React, { useEffect, useState } from "react";
+import Classement from "@/Components/Ranking";
+import ClassementReel from "@/Components/RealTimeRanking";
+import { socket } from "@/utils/socket";
 
-const classesData = [
-  { nom: "Classe A", etudiants: 30, tours: 120 },
-  { nom: "Classe B", etudiants: 25, tours: 110 },
-  { nom: "Classe C", etudiants: 28, tours: 95 },
-  { nom: "Classe D", etudiants: 32, tours: 130 },
-  { nom: "Classe E", etudiants: 27, tours: 115 },
-  { nom: "Classe F", etudiants: 29, tours: 105 },
-  { nom: "Classe G", etudiants: 33, tours: 140 },
-  { nom: "Classe H", etudiants: 24, tours: 100 },
-  { nom: "Classe I", etudiants: 26, tours: 125 },
-  { nom: "Classe J", etudiants: 31, tours: 135 },
-  { nom: "Classe K", etudiants: 22, tours: 90 },
-  { nom: "Classe L", etudiants: 35, tours: 145 },
-  { nom: "Classe M", etudiants: 30, tours: 110 },
-  { nom: "Classe N", etudiants: 28, tours: 102 },
-  { nom: "Classe O", etudiants: 20, tours: 85 },
-];
+function App() {
 
-function App( { page } ) {
-  page = "Ranking";
+  const [classesData, setClassesData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [isRunning, setIsRunning] = useState(true);
+
+  useEffect(() => {
+    fetch("http://localhost:3030/api.php?action=Ranking")
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Erreur lors de la récupération des données");
+        }
+        return response.json();
+      })
+      .then((data) => {
+        setClassesData(data);
+        setLoading(false);
+      })
+      .catch((err) => {
+        setError(err.message);
+        setLoading(false);
+      });
+  }, []);
+  
+  useEffect(() => {
+    // Écouter les mises à jour de isRunning
+    socket.on("updateIsRunning", (state) => {
+      setIsRunning(state);
+    });
+
+    return () => {
+      socket.off("updateIsRunning");
+    };
+  }, []);
+  
   return (
-    <>
-      <div className="bg-gradient-to-br from-gray-900 via-gray-750 to-gray-900">
-        <div className="px-16 py-16">
-          {page == "Ranking" && 
-            <Classement data={classesData} />
-          }
-        </div>
+    <div className="bg-gradient-to-br from-gray-900 via-gray-750 to-gray-900 h-full">
+      <div className="px-16 py-16">
+        {!isRunning ? (
+          <>
+            {loading && <p className="text-white">Chargement des données...</p>}
+            {error && <p className="text-red-500">Erreur : {error}</p>}
+            {!loading && !error && <Classement data={classesData} />}
+          </>
+        ) : (
+          <>
+            {loading && <p className="text-white">Chargement des données...</p>}
+            {error && <p className="text-red-500">Erreur : {error}</p>}
+            {!loading && !error && <ClassementReel />}
+          </>
+        )}
       </div>
-    </>
+    </div>
   );
 }
 

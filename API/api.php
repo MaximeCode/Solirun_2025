@@ -1,5 +1,11 @@
 <?php
+
+header("Access-Control-Allow-Origin: *");
+header("Access-Control-Allow-Methods: GET, POST, OPTIONS");
+header("Access-Control-Allow-Headers: Content-Type");
+
 define('SECURE_ACCESS', true);
+
 // Inclure le fichier de configuration
 $config = require 'config.php';
 
@@ -11,21 +17,26 @@ if ($conn->connect_error) {
     die(json_encode(["error" => "Échec de la connexion : " . $conn->connect_error]));
 }
 
-// Exemple de requête SQL
-$sql = "SELECT * FROM Classes";
-$result = $conn->query($sql);
+// Vérifier si "request" est défini et vaut "Ranking"
+if (isset($_GET['action']) && $_GET['action'] === 'Ranking') {
+    $sql = "SELECT * FROM Ranking";
+    $result = $conn->query($sql);
 
-// Stocker les résultats dans un tableau
-$data = [];
-if ($result->num_rows > 0) {
-    while ($row = $result->fetch_assoc()) {
-        $data[] = $row;
+    $data = [];
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            $data[] = $row;
+        }
     }
-}
 
-// Retourner le résultat encodé en JSON
-header('Content-Type: application/json');
-echo json_encode($data);
+    // Retourner les données en JSON
+    header('Content-Type: application/json');
+    echo json_encode($data);
+} else {
+    // Retourner un message d'erreur si le paramètre est absent ou incorrect
+    header('Content-Type: application/json');
+    echo json_encode(["error" => "Paramètre 'request=Ranking' requis"]);
+}
 
 // Fermer la connexion
 $conn->close();

@@ -5,7 +5,9 @@ import Clock from './Clock';
 
 const Classement = ({ data }) => {
   // Trier les données par le nombre de tours (décroissant)
-  const sortedData = [...data].sort((a, b) => b.tours - a.tours);
+  const sortedData = [...data].sort((a, b) => b.laps - a.laps);
+
+  console.log(sortedData);
 
   return (
     <div className="bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg rounded-xl p-8 mx-auto">
