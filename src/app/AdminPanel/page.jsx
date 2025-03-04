@@ -9,6 +9,8 @@ function AdminPanel() {
   const [classes, setClasses] = useState([]);
   const [runs, setRuns] = useState([]);
   const [selectedRun, setSelectedRun] = useState(null);
+  const [error, setError] = useState(false);
+  const [buttonText, setButtonText] = useState(isRunning ? "Arrêter la Course" : "Démarrer la Course");
 
   useEffect(() => {
     socket.on("updateIsRunning", setIsRunning);
@@ -24,6 +26,10 @@ function AdminPanel() {
   }, []);
 
   useEffect(() => {
+    setButtonText(isRunning ? "Arrêter la Course" : "Démarrer la Course");
+  }, [isRunning]);
+
+  useEffect(() => {
     fetch("http://localhost:3030/api.php?action=NextRuns")
       .then((response) => {
         if (!response.ok) {
@@ -34,16 +40,85 @@ function AdminPanel() {
       .then((data) => {
         console.log(data);
         setRuns(data);
-        setLoading(false);
       })
-  }, []);
+  }, [isRunning]);
 
   const toggleIsRunning = () => {
     socket.emit("toggleIsRunning");
+    console.log(isRunning);
   };
 
   const updateTours = (id, increment) => {
     socket.emit("updateTours", { id, increment });
+  };
+
+  const setRunningClasses = (newClasses) => {
+    socket.emit("setClasses", newClasses);
+  };
+
+  const handleClick = () => {
+    if (!isRunning) {
+      if (selectedRun == null) {
+        setError(true);
+        setButtonText("Aucune course sélectionnée");
+
+        // Réinitialiser après 1 secondes
+        setTimeout(() => {
+          setError(false);
+          setButtonText(isRunning ? "Arrêter la Course" : "Démarrer la Course");
+        }, 1000);
+      } else {
+        toggleIsRunning();
+        fetch("http://localhost:3030/api.php", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            action: "StartRun",
+            id: selectedRun,
+          }),
+        })
+          .then((response) => response.json())
+          .then((data) => console.log(data))
+          .catch((error) => console.error("Erreur:", error));
+
+          fetch(`http://localhost:3030/api.php?action=ClassesRunning&id=${selectedRun}`, {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            }
+          })
+          .then((response) => {
+            if (!response.ok) {
+              throw new Error("Erreur lors de la récupération des données");
+            }
+            return response.json();
+          })
+          .then((data) => {
+            setRunningClasses(data);
+          })
+      }
+    }
+    else {
+      toggleIsRunning();
+      console.log(selectedRun);
+      fetch("http://localhost:3030/api.php", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          action: "EndRun",
+          id: selectedRun,
+        }),
+      })
+        .then((response) => response.json())
+        .then((data) => console.log(data))
+        .catch((error) => console.error("Erreur:", error));
+
+        setSelectedRun(null);
+    }
   };
   
   return (
@@ -62,15 +137,17 @@ function AdminPanel() {
             <p className="text-sm text-gray-600 mb-4">
               Démarrez ou arrêtez la course actuelle. Ce changement sera reflété en temps réel pour tous les utilisateurs.
             </p>
-            <button 
-              onClick={toggleIsRunning}
-              className={`w-full py-3 px-4 rounded-md font-medium transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 ${
-                isRunning 
-                  ? 'bg-red-600 hover:bg-red-700 text-white focus:ring-red-500' 
-                  : 'bg-green-600 hover:bg-green-700 text-white focus:ring-green-500'
-              }`}
+            <button
+              onClick={handleClick}
+              className={`w-full py-3 px-4 rounded-md font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 
+                ${isRunning 
+                  ? "bg-red-600 hover:bg-red-700 text-white focus:ring-red-500" 
+                  : "bg-green-600 hover:bg-green-700 text-white focus:ring-green-500"
+                }
+                ${error ? "bg-red-500 animate-shake" : ""} // Ajout de l'animation
+              `}
             >
-              {isRunning ? 'Arrêter la Course' : 'Démarrer la Course'}
+              {buttonText}
             </button>
           </div>
           
