@@ -17,7 +17,7 @@ if ($conn->connect_error) {
     die(json_encode(["error" => "Échec de la connexion : " . $conn->connect_error]));
 }
 
-// Vérifier si "request" est défini et vaut "Ranking"
+// Vérifier si "action" est défini et vaut "Ranking"
 if (isset($_GET['action']) && $_GET['action'] === 'Ranking') {
     $sql = "SELECT * FROM Ranking";
     $result = $conn->query($sql);
@@ -32,10 +32,40 @@ if (isset($_GET['action']) && $_GET['action'] === 'Ranking') {
     // Retourner les données en JSON
     header('Content-Type: application/json');
     echo json_encode($data);
-} else {
-    // Retourner un message d'erreur si le paramètre est absent ou incorrect
+}
+
+// Vérifier si "action" est défini et vaut "Classes"
+if (isset($_GET['action']) && $_GET['action'] === 'Classes') {
+    $sql = "SELECT * FROM Classes";
+    $result = $conn->query($sql);
+
+    $data = [];
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            $data[] = $row;
+        }
+    }
+
+    // Retourner les données en JSON
     header('Content-Type: application/json');
-    echo json_encode(["error" => "Paramètre 'request=Ranking' requis"]);
+    echo json_encode($data);
+}
+
+// Vérifier si "action" est défini et vaut "NextRuns"
+if (isset($_GET['action']) && $_GET['action'] === 'NextRuns') {
+    $sql = "SELECT * FROM NextRuns";
+    $result = $conn->query($sql);
+
+    $data = [];
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            $data[] = $row;
+        }
+    }
+
+    // Retourner les données en JSON
+    header('Content-Type: application/json');
+    echo json_encode($data);
 }
 
 // Fermer la connexion

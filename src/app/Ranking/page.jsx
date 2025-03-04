@@ -42,7 +42,9 @@ function App() {
   }, []);
   
   return (
-    <div className="bg-gradient-to-br from-gray-900 via-gray-750 to-gray-900 h-full">
+    <>
+    <div className="fixed top-0 left-0 bg-gradient-to-br from-gray-900 via-gray-750 to-gray-900 h-screen w-screen -z-1"></div>
+    <div>
       <div className="px-16 py-16">
         {!isRunning ? (
           <>
@@ -52,13 +54,12 @@ function App() {
           </>
         ) : (
           <>
-            {loading && <p className="text-white">Chargement des données...</p>}
-            {error && <p className="text-red-500">Erreur : {error}</p>}
-            {!loading && !error && <ClassementReel />}
+            <ClassementReel />
           </>
         )}
       </div>
     </div>
+    </>
   );
 }
 

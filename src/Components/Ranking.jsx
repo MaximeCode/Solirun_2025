@@ -1,34 +1,32 @@
 import React from "react";
-import ClasseHeader from "./RankingHeader";
+import ClassePodiumItem from "./RankingPodiumItem";
 import ClasseItem from "./RankingItem";
 import Clock from './Clock';
 
 const Classement = ({ data }) => {
-  // Trier les données par le nombre de tours (décroissant)
+  // Trier les classes par nombre de tours (décroissant)
   const sortedData = [...data].sort((a, b) => b.laps - a.laps);
-
-  console.log(sortedData);
-
+  
   return (
-    <div className="bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg rounded-xl p-8 mx-auto">
+    <div className="bg-gray-800 h-full w-full text-white shadow-lg rounded-xl p-8 mx-auto rounded-xl">
       <Clock />
-      <h2 className="text-4xl font-extrabold text-center mb-8 font-outline-2">
-        Classement des Classes
-      </h2>
-      <div className="overflow-x-auto">
-        <table className="table-auto w-full text-left border-collapse">
-          <ClasseHeader />
-          <tbody className="">
-            {sortedData.map((classe, index) => (
-              <ClasseItem
-                key={index}
-                rank={index + 1}
-                classe={classe}
-                isTopThree={index < 3} // Ajouter une logique pour les couleurs or, argent, bronze
-              />
-            ))}
-          </tbody>
-        </table>
+      <h2 className="text-6xl font-extrabold text-center mb-8">Scores<br />Classement général</h2>
+      
+      <div className="bg-orange-100 px-4 pb-4 rounded-lg">
+        <h3 className="text-black font-bold text-4xl px-4 py-2 font-extrabold">Podium</h3>
+        <div className="space-y-2">
+          {sortedData.slice(0, 3).map((classe, index) => (
+            <ClassePodiumItem key={classe.id} rank={index + 1} classe={classe} />
+          ))}
+        </div>
+      </div>
+      
+      <div className="mt-6 bg-orange-100 rounded-lg p-4">
+        <div className="space-y-2">
+        {sortedData.slice(3).map((classe, index) => (
+          <ClasseItem key={classe.id} rank={index + 4} classe={classe} />
+        ))}
+        </div>
       </div>
     </div>
   );
