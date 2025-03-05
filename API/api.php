@@ -33,30 +33,31 @@ function showPettryJson($data)
 
 function fetchData($sql, $conn, $params = [])
 {
-  $stmt = $conn->prepare($sql);
+    $stmt = $conn->prepare($sql);
 
-  // Vérifier si on a des paramètres à binder
-  if (!empty($params)) {
-    // Déterminer dynamiquement les types
-    $types = "";
-    foreach ($params as $param) {
-      $types .= is_int($param) ? "i" : "s";
+    // Vérifier si on a des paramètres à binder
+    if (!empty($params)) {
+        // Déterminer dynamiquement les types
+        $types = "";
+        foreach ($params as $param) {
+            $types .= is_int($param) ? "i" : "s";
+        }
+        $stmt->bind_param($types, ...$params);
     }
-    $stmt->bind_param($types, ...$params);
-  }
 
-  $stmt->execute();
-  $data = $stmt->get_result()->fetch_all(MYSQLI_ASSOC) ? : [];
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $data = $result->fetch_all(MYSQLI_ASSOC); // Récupérer les résultats sous forme de tableau associatif
 
-  if (!empty($data)) {
+    // ✅ Forcer $data à être un tableau vide si aucun résultat
+    if ($data === null) {
+        $data = [];
+    }
+
     http_response_code(200);
-    showPettryJson($data);
-  } else {
-    http_response_code(204); // No Content
-    showPettryJson(["message" => "Aucune donnée trouvée"]);
-  }
+    showPettryJson($data); // Afficher un tableau vide [] si aucune donnée
 
-  $stmt->close();
+    $stmt->close();
 }
 
 try {
