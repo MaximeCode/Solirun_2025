@@ -46,7 +46,7 @@ function fetchData($sql, $conn, $params = [])
   }
 
   $stmt->execute();
-  $data = $stmt->get_result() ? $stmt->get_result()->fetch_all(MYSQLI_ASSOC) : [];
+  $data = $stmt->get_result()->fetch_all(MYSQLI_ASSOC) ? : [];
 
   if (!empty($data)) {
     http_response_code(200);
