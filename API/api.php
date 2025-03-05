@@ -70,7 +70,7 @@ try {
             }
 
             $stmt->close();
-        } elseif (isset($data['action']) && $data['action'] === 'endTime' && isset($data['id'])) {
+        } elseif (isset($data['action']) && $data['action'] === 'EndRun' && isset($data['id'])) {
             $stmt = $conn->prepare("UPDATE Runs SET endTime = NOW() WHERE id = ?");
             $stmt->bind_param("i", $data['id']); // "i" pour integer
 
