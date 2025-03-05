@@ -1,0 +1,60 @@
+'use client'
+
+import React from "react";
+import { useState, useEffect } from "react";
+import ClassSelector from "@/Components/ClassSelector";
+import { socket } from "@/utils/socket";
+
+function Manager() {
+    const [isRunning, setIsRunning] = useState(false);
+    const [classes, setClasses] = useState([]);
+
+    useEffect(() => {
+        socket.on("updateIsRunning", setIsRunning);
+        socket.on("updateClasses", (newClasses) => {
+          setClasses(newClasses);
+        });
+      
+    
+        return () => {
+          socket.off("updateIsRunning");
+          socket.off("updateClasses");
+        };
+      }, []);
+    const handleClassSelect = (classe) => {
+        console.log("Classe sélectionnée :", classe);
+    };
+
+    const setRunning = (state) => () => {
+        setIsRunning(state);
+    }
+
+    return (
+        <>
+          <div className="fixed top-0 left-0 bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 h-screen w-screen -z-1"></div>
+    
+          {/* Conteneur général avec transition */}
+          <div className="relative min-h-screen flex items-center justify-center transition-all duration-500">
+            
+            {/* Affichage des classes */}
+            <div className={`absolute w-full transition-all duration-1000 ease-in-out ${isRunning ? "opacity-100 translate-y-0 z-1" : "opacity-0 translate-y-10 z-0"}`}>
+              <ClassSelector classes={classes} onSelect={handleClassSelect} isRunning={isRunning}/>
+            </div>
+    
+            {/* Écran d'attente */}
+            <div className={`absolute w-full flex flex-col items-center justify-center transition-all duration-1000 ease-in-out ${!isRunning ? "opacity-100 translate-y-0 z-1" : "opacity-0 -translate-y-10 z-0"}`}>
+              {/* Icône */}
+              <div className="mb-4 animate-bounce">
+                <span className="text-6xl">🏁</span>
+              </div>
+    
+              {/* Message principal */}
+              <h2 className="text-3xl font-bold">La course est arrêtée</h2>
+              <p className="text-gray-400 text-center mt-2 text-lg px-3">En attente que les administrateurs de la course en lancent une...</p>
+            </div>
+          </div>
+        </>
+      );
+};
+
+export default Manager;
