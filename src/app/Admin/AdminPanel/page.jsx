@@ -3,8 +3,6 @@
 import React, { useState, useEffect } from "react"
 import RunCard from "@/Components/RunCard"
 import { socket } from "@/utils/socket"
-import Link from "next/link"
-import Header from "@/Components/Header"
 
 function AdminPanel() {
   const [isRunning, setIsRunning] = useState(false)
@@ -122,7 +120,24 @@ function AdminPanel() {
         .then((data) => console.log(data))
         .catch((error) => console.error("Erreur:", error))
 
-      setSelectedRun(null)
+      classes.map((classe, index) => {
+        fetch("http://localhost:3030/api.php", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            action: "UpdateLaps",
+            theClass: classe.id,
+            theRun: selectedRun,
+            laps: classe.laps,
+          }),
+        })
+          .then((response) => response.json())
+          .then((data) => console.log(data))
+          .catch((error) => console.error("Erreur:", error))
+        setSelectedRun(null)
+      })
     }
   }
 
@@ -161,7 +176,7 @@ function AdminPanel() {
                     : "bg-green-600 hover:bg-green-700 text-white focus:ring-green-500"
                 }
                 ${
-                  error ? "bg-red-500 animate-shake" : ""
+                  error ? "bg-red-500 animate-shake hover:bg-red-600" : ""
                 } // Ajout de l'animation
               `}>
               {buttonText}

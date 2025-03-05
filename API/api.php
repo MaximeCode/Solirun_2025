@@ -144,8 +144,8 @@ try {
 
           $stmt->close();
         } else {
-          http_response_code(400);
-          showPettryJson(["error" => "Paramètres manquants (theClass, theRun, laps)"]);
+            http_response_code(400);
+            showPettryJson(["error" => "Paramètres manquants (theClass, theRun, laps)"]);
         }
         break;
 

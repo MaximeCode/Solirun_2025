@@ -31,14 +31,17 @@ body,
 
   25% {
     transform: translateX(-5px);
+    scale: 105%;
   }
 
   50% {
     transform: translateX(5px);
+    scale: 110%;
   }
 
   75% {
     transform: translateX(-5px);
+    scale: 105%;
   }
 }
 

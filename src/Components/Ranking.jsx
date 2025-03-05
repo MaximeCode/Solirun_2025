@@ -11,23 +11,30 @@ const Classement = ({ data }) => {
     <div className="bg-gray-800 h-full w-full text-white shadow-lg rounded-xl p-8 mx-auto rounded-xl">
       <Clock />
       <h2 className="text-6xl font-extrabold text-center mb-8">Scores<br />Classement général</h2>
+      {sortedData.length > 0 ? (
+      <>
+        <div className="bg-orange-100 px-4 pb-4 rounded-lg">
+          <h3 className="text-black font-bold text-4xl px-4 py-2 font-extrabold">Podium</h3>
+          <div className="space-y-2">
+            {sortedData.slice(0, 3).map((classe, index) => (
+              <ClassePodiumItem key={classe.id} rank={index + 1} classe={classe} />
+            ))}
+          </div>
+        </div>
       
-      <div className="bg-orange-100 px-4 pb-4 rounded-lg">
-        <h3 className="text-black font-bold text-4xl px-4 py-2 font-extrabold">Podium</h3>
-        <div className="space-y-2">
-          {sortedData.slice(0, 3).map((classe, index) => (
-            <ClassePodiumItem key={classe.id} rank={index + 1} classe={classe} />
+        <div className="mt-6 bg-orange-100 rounded-lg p-4">
+          <div className="space-y-2">
+          {sortedData.slice(3).map((classe, index) => (
+            <ClasseItem key={classe.id} rank={index + 4} classe={classe} />
           ))}
+          </div>
         </div>
-      </div>
-      
-      <div className="mt-6 bg-orange-100 rounded-lg p-4">
-        <div className="space-y-2">
-        {sortedData.slice(3).map((classe, index) => (
-          <ClasseItem key={classe.id} rank={index + 4} classe={classe} />
-        ))}
+      </>
+      ) : (
+        <div className="bg-orange-100 px-4 pb-4 rounded-lg">
+          <p className="text-black text-center font-bold text-4xl px-4 py-2 font-extrabold">Aucune course n'a été couru !</p>
         </div>
-      </div>
+      )}
     </div>
   );
 };

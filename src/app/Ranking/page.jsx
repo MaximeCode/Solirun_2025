@@ -6,13 +6,15 @@ import ClassementReel from "@/Components/RealTimeRanking"
 import { socket } from "@/utils/socket"
 
 function App() {
-  const [classesData, setClassesData] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(null)
-  const [isRunning, setIsRunning] = useState(true)
+
+  const [classesData, setClassesData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [isRunning, setIsRunning] = useState(false);
 
   useEffect(() => {
-    fetch("http://localhost:3030/api.php?action=Ranking")
+    setInterval(() => {
+      fetch("http://localhost:3030/api.php?action=Ranking")
       .then((response) => {
         if (!response.ok) {
           throw new Error("Erreur lors de la récupération des données")
@@ -24,11 +26,12 @@ function App() {
         setLoading(false)
       })
       .catch((err) => {
-        setError(err.message)
-        setLoading(false)
-      })
-  }, [])
-
+        setError(err.message);
+        setLoading(false);
+      });
+    }, 100);
+  }, [isRunning]);
+  
   useEffect(() => {
     // Écouter les mises à jour de isRunning
     socket.on("updateIsRunning", (state) => {
