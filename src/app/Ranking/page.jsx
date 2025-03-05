@@ -13,7 +13,7 @@ function App() {
   const [isRunning, setIsRunning] = useState(false);
 
   useEffect(() => {
-    setInterval(() => {
+    setTimeout(() => {
       fetch("http://localhost:3030/api.php?action=Ranking")
       .then((response) => {
         if (!response.ok) {
@@ -29,7 +29,7 @@ function App() {
         setError(err.message);
         setLoading(false);
       });
-    }, 100);
+    }, 50);
   }, [isRunning]);
   
   useEffect(() => {
