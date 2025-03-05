@@ -22,76 +22,13 @@ if ($_SERVER["REQUEST_METHOD"] === "OPTIONS") {
   exit();
 }
 
-try {
-  // Vérifier si l'action est définie
-  if ($_SERVER["REQUEST_METHOD"] === "GET" && isset($_GET['action'])) {
-    $action = $_GET['action'];
+$id = $_GET['id'];
+$action = $_GET['action'];
+$data = json_decode(file_get_contents("php://input"), true); // => Array
 
-    switch ($action) {
-      case 'Ranking':
-        fetchData("SELECT * FROM Ranking", $conn);
-        break;
-
-      case 'Classes':
-        fetchData("SELECT * FROM Classes", $conn);
-        break;
-
-      case 'NextRuns':
-        fetchData("SELECT * FROM NextRuns", $conn);
-        break;
-
-      case 'ClassesRunning':
-        if (isset($_GET['id'])) {
-          $id = $_GET['id'];
-          fetchData("SELECT Classes.id, Classes.name, Classes.surname AS alias, Classes.color, Classes.nbStudents AS students, Runners.laps FROM Classes INNER JOIN Runners ON Classes.id = Runners.theClass INNER JOIN Runs ON Runs.id = Runners.theRun WHERE Runs.id = ?", $conn, [$id]);
-        } else {
-          http_response_code(400); // Bad Request
-          echo json_encode(["error" => "Paramètre 'id' requis"]);
-        }
-        break;
-
-      default:
-        http_response_code(400); // Bad Request
-        echo json_encode(["error" => "Action invalide"]);
-        break;
-    }
-  } elseif ($_SERVER["REQUEST_METHOD"] === "POST") {
-    $data = json_decode(file_get_contents("php://input"), true);
-    error_log(print_r($data, true));
-
-    if (isset($data['action']) && $data['action'] === 'StartRun' && isset($data['id'])) {
-      $stmt = $conn->prepare("UPDATE Runs SET startTime = NOW() WHERE id = ?");
-      $stmt->bind_param("i", $data['id']); // "i" pour integer
-
-      if ($stmt->execute()) {
-        echo json_encode(["success" => "La course a été commencée avec succès"]);
-      } else {
-        echo json_encode(["error" => "Erreur lors de l'arrêt de la course : " . $stmt->error]);
-      }
-
-      $stmt->close();
-    } elseif (isset($data['action']) && $data['action'] === 'EndRun' && isset($data['id'])) {
-      $stmt = $conn->prepare("UPDATE Runs SET endTime = NOW() WHERE id = ?");
-      $stmt->bind_param("i", $data['id']); // "i" pour integer
-
-      if ($stmt->execute()) {
-        echo json_encode(["success" => "La course a été terminée avec succès"]);
-      } else {
-        echo json_encode(["error" => "Erreur lors de l'arrêt de la course : " . $stmt->error]);
-      }
-
-      $stmt->close();
-    } else {
-      http_response_code(400);
-      echo json_encode(["error" => "Paramètres manquants"]);
-    }
-  } else {
-    http_response_code(400);
-    echo json_encode(["error" => "Requête invalide"]);
-  }
-} catch (Exception $e) {
-  http_response_code(500); // Internal Server Error
-  echo json_encode(["error" => "Erreur serveur : " . $e->getMessage()]);
+function showPettryJson($data)
+{
+  echo json_encode($data, JSON_PRETTY_PRINT);
 }
 
 function fetchData($sql, $conn, $params = [])
@@ -109,90 +46,138 @@ function fetchData($sql, $conn, $params = [])
   }
 
   $stmt->execute();
-  $result = $stmt->get_result();
-  $data = $result->fetch_all(MYSQLI_ASSOC);
+  $data = $stmt->get_result() ? $stmt->get_result()->fetch_all(MYSQLI_ASSOC) : [];
 
   if (!empty($data)) {
     http_response_code(200);
-    echo json_encode($data);
+    showPettryJson($data);
   } else {
     http_response_code(204); // No Content
-    echo json_encode(["message" => "Aucune donnée trouvée"]);
+    showPettryJson(["message" => "Aucune donnée trouvée"]);
   }
 
   $stmt->close();
-  die(json_encode(["error" => "Échec de la connexion : " . $conn->connect_error]));
 }
 
-$action = $_GET['action'];
-$table = $_GET['table'];
+try {
+  // Vérifier si l'action est définie
+  if ($_SERVER["REQUEST_METHOD"] === "GET" && isset($action)) {
 
-// Récupérer les données POST
-$input = json_decode(file_get_contents('php://input'), true);
-$classId = $input['classId'];
-$name = $input['name'];
-$nbStudents = $input['nbStudents'];
+    switch ($action) {
+      case 'Ranking':
+        fetchData("SELECT * FROM Ranking", $conn);
+        break;
 
-function showPettryJson($data)
-{
-  echo json_encode($data, JSON_PRETTY_PRINT);
-}
+      case 'Classes':
+        fetchData("SELECT * FROM Classes", $conn);
+        break;
 
-switch ($action) {
-  case 'select':
-    $sql = "SELECT * FROM $table";
-    $result = $conn->query($sql);
+      case 'NextRuns':
+        fetchData("SELECT * FROM NextRuns", $conn);
+        break;
 
-    $data = [];
-    if ($result->num_rows > 0) {
-      while ($row = $result->fetch_assoc()) {
-        $data[] = $row;
-      }
+      case 'ClassesRunning':
+        if (isset($_GET['id'])) {
+          fetchData("SELECT Classes.id, Classes.name, Classes.surname AS alias, Classes.color, Classes.nbStudents AS students, Runners.laps FROM Classes INNER JOIN Runners ON Classes.id = Runners.theClass INNER JOIN Runs ON Runs.id = Runners.theRun WHERE Runs.id = ?", $conn, [$id]);
+        } else {
+          http_response_code(400); // Bad Request
+          showPettryJson(["error" => "Paramètre 'id' requis"]);
+        }
+        break;
+
+      default:
+        http_response_code(400); // Bad Request
+        showPettryJson(["error" => "Action invalide"]);
+        break;
     }
-    showPettryJson($data);
-    break;
+  } elseif ($_SERVER["REQUEST_METHOD"] === "POST") {
+    error_log(print_r($data, true));
 
-  case 'update':
-    // Vérifier si les données nécessaires sont présentes
-    if (isset($classId) && isset($name) && isset($nbStudents)) {
-      $classId = $conn->real_escape_string($classId);
-      $name = $conn->real_escape_string($name);
-      $nbStudents = $conn->real_escape_string($nbStudents);
+    switch ($data['action']) {
+      case 'StartRun':
+        if (isset($data['id'])) {
+          $stmt = $conn->prepare("UPDATE Runs SET startTime = NOW() WHERE id = ?");
+          $stmt->bind_param("i", $data['id']); // "i" pour integer
 
-      $sql = "UPDATE $table SET name = '$name', nbStudents = '$nbStudents' WHERE id = '$classId'";
-      if ($conn->query($sql) === TRUE) {
-        showPettryJson(["success" => "Classe mise à jour"]);
-      } else {
-        showPettryJson(["error" => "Erreur lors de la mise à jour de la classe : " . $conn->error]);
-      }
-    } else {
-      showPettryJson([
-        "error" => "Paramètres manquants pour la mise à jour de la classe",
-        "classId" => $classId,
-        "name" => $name,
-        "nbStudents" => $nbStudents
-      ]);
+          if ($stmt->execute()) {
+            showPettryJson(["success" => "La course a été commencée avec succès"]);
+          } else {
+            showPettryJson(["error" => "Erreur lors de l'arrêt de la course : " . $stmt->error]);
+          }
+
+          $stmt->close();
+        } else {
+          http_response_code(400);
+          showPettryJson(["error" => "Paramètres manquants (id)"]);
+        }
+        break;
+
+      case 'EndRun':
+        if (isset($data['id'])) {
+          $stmt = $conn->prepare("UPDATE Runs SET endTime = NOW() WHERE id = ?");
+          $stmt->bind_param("i", $data['id']); // "i" pour integer
+
+          if ($stmt->execute()) {
+            showPettryJson(["success" => "La course a été terminée avec succès"]);
+          } else {
+            showPettryJson(["error" => "Erreur lors de l'arrêt de la course : " . $stmt->error]);
+          }
+
+          $stmt->close();
+        } else {
+          http_response_code(400);
+          showPettryJson(["error" => "Paramètres manquants (id)"]);
+        }
+        break;
+
+      case 'updateClass':
+        // Vérifier si les données nécessaires sont présentes
+        if (isset($data['classId']) && isset($data['name']) && isset($data['nbStudents'])) {
+          $stmt = $conn->prepare("UPDATE $table SET name = :name, nbStudents = :nbStudents WHERE id = :classId");
+          $stmt->bind_Param(':name', $data['name']);
+          $stmt->bind_Param(':nbStudents', $data['nbStudents']);
+          $stmt->bind_Param(':classId', $data['classId']);
+          if ($conn->query($sql) === TRUE) {
+            showPettryJson(["success" => "Classe mise à jour"]);
+          } else {
+            showPettryJson(["error" => "Erreur lors de la mise à jour de la classe : " . $conn->error]);
+          }
+        } else {
+          showPettryJson([
+            "error" => "Paramètres manquants pour la mise à jour de la classe",
+            "classId" => $data['classId'],
+            "name" => $data['name'],
+            "nbStudents" => $data['nbStudents']
+          ]);
+        }
+        break;
+
+      case 'delete':
+        // Vérifier si l'ID est présent
+        if (isset($data['classId'])) {
+          $stmt = $conn->prepare("DELETE FROM $table WHERE id = :classId");
+          $stmt->bind_Param(':classId', $data['classId']);
+          if ($conn->query($sql) === TRUE) {
+            showPettryJson(["success" => "Enregistrement supprimé"]);
+          } else {
+            showPettryJson(["error" => "Erreur lors de la suppression: " . $conn->error]);
+          }
+        } else {
+          showPettryJson(["error" => "ID manquant pour la suppression"]);
+        }
+        break;
+
+      default:
+        showPettryJson(["error" => "Action non reconnue. Utilisez 'select', 'update', ou 'delete'"]);
+        break;
     }
-    break;
-
-  case 'delete':
-    // Vérifier si l'ID est présent
-    if (isset($classId)) {
-      $classId = $conn->real_escape_string($classId);
-
-      $sql = "DELETE FROM Ranking WHERE id = '$classId'";
-      if ($conn->query($sql) === TRUE) {
-        showPettryJson(["success" => "Enregistrement supprimé"]);
-      } else {
-        showPettryJson(["error" => "Erreur lors de la suppression: " . $conn->error]);
-      }
-    } else {
-      showPettryJson(["error" => "ID manquant pour la suppression"]);
-    }
-    break;
-
-  default:
-    showPettryJson(["error" => "Action non reconnue. Utilisez 'select', 'update', ou 'delete'"]);
+  } else {
+    http_response_code(400);
+    showPettryJson(["error" => "Requête invalide"]);
+  }
+} catch (Exception $e) {
+  http_response_code(500); // Internal Server Error
+  showPettryJson(["error" => "Erreur serveur : " . $e->getMessage()]);
 }
 
 // Fermer la connexion

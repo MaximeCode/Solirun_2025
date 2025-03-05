@@ -39,13 +39,14 @@ export default function UpdateClass({
   const updateClass = async () => {
     try {
       const response = await fetch(
-        "http://localhost:8000/api.php?action=update&table=Classes",
+        "http://localhost:3030/api.php",
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
+            action: "UpdateClass",
             classId: classe.id,
             name: formData.name,
             nbStudents: formData.nbStudents,

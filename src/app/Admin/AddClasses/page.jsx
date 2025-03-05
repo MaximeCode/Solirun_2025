@@ -16,7 +16,7 @@ export default function AddClasses() {
       try {
         // Appel à l'API pour obtenir les classes
         const response = await fetch(
-          "http://localhost:8000/api.php?action=select&table=Classes"
+          "http://localhost:3030/api.php?action=Classes"
         )
         // Convertir la réponse en format JSON
         const data = await response.json()
