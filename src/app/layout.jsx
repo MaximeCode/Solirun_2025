@@ -1,32 +1,30 @@
-'use client'
+"use client"
 
-import "./globals.css";
-import { socket } from "../utils/socket";
-import { useEffect, useState } from "react";
+import "./globals.css"
+import { socket } from "../utils/socket"
+import { useEffect, useState } from "react"
 
 export default function RootLayout({ children }) {
-  const [isConnected, setIsConnected] = useState(socket.connected);
+  const [isConnected, setIsConnected] = useState(socket.connected)
 
   useEffect(() => {
     function onConnect() {
-      setIsConnected(true);
+      setIsConnected(true)
     }
 
     function onDisconnect() {
-      setIsConnected(false);
+      setIsConnected(false)
     }
 
     return () => {
-      socket.off('connect', onConnect);
-      socket.off('disconnect', onDisconnect);
-    };
-  }, []);
+      socket.off("connect", onConnect)
+      socket.off("disconnect", onDisconnect)
+    }
+  }, [])
 
   return (
     <html lang="en">
-      <body className="h-full">
-        {children}
-      </body>
+      <body className="h-full">{children}</body>
     </html>
-  );
+  )
 }
