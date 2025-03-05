@@ -29,7 +29,9 @@ io.on("connection", (socket) => {
   });
   
   socket.on("setClasses", (newClasses) => {
-    classes = newClasses;
+    classes = newClasses
+    console.log("Running Classes :", classes);
+    io.emit("updateClasses", classes);
   });
 
   socket.on("updateTours", ({ id, increment }) => {

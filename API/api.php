@@ -131,6 +131,24 @@ try {
         }
         break;
 
+      case 'UpdateLaps':
+        if (isset($data['theClass']) && isset($data['theRun']) && isset($data['laps'])) {
+          $stmt = $conn->prepare("UPDATE Runners SET laps = ? WHERE theClass = ? AND theRun = ?");
+          $stmt->bind_param("iii", $data['laps'], $data['theClass'], $data['theRun']); // "i" pour integer
+
+          if ($stmt->execute()) {
+            showPettryJson(["success" => "Le nombre de tours a été mis à jour avec succès"]);
+          } else {
+            showPettryJson(["error" => "Erreur lors de la mise à jour du nombre de tours : " . $stmt->error]);
+          }
+
+          $stmt->close();
+        } else {
+            http_response_code(400);
+            showPettryJson(["error" => "Paramètres manquants (theClass, theRun, laps)"]);
+        }
+        break;
+
       case 'updateClass':
         // Vérifier si les données nécessaires sont présentes
         if (isset($data['classId']) && isset($data['name']) && isset($data['nbStudents'])) {
