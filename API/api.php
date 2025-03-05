@@ -33,31 +33,31 @@ function showPettryJson($data)
 
 function fetchData($sql, $conn, $params = [])
 {
-    $stmt = $conn->prepare($sql);
+  $stmt = $conn->prepare($sql);
 
-    // Vérifier si on a des paramètres à binder
-    if (!empty($params)) {
-        // Déterminer dynamiquement les types
-        $types = "";
-        foreach ($params as $param) {
-            $types .= is_int($param) ? "i" : "s";
-        }
-        $stmt->bind_param($types, ...$params);
+  // Vérifier si on a des paramètres à binder
+  if (!empty($params)) {
+    // Déterminer dynamiquement les types
+    $types = "";
+    foreach ($params as $param) {
+      $types .= is_int($param) ? "i" : "s";
     }
+    $stmt->bind_param($types, ...$params);
+  }
 
-    $stmt->execute();
-    $result = $stmt->get_result();
-    $data = $result->fetch_all(MYSQLI_ASSOC); // Récupérer les résultats sous forme de tableau associatif
+  $stmt->execute();
+  $result = $stmt->get_result();
+  $data = $result->fetch_all(MYSQLI_ASSOC); // Récupérer les résultats sous forme de tableau associatif
 
-    // ✅ Forcer $data à être un tableau vide si aucun résultat
-    if ($data === null) {
-        $data = [];
-    }
+  // ✅ Forcer $data à être un tableau vide si aucun résultat
+  if ($data === null) {
+    $data = [];
+  }
 
-    http_response_code(200);
-    showPettryJson($data); // Afficher un tableau vide [] si aucune donnée
+  http_response_code(200);
+  showPettryJson($data); // Afficher un tableau vide [] si aucune donnée
 
-    $stmt->close();
+  $stmt->close();
 }
 
 try {
@@ -128,6 +128,24 @@ try {
         } else {
           http_response_code(400);
           showPettryJson(["error" => "Paramètres manquants (id)"]);
+        }
+        break;
+
+      case 'UpdateLaps':
+        if (isset($data['theClass']) && isset($data['theRun']) && isset($data['laps'])) {
+          $stmt = $conn->prepare("UPDATE Runners SET laps = ? WHERE theClass = ? AND theRun = ?");
+          $stmt->bind_param("iii", $data['laps'], $data['theClass'], $data['theRun']); // "i" pour integer
+
+          if ($stmt->execute()) {
+            showPettryJson(["success" => "Le nombre de tours a été mis à jour avec succès"]);
+          } else {
+            showPettryJson(["error" => "Erreur lors de la mise à jour du nombre de tours : " . $stmt->error]);
+          }
+
+          $stmt->close();
+        } else {
+          http_response_code(400);
+          showPettryJson(["error" => "Paramètres manquants (theClass, theRun, laps)"]);
         }
         break;
 
