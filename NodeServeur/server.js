@@ -43,6 +43,22 @@ io.on("connection", (socket) => {
     }
   });
 
+  socket.on("updateToursById", ({ id, increment }) => {
+    requestedClass = classes.find((cls) => cls.id === id);
+    if (requestedClass) {
+      requestedClass.laps += increment;
+      if (requestedClass.laps < 0) requestedClass.laps = 0; // Empêcher valeurs négatives
+      console.log("classes:", requestedClass.name, "prend :", increment);
+      io.emit("updateClasses", classes);
+    }
+  });
+
+  socket.on("getClassById", (id) => {
+    requestedClass = classes.find((cls) => cls.id === id);
+    console.log("Requested Class :", requestedClass);
+    socket.emit("receiveClass", requestedClass);
+  });
+
   socket.on("disconnect", () => console.log("Client déconnecté"));
 });
 

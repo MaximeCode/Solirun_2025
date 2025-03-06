@@ -24,9 +24,9 @@ function Manager() {
         };
       }, []);
 
-    const handleClassSelect = (classe) => {
-        console.log("Classe sélectionnée :", classe);
-    };
+      useEffect(() => {
+        setSelectedClass(null);
+      }, [isRunning == false]);
 
     return (
         <>
@@ -54,7 +54,7 @@ function Manager() {
             </div>
           ) : (
             <div>
-              <ClassManager classe={selectedClass} />
+              <ClassManager classe={selectedClass}/>
             </div>
           )}
         </>
