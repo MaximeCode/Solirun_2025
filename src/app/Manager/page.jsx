@@ -13,7 +13,7 @@ function Manager() {
 
     useEffect(() => {
         socket.on("updateIsRunning", setIsRunning);
-        socket.on("updateClasses", (newClasses) => {
+        socket.on("updateUnUsedClasses", (newClasses) => {
           setClasses(newClasses);
         });
       
@@ -48,7 +48,7 @@ function Manager() {
                 </div>
       
                 {/* Message principal */}
-                <h2 className="text-3xl font-bold">La course est arrêtée</h2>
+                <h2 className="text-3xl text-white font-bold">La course est arrêtée</h2>
                 <p className="text-gray-400 text-center mt-2 text-lg px-3">En attente que les administrateurs de la course en lancent une...</p>
               </div>
             </div>

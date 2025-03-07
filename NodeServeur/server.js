@@ -13,11 +13,14 @@ let isRunning = false;
 
 let classes = [];
 
+let unUsedClasses = []
+
 io.on("connection", (socket) => {
   console.log("Un client s'est connecté");
 
   socket.emit("updateIsRunning", isRunning);
   socket.emit("updateClasses", classes);
+  socket.emit("updateUnUsedClasses", unUsedClasses);
 
   socket.on("toggleIsRunning", async () => {
     isRunning = !isRunning;
@@ -29,7 +32,8 @@ io.on("connection", (socket) => {
   });
   
   socket.on("setClasses", (newClasses) => {
-    classes = newClasses
+    classes = newClasses;
+    unUsedClasses = classes;
     console.log("Running Classes :", classes);
     io.emit("updateClasses", classes);
   });
@@ -56,7 +60,21 @@ io.on("connection", (socket) => {
   socket.on("getClassById", (id) => {
     requestedClass = classes.find((cls) => cls.id === id);
     console.log("Requested Class :", requestedClass);
+    requestedClass.isUsed = true;
+    io.emit("updateClasses", classes);
     socket.emit("receiveClass", requestedClass);
+  });
+
+  socket.on("UseClasse", (classe) => {
+    unUsedClasses.remove(classe);
+    console.log("UnUsed Classes :", unUsedClasses);
+    io.emit("updateUnUsedClasses", unUsedClasses);
+  });
+
+  socket.on("UnUseClasse", (classe) => {
+    unUsedClasses.push(classe);
+    console.log("UnUsed Classes :", unUsedClasses);
+    io.emit("updateUnUsedClasses", unUsedClasses);
   });
 
   socket.on("disconnect", () => console.log("Client déconnecté"));
