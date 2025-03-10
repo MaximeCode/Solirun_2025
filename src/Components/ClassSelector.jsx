@@ -1,8 +1,13 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useState } from "react";
 
-const ClassSelector = ({ classes, isRunning, setSelectedClass }) => {
+const ClassSelector = ({ classes, isRunning, handleClasse }) => {
   const [PreSelectedClass, setPreSelectedClass] = useState(null);
+  const [Classes, setClasses] = useState([]);
+
+  useEffect(() => {
+    setClasses(classes);
+  }, [classes]);
   
   return (
     <div className="max-w-sm mx-auto p-4">
@@ -10,7 +15,7 @@ const ClassSelector = ({ classes, isRunning, setSelectedClass }) => {
       <div className="grid grid-cols-2 gap-4">
         {isRunning && (
             <>
-            {classes.map((classe) => (
+            {Classes.map((classe) => (
                 <button
                     key={classe.id}
                     onClick={() => setPreSelectedClass(classe)}
@@ -28,7 +33,7 @@ const ClassSelector = ({ classes, isRunning, setSelectedClass }) => {
       </div>
       <button
         className="mt-4 p-2 bg-blue-500 text-white rounded-lg font-bold w-full"
-        onClick={() => setSelectedClass(PreSelectedClass)}
+        onClick={() => handleClasse(PreSelectedClass)}
         >
         Séléctionner
       </button>

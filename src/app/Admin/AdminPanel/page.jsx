@@ -13,6 +13,9 @@ function AdminPanel() {
   const [buttonText, setButtonText] = useState(isRunning ? "Arrêter la Course" : "Démarrer la Course");
 
   useEffect(() => {
+    socket.emit("getIsRunning");
+    socket.emit("getClasses");
+
     socket.on("updateIsRunning", setIsRunning);
     socket.on("updateClasses", (newClasses) => {
       setClasses(newClasses);

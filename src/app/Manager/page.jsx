@@ -1,7 +1,6 @@
 'use client'
 
-import React from "react";
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import ClassSelector from "@/Components/ClassSelector";
 import ClassManager from "@/Components/ClassManager";
 import { socket } from "@/utils/socket";
@@ -12,7 +11,16 @@ function Manager() {
     const [selectedClass, setSelectedClass] = useState(null);
 
     useEffect(() => {
-        socket.on("updateIsRunning", setIsRunning);
+      console.log("In useEffect:", isRunning);
+      if (socket){
+        socket.emit("getIsRunning");
+        socket.emit("getUnUsedClasses");
+
+        socket.on("updateIsRunning", response => {
+          console.log("In updateIsRunning:", response);
+          setIsRunning(response);
+        });
+        console.log("In socket:", isRunning);
         socket.on("updateUnUsedClasses", (newClasses) => {
           setClasses(newClasses);
         });
@@ -20,13 +28,19 @@ function Manager() {
     
         return () => {
           socket.off("updateIsRunning");
-          socket.off("updateClasses");
+          socket.off("updateUnUsedClasses");
         };
-      }, []);
+      };
+    }, []);
 
       useEffect(() => {
         setSelectedClass(null);
       }, [isRunning == false]);
+
+      function handleClasse(classe) {
+        setSelectedClass(classe);
+        socket.emit("UseClasse", classe);
+      }
 
     return (
         <>
@@ -36,8 +50,9 @@ function Manager() {
             <div className="relative min-h-screen flex items-center justify-center transition-all duration-500">
               
               {/* Affichage des classes */}
+              {console.log(isRunning)}
               <div className={`absolute w-full transition-all duration-1000 ease-in-out ${isRunning ? "opacity-100 translate-y-0 z-1" : "opacity-0 translate-y-10 z-0"}`}>
-                <ClassSelector classes={classes} isRunning={isRunning} setSelectedClass={setSelectedClass}/>
+                <ClassSelector classes={classes} isRunning={isRunning} handleClasse={handleClasse}/>
               </div>
       
               {/* Écran d'attente */}
@@ -54,7 +69,7 @@ function Manager() {
             </div>
           ) : (
             <div>
-              <ClassManager classe={selectedClass}/>
+              <ClassManager classe={selectedClass} setClasse={setSelectedClass}/>
             </div>
           )}
         </>
