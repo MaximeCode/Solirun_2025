@@ -26,13 +26,12 @@ export default function RootLayout({ children }) {
   }, [])
 
   return (
-    <html lang="en">
+    <html lang="en" data-theme="fantasy">
       <body className="h-full">
         {/* Header */}
-        {typeof window !== "undefined" &&
-          window.location.pathname !== "/Ranking" && <Header />}
+        {window.location.pathname !== "/Ranking" && <Header />}
         {/* Content */}
-        <div className="px-16 py-16">{children}</div>
+        <div className="px-16 py-8">{children}</div>
       </body>
     </html>
   )

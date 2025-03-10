@@ -22,9 +22,8 @@ if ($_SERVER["REQUEST_METHOD"] === "OPTIONS") {
   exit();
 }
 
-$id = $_GET['id'];
-$action = $_GET['action'];
-$data = json_decode(file_get_contents("php://input"), true); // => Array
+$action = $_GET['action'] ?: null;
+$data = json_decode(file_get_contents("php://input"), true); // => Array with param in body in JSON
 
 function showPettryJson($data)
 {
@@ -71,6 +70,7 @@ try {
 
       case 'Classes':
         fetchData("SELECT * FROM Classes", $conn);
+        error_log("Classes");
         break;
 
       case 'NextRuns':
@@ -79,6 +79,7 @@ try {
 
       case 'ClassesRunning':
         if (isset($_GET['id'])) {
+          $id = $_GET['id'];
           fetchData("SELECT Classes.id, Classes.name, Classes.surname AS alias, Classes.color, Classes.nbStudents AS students, Runners.laps FROM Classes INNER JOIN Runners ON Classes.id = Runners.theClass INNER JOIN Runs ON Runs.id = Runners.theRun WHERE Runs.id = ?", $conn, [$id]);
         } else {
           http_response_code(400); // Bad Request
@@ -144,19 +145,39 @@ try {
 
           $stmt->close();
         } else {
-            http_response_code(400);
-            showPettryJson(["error" => "Paramètres manquants (theClass, theRun, laps)"]);
+          http_response_code(400);
+          showPettryJson(["error" => "Paramètres manquants (theClass, theRun, laps)"]);
+        }
+        break;
+
+      case 'insertClasses':
+        error_log(print_r($data, true));
+        // Vérifier si les données nécessaires sont présentes
+        if (isset($data['classes'])) {
+          foreach ($data['classes'] as $class) {
+
+            $codeClass = strtoupper(substr($class['name'], 0, 3)) . substr($class['name'], -1);
+            $stmt = $conn->prepare("INSERT INTO Classes (name, nbStudents, codeClass) VALUES (?, ?, ?)");
+            $stmt->bind_param("sis", $class['name'], $class['nbStudents'], $codeClass);
+          }
+          $stmt->execute();
+          showPettryJson(["success" => "Classe insérée en DB avec succès"]);
+        } else {
+          showPettryJson([
+            "error" => "Paramètres manquants pour l'insertion de la classe",
+            "name" => $data['name'],
+            "nbStudents" => $data['nbStudents']
+          ]);
         }
         break;
 
       case 'updateClass':
+        error_log(print_r($data, true));
         // Vérifier si les données nécessaires sont présentes
         if (isset($data['classId']) && isset($data['name']) && isset($data['nbStudents'])) {
-          $stmt = $conn->prepare("UPDATE $table SET name = :name, nbStudents = :nbStudents WHERE id = :classId");
-          $stmt->bind_Param(':name', $data['name']);
-          $stmt->bind_Param(':nbStudents', $data['nbStudents']);
-          $stmt->bind_Param(':classId', $data['classId']);
-          if ($conn->query($sql) === TRUE) {
+          $stmt = $conn->prepare("UPDATE Classes SET name = ?, nbStudents = ? WHERE id = ?");
+          $stmt->bind_param("sii", $data['name'], $data['nbStudents'], $data['classId']);
+          if ($stmt->execute()) {
             showPettryJson(["success" => "Classe mise à jour"]);
           } else {
             showPettryJson(["error" => "Erreur lors de la mise à jour de la classe : " . $conn->error]);
@@ -171,13 +192,14 @@ try {
         }
         break;
 
-      case 'delete':
+      case 'deleteClass':
+        error_log(print_r($data, true));
         // Vérifier si l'ID est présent
         if (isset($data['classId'])) {
-          $stmt = $conn->prepare("DELETE FROM $table WHERE id = :classId");
-          $stmt->bind_Param(':classId', $data['classId']);
-          if ($conn->query($sql) === TRUE) {
-            showPettryJson(["success" => "Enregistrement supprimé"]);
+          $stmt = $conn->prepare("DELETE FROM Classes WHERE id = ?");
+          $stmt->bind_param("i", $data['classId']);
+          if ($stmt->execute()) {
+            showPettryJson(["success" => "Classe supprimée avec succès"]);
           } else {
             showPettryJson(["error" => "Erreur lors de la suppression: " . $conn->error]);
           }
@@ -201,3 +223,4 @@ try {
 
 // Fermer la connexion
 $conn->close();
+die();

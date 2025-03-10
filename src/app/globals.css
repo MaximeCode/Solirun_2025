@@ -1,5 +1,9 @@
 @import "tailwindcss";
 
+@plugin "daisyui" {
+  themes: light --default, fantasy, night;
+}
+
 @layer base {
   .font-outline-1 {
     -webkit-text-stroke: 1px #000000;
@@ -51,4 +55,20 @@ body,
 
 button {
   cursor: pointer;
+}
+
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.animate-slideInRight {
+  animation: slideInRight 0.3s ease-out forwards;
 }
