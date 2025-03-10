@@ -11,7 +11,7 @@ export default function AddClasses() {
   }
 
   const [classes, setClasses] = useState([])
-  
+
   const [loading, setLoading] = useState(true)
   const [showUpdateClass, setShowUpdateClass] = useState(0) // 0 => Ne pas afficher, [nb] => Afficher le composant update pour la classe avec l'id [nb]
   const [dataRefresh, setDataRefresh] = useState(false)
@@ -34,7 +34,6 @@ export default function AddClasses() {
         setClasses(data)
       } catch (error) {
         showToast(error.message, true)
-
       } finally {
         setLoading(false)
         setShowAddClass(1)
@@ -198,6 +197,7 @@ export default function AddClasses() {
                   classes.push(newClass)
                   setShowAddClass(1)
                   setNewClass(initClass)
+                  showToast("Classe ajoutée avec succès !", false)
                 }}>
                 Ajouter
               </button>
@@ -246,7 +246,14 @@ export default function AddClasses() {
             onClick={() => saveClasses()}>
             Enregistrer
           </button>
-          <button className="btn btn-soft">Annuler</button>
+          <button
+            className="btn btn-soft"
+            onClick={() => {
+              setDataRefresh(!dataRefresh)
+              showToast("Modifications annulées !", false)
+            }}>
+            Annuler
+          </button>
         </div>
       )}
     </div>
