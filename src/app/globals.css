@@ -52,3 +52,60 @@ body,
 button {
   cursor: pointer;
 }
+
+@keyframes samba {
+  0% { transform: rotate(0deg); }
+  25% { transform: rotate(5deg); }
+  50% { transform: rotate(-5deg); }
+  75% { transform: rotate(5deg); }
+  100% { transform: rotate(0deg); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes bouncePodium {
+  0% { transform: translateY(50px); opacity: 0; }
+  50% { transform: translateY(-10px); opacity: 0.8; }
+  100% { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes flash {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+/* Ajout des classes Tailwind personnalisées */
+.animate-samba { animation: samba 1s infinite ease-in-out; }
+.animate-fadeIn { animation: fadeIn 1s ease-out; }
+.animate-bouncePodium { animation: bouncePodium 1s ease-in-out forwards; }
+.animate-flash { animation: flash 1.5s infinite; }
+.animate-boum { animation: shake 1s infinite; }
+
+
+@keyframes explode {
+  0% {
+    opacity: 1;
+    transform: scale(0);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.5);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(2);
+  }
+}
+
+.firework {
+  position: absolute;
+  width: 15px;
+  height: 15px;
+  background: radial-gradient(circle, #ff0, orange, red, transparent);
+  border-radius: 50%;
+  opacity: 0;
+  animation: explode 1.5s ease-out infinite;
+}

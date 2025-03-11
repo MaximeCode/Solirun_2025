@@ -174,7 +174,7 @@ try {
       case 'delete':
         // Vérifier si l'ID est présent
         if (isset($data['classId'])) {
-          $stmt = $conn->prepare("DELETE FROM $table WHERE id = :classId");
+          $stmt = $conn->prepare("DELETE FROM $table");
           $stmt->bind_Param(':classId', $data['classId']);
           if ($conn->query($sql) === TRUE) {
             showPrettyJson(["success" => "Enregistrement supprimé"]);
