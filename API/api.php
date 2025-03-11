@@ -22,7 +22,7 @@ if ($_SERVER["REQUEST_METHOD"] === "OPTIONS") {
   exit();
 }
 
-$action = $_GET['action'] ?: null;
+$action = isset($_GET['action']) ? $_GET['action'] : null;
 $data = json_decode(file_get_contents("php://input"), true); // => Array with param in body in JSON
 
 function showPettryJson($data)
@@ -77,6 +77,17 @@ try {
         fetchData("SELECT * FROM NextRuns", $conn);
         break;
 
+      case 'Runs':
+        $sql = "SELECT Classes.id AS Classes_id, Classes.name AS Classes_name, Classes.surname AS Classes_surname, Classes.color AS Classes_color, 
+          Classes.nbStudents AS Classes_nbStudents, Classes.codeClass AS Classes_codeClass,
+          Runners.theClass AS Runners_theClass, Runners.theRun AS Runners_theRun, Runners.laps AS Runners_laps,
+          Runs.id AS Runs_id, Runs.startTime AS Runs_startTime, Runs.endTime AS Runs_endTime, Runs.estimatedTime AS Runs_estimatedTime
+          FROM Classes 
+          INNER JOIN Runners ON Classes.id = Runners.theClass 
+          INNER JOIN Runs ON Runs.id = Runners.theRun";
+        fetchData($sql, $conn);
+        break;
+
       case 'ClassesRunning':
         if (isset($_GET['id'])) {
           $id = $_GET['id'];
@@ -93,8 +104,9 @@ try {
         break;
     }
   } elseif ($_SERVER["REQUEST_METHOD"] === "POST") {
-    error_log(print_r($data, true));
+    // error_log(print_r($data, true));
 
+    error_log("Action : " . $data['action']);
     switch ($data['action']) {
       case 'StartRun':
         if (isset($data['id'])) {
@@ -150,61 +162,54 @@ try {
         }
         break;
 
-      case 'insertClasses':
-        error_log(print_r($data, true));
+      case 'insertAllClasses':
         // Vérifier si les données nécessaires sont présentes
         if (isset($data['classes'])) {
-          foreach ($data['classes'] as $class) {
+          // Begin transaction for atomicity
+          $conn->begin_transaction();
 
-            $codeClass = strtoupper(substr($class['name'], 0, 3)) . substr($class['name'], -1);
-            $stmt = $conn->prepare("INSERT INTO Classes (name, nbStudents, codeClass) VALUES (?, ?, ?)");
-            $stmt->bind_param("sis", $class['name'], $class['nbStudents'], $codeClass);
+          try {
+            error_log("Attempting to delete all classes");
+            // Delete all classes
+            $stmt = $conn->prepare("DELETE FROM Classes");
+            if (!$stmt->execute()) {
+              throw new Exception("Failed to delete classes: " . $stmt->error);
+            }
+            error_log("Classes deleted successfully");
+
+            // Insert all new classes
+            foreach ($data['classes'] as $class) {
+              $stmt = $conn->prepare("INSERT INTO Classes (name, nbStudents, codeClass) VALUES (?, ?, ?)");
+              if (!$stmt) {
+                throw new Exception("Failed to prepare insert statement: " . $conn->error);
+              }
+
+              $codeClass = strtoupper(substr($class['name'], 0, 3)) . substr($class['name'], -1);
+              $stmt->bind_param("sis", $class['name'], $class['nbStudents'], $codeClass);
+
+              if (!$stmt->execute()) {
+                throw new Exception("Failed to insert class: " . $stmt->error);
+              }
+
+              error_log("Inserted class: " . $class['name']);
+            }
+
+            // Commit the transaction
+            $conn->commit();
+            error_log("Classes inserted successfully");
+            showPettryJson(["success" => "Classes insérées en DB avec succès"]);
+          } catch (Exception $e) {
+            // Rollback on error
+            $conn->rollback();
+            error_log("Error in insertAllClasses: " . $e->getMessage());
+            http_response_code(500);
+            showPettryJson(["error" => "Erreur lors de l'insertion des classes: " . $e->getMessage()]);
           }
-          $stmt->execute();
-          showPettryJson(["success" => "Classe insérée en DB avec succès"]);
         } else {
+          http_response_code(400);
           showPettryJson([
-            "error" => "Paramètres manquants pour l'insertion de la classe",
-            "name" => $data['name'],
-            "nbStudents" => $data['nbStudents']
+            "error" => "Paramètres manquants pour l'insertion des classes"
           ]);
-        }
-        break;
-
-      case 'updateClass':
-        error_log(print_r($data, true));
-        // Vérifier si les données nécessaires sont présentes
-        if (isset($data['classId']) && isset($data['name']) && isset($data['nbStudents'])) {
-          $stmt = $conn->prepare("UPDATE Classes SET name = ?, nbStudents = ? WHERE id = ?");
-          $stmt->bind_param("sii", $data['name'], $data['nbStudents'], $data['classId']);
-          if ($stmt->execute()) {
-            showPettryJson(["success" => "Classe mise à jour"]);
-          } else {
-            showPettryJson(["error" => "Erreur lors de la mise à jour de la classe : " . $conn->error]);
-          }
-        } else {
-          showPettryJson([
-            "error" => "Paramètres manquants pour la mise à jour de la classe",
-            "classId" => $data['classId'],
-            "name" => $data['name'],
-            "nbStudents" => $data['nbStudents']
-          ]);
-        }
-        break;
-
-      case 'deleteClass':
-        error_log(print_r($data, true));
-        // Vérifier si l'ID est présent
-        if (isset($data['classId'])) {
-          $stmt = $conn->prepare("DELETE FROM Classes WHERE id = ?");
-          $stmt->bind_param("i", $data['classId']);
-          if ($stmt->execute()) {
-            showPettryJson(["success" => "Classe supprimée avec succès"]);
-          } else {
-            showPettryJson(["error" => "Erreur lors de la suppression: " . $conn->error]);
-          }
-        } else {
-          showPettryJson(["error" => "ID manquant pour la suppression"]);
         }
         break;
 

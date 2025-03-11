@@ -1,6 +1,12 @@
 import React, { useState, useEffect } from "react"
 
-export default function UpdateClass({ classe, onCancel, onSuccess, showToast }) {
+export default function UpdateClass({
+  classe,
+  setClasses,
+  onCancel,
+  onSuccess,
+  showToast,
+}) {
   const [formData, setFormData] = useState({
     name: "",
     nbStudents: 0,
@@ -24,43 +30,24 @@ export default function UpdateClass({ classe, onCancel, onSuccess, showToast }) 
     })
   }
 
-  // Fonction asynchrone -> envoi des données vers le serveur
-  const updateClass = async () => {
+  // Update de la classe ds la list des classes avant l'envoi vers la db
+  const updateClass = () => {
     setLoading(true)
-    fetch("http://localhost:3030/api.php", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        action: "updateClass",
-        classId: classe.id,
-        name: formData.name,
-        nbStudents: formData.nbStudents,
-      }),
+    setClasses((prevClasses) => {
+      return prevClasses.map((cl) => {
+        if (cl.id === classe.id) {
+          return {
+            ...cl,
+            name: formData.name,
+            nbStudents: formData.nbStudents,
+          }
+        }
+        return cl
+      })
     })
-      .then((response) => {
-        if (!response.ok) {
-          showToast("Erreur lors de la mise à jour ❌", true)
-          throw new Error("Erreur lors de la mise à jour")
-        }
-        return response.json()
-      })
-      .then((result) => {
-        if (result.success) {
-          showToast("Classe mise à jour avec succès ✅")
-          onSuccess()
-        } else {
-          showToast("Error while updating classes : " . result.message, true)
-          console.error(result.message)
-        }
-      })
-      .catch((error) => {
-        showToast("Error in catch : " . error.message, true)
-      })
-      .finally(() => {
-        setLoading(false)
-      })
+    setLoading(false)
+    showToast(`Classe ${formData.name} mise à jour avec succès`, false)
+    onSuccess()
   }
 
   const handleSubmit = (e) => {
@@ -73,8 +60,14 @@ export default function UpdateClass({ classe, onCancel, onSuccess, showToast }) 
       <h2 className="text-2xl font-bold text-left">
         Modifier la classe {classe.name}
       </h2>
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <input type="hidden" name="classId" value={classe.id} />
+      <form
+        onSubmit={handleSubmit}
+        className="space-y-4">
+        <input
+          type="hidden"
+          name="classId"
+          value={classe.id}
+        />
         <div>
           <label
             htmlFor="name"

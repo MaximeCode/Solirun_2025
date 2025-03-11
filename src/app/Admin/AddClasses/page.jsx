@@ -46,12 +46,10 @@ export default function AddClasses() {
 
   // Fonction pour supprimer une classe
   const deleteClass = (classId) => {
-    if (confirm("Voulez-vous vraiment supprimer cette classe ?")) {
-      // suppression de la classe avec l'id [classId] de classes
-      setClasses(classes.filter((classe) => classe.id !== classId))
-      const className = classes.find((classe) => classe.id === classId).name
-      showToast(`Classe ${className} supprimée avec succès`, false)
-    }
+    // suppression de la classe avec l'id [classId] de classes
+    setClasses(classes.filter((classe) => classe.id !== classId))
+    const className = classes.find((classe) => classe.id === classId).name
+    showToast(`Classe ${className} supprimée avec succès`, false)
   }
 
   // Fonction pour insérer les nouvelles classes dans la DB
@@ -63,25 +61,21 @@ export default function AddClasses() {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        action: "insertClasses",
+        action: "insertAllClasses",
         classes: classes,
       }),
     })
       .then((response) => {
+        console.log(response)
         if (!response.ok) {
           showToast("Erreur lors de l'insertion des classes ❌", true)
-          throw new Error("Erreur lors de l'insertion des classes")
+          throw new Error("Erreur lors de l'insertion des classes en base de données")
         }
-        return response.json()
-      })
-      .then((result) => {
-        if (result.success) {
-          showToast("Classes insérées avec succès", false)
-        } else {
-          showToast(result.message, true)
-        }
+        setDataRefresh(!dataRefresh)
+        showToast("Classes enregistrées avec succès ✅", false)
       })
       .catch((error) => {
+        console.error("Erreur:", error)
         showToast(error.message, true)
       })
   }
@@ -99,10 +93,10 @@ export default function AddClasses() {
       {showUpdateClass ? (
         <UpdateClass
           classe={classes.find((classe) => classe.id === showUpdateClass)}
+          setClasses={setClasses}
           onCancel={() => setShowUpdateClass(0)}
           onSuccess={() => {
             setShowUpdateClass(0)
-            setDataRefresh(!dataRefresh)
           }}
           showToast={showToast}
         />
@@ -138,11 +132,10 @@ export default function AddClasses() {
             <h3 className="mb-2 text-2xl font-bold tracking-tight text-gray-900">
               {classe.name}
             </h3>
-
+            id = {classe.id}
             <h4 className="mb-4 text-lg font-medium text-gray-900">
               {classe.nbStudents} élèves
             </h4>
-
             <button
               onClick={() => setShowUpdateClass(classe.id)}
               href="/Admin/UpdateClass"
@@ -178,7 +171,7 @@ export default function AddClasses() {
             />
 
             <input
-              type="text"
+              type="number"
               placeholder="Nombre d'élèves"
               className="w-3/4 mb-4 text-lg font-medium text-gray-900 border-b-2 border-gray-200 input input-ghost p-0"
               onChange={(e) =>
