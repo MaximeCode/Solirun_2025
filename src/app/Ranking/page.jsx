@@ -32,6 +32,7 @@ function App() {
 	}, [isRunning]);
 
 	useEffect(() => {
+    socket.emit("getIsRunning");
 		// Écouter les mises à jour de isRunning
 		socket.on("updateIsRunning", (state) => {
 			setIsRunning(state);
