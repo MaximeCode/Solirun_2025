@@ -22,9 +22,8 @@ if ($_SERVER["REQUEST_METHOD"] === "OPTIONS") {
   exit();
 }
 
-$id = $_GET['id'];
-$action = $_GET['action'];
-$data = json_decode(file_get_contents("php://input"), true); // => Array
+$action = isset($_GET['action']) ? $_GET['action'] : null;
+$data = json_decode(file_get_contents("php://input"), true); // => Array with param in body in JSON
 
 function showPrettyJson($data)
 {
@@ -33,31 +32,31 @@ function showPrettyJson($data)
 
 function fetchData($sql, $conn, $params = [])
 {
-    $stmt = $conn->prepare($sql);
+  $stmt = $conn->prepare($sql);
 
-    // Vérifier si on a des paramètres à binder
-    if (!empty($params)) {
-        // Déterminer dynamiquement les types
-        $types = "";
-        foreach ($params as $param) {
-            $types .= is_int($param) ? "i" : "s";
-        }
-        $stmt->bind_param($types, ...$params);
+  // Vérifier si on a des paramètres à binder
+  if (!empty($params)) {
+    // Déterminer dynamiquement les types
+    $types = "";
+    foreach ($params as $param) {
+      $types .= is_int($param) ? "i" : "s";
     }
+    $stmt->bind_param($types, ...$params);
+  }
 
-    $stmt->execute();
-    $result = $stmt->get_result();
-    $data = $result->fetch_all(MYSQLI_ASSOC); // Récupérer les résultats sous forme de tableau associatif
+  $stmt->execute();
+  $result = $stmt->get_result();
+  $data = $result->fetch_all(MYSQLI_ASSOC); // Récupérer les résultats sous forme de tableau associatif
 
-    // ✅ Forcer $data à être un tableau vide si aucun résultat
-    if ($data === null) {
-        $data = [];
-    }
+  // ✅ Forcer $data à être un tableau vide si aucun résultat
+  if ($data === null) {
+    $data = [];
+  }
 
     http_response_code(200);
     showPrettyJson($data); // Afficher un tableau vide [] si aucune donnée
 
-    $stmt->close();
+  $stmt->close();
 }
 
 try {
@@ -71,14 +70,21 @@ try {
 
       case 'Classes':
         fetchData("SELECT * FROM Classes", $conn);
+        error_log("Classes");
         break;
 
       case 'NextRuns':
-        fetchData("SELECT * FROM NextRuns", $conn);
+        fetchData("SELECT * FROM NextRuns", $conn); // View
+        break;
+
+      case 'AllRuns':
+        $sql = "SELECT * FROM AllRuns"; // View which return estimatedTime, classIdList, classNameList
+        fetchData($sql, $conn);
         break;
 
       case 'ClassesRunning':
         if (isset($_GET['id'])) {
+          $id = $_GET['id'];
           fetchData("SELECT Classes.id, Classes.name, Classes.surname AS alias, Classes.color, Classes.nbStudents AS students, Runners.laps FROM Classes INNER JOIN Runners ON Classes.id = Runners.theClass INNER JOIN Runs ON Runs.id = Runners.theRun WHERE Runs.id = ?", $conn, [$id]);
         } else {
           http_response_code(400); // Bad Request
@@ -92,8 +98,8 @@ try {
         break;
     }
   } elseif ($_SERVER["REQUEST_METHOD"] === "POST") {
-    error_log(print_r($data, true));
 
+    error_log("Action : " . $data['action']);
     switch ($data['action']) {
       case 'StartRun':
         if (isset($data['id'])) {
@@ -149,17 +155,48 @@ try {
         }
         break;
 
-      case 'updateClass':
+      case 'insertAllClasses':
         // Vérifier si les données nécessaires sont présentes
-        if (isset($data['classId']) && isset($data['name']) && isset($data['nbStudents'])) {
-          $stmt = $conn->prepare("UPDATE $table SET name = :name, nbStudents = :nbStudents WHERE id = :classId");
-          $stmt->bind_Param(':name', $data['name']);
-          $stmt->bind_Param(':nbStudents', $data['nbStudents']);
-          $stmt->bind_Param(':classId', $data['classId']);
-          if ($conn->query($sql) === TRUE) {
-            showPrettyJson(["success" => "Classe mise à jour"]);
-          } else {
-            showPrettyJson(["error" => "Erreur lors de la mise à jour de la classe : " . $conn->error]);
+        if (isset($data['classes'])) {
+          // Begin transaction for atomicity
+          $conn->begin_transaction();
+
+          try {
+            error_log("Attempting to delete all classes");
+            // Delete all classes
+            $stmt = $conn->prepare("DELETE FROM Classes");
+            if (!$stmt->execute()) {
+              throw new Exception("Failed to delete classes: " . $stmt->error);
+            }
+            error_log("Classes deleted successfully");
+
+            // Insert all new classes
+            foreach ($data['classes'] as $class) {
+              $stmt = $conn->prepare("INSERT INTO Classes (name, nbStudents, codeClass) VALUES (?, ?, ?)");
+              if (!$stmt) {
+                throw new Exception("Failed to prepare insert statement: " . $conn->error);
+              }
+
+              $codeClass = strtoupper(substr($class['name'], 0, 3)) . substr($class['name'], -1);
+              $stmt->bind_param("sis", $class['name'], $class['nbStudents'], $codeClass);
+
+              if (!$stmt->execute()) {
+                throw new Exception("Failed to insert class: " . $stmt->error);
+              }
+
+              error_log("Inserted class: " . $class['name']);
+            }
+
+            // Commit the transaction
+            $conn->commit();
+            error_log("Classes inserted successfully");
+            showPettryJson(["success" => "Classes insérées en DB avec succès"]);
+          } catch (Exception $e) {
+            // Rollback on error
+            $conn->rollback();
+            error_log("Error in insertAllClasses: " . $e->getMessage());
+            http_response_code(500);
+            showPettryJson(["error" => "Erreur lors de l'insertion des classes: " . $e->getMessage()]);
           }
         } else {
           showPrettyJson([
@@ -171,16 +208,70 @@ try {
         }
         break;
 
-      case 'delete':
-        // Vérifier si l'ID est présent
-        if (isset($data['classId'])) {
-          $stmt = $conn->prepare("DELETE FROM $table");
-          $stmt->bind_Param(':classId', $data['classId']);
-          if ($conn->query($sql) === TRUE) {
-            showPrettyJson(["success" => "Enregistrement supprimé"]);
-          } else {
-            showPrettyJson(["error" => "Erreur lors de la suppression: " . $conn->error]);
+      case 'insertRun':
+        if (isset($data['estimatedTime']) && isset($data['class_idToAdd']) && count($data['class_idToAdd']) > 0) {
+          $conn->begin_transaction();
+          try {
+            error_log("Attempting to insert run");
+            $stmt = $conn->prepare("INSERT INTO Runs (estimatedTime) VALUES (?)");
+            $stmt->bind_param("s", $data['estimatedTime']);
+            if (!$stmt->execute()) {
+              throw new Exception("Failed to insert run: " . $stmt->error);
+            }
+            error_log("Run inserted successfully ✅");
+
+            // Get the ID of the last inserted run
+            $runId = $conn->insert_id;
+            error_log("Run ID: $runId");
+
+            // Link to Runners table
+            foreach ($data['class_idToAdd'] as $class_id) {
+              $stmt = $conn->prepare("INSERT INTO Runners (theClass, theRun) VALUES (?, ?)");
+              $stmt->bind_param("ii", $class_id, $runId);
+              if (!$stmt->execute()) {
+                throw new Exception("Failed to link class to run: " . $stmt->error);
+              }
+              error_log("Linked class $class_id to run " . $runId);
+            }
+          } catch (Exception $e) {
+            $conn->rollback();
+            error_log("Error in insertRun: " . $e->getMessage());
+            http_response_code(500);
+            showPettryJson(["error" => "Erreur lors de l'insertion de la course: " . $e->getMessage()]);
           }
+          $conn->commit();
+        }
+        break;
+
+      case 'updateRun':
+        break;
+
+      case 'deleteRun':
+        if (isset($data['run_id'])) {
+          $conn->begin_transaction();
+          try {
+            $stmt = $conn->prepare("DELETE FROM Runners WHERE theRun = ?");
+            $stmt->bind_param("i", $data['run_id']);
+            if (!$stmt->execute()) {
+              throw new Exception("Failed to delete runners: " . $stmt->error);
+            }
+            error_log("Deleted runners successfully ✅");
+
+            $stmt = $conn->prepare("DELETE FROM Runs WHERE id = ?");
+            $stmt->bind_param("i", $data['run_id']);
+            if (!$stmt->execute()) {
+              throw new Exception("Failed to delete run: " . $stmt->error);
+            }
+            error_log("Deleted run successfully");
+
+            showPettryJson(["success" => "Course supprimée avec succès"]);
+          } catch (Exception $e) {
+            $conn->rollback();
+            error_log("Error in deleteRun: " . $e->getMessage());
+            http_response_code(500);
+            showPettryJson(["error" => "Erreur lors de la suppression de la course: " . $e->getMessage()]);
+          }
+          $conn->commit();
         } else {
           showPrettyJson(["error" => "ID manquant pour la suppression"]);
         }
@@ -201,3 +292,4 @@ try {
 
 // Fermer la connexion
 $conn->close();
+die();

@@ -1,5 +1,9 @@
 @import "tailwindcss";
 
+@plugin "daisyui" {
+  themes: light --default, fantasy, night;
+}
+
 @layer base {
   .font-outline-1 {
     -webkit-text-stroke: 1px #000000;
@@ -49,9 +53,23 @@ body,
   animation: shake 0.3s ease-in-out;
 }
 
-button {
-  cursor: pointer;
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
 }
+
+.animate-slideInRight {
+  animation: slideInRight 0.3s ease-out forwards;
+}
+
+
 
 @keyframes samba {
   0% { transform: rotate(0deg); }
@@ -153,4 +171,32 @@ button {
   border-radius: 50%;
   opacity: 0;
   animation: explode 1.5s ease-out infinite;
+}
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.animate-slideInRight {
+  animation: slideInRight 0.3s ease-out forwards;
+}
+
+/* Retirer les flèches de l input type number */
+/* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type="number"] {
+  -moz-appearance: textfield;
 }

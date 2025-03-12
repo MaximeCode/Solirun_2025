@@ -4,6 +4,7 @@ import "./globals.css"
 import { socket } from "../utils/socket"
 import { useEffect, useState } from "react"
 
+
 export default function RootLayout({ children }) {
   const [isConnected, setIsConnected] = useState(socket.connected)
 
@@ -23,8 +24,12 @@ export default function RootLayout({ children }) {
   }, [])
 
   return (
-    <html lang="en">
-      <body className="h-full">{children}</body>
+    <html
+      lang="en"
+      data-theme="fantasy">
+      <body className="h-full">
+        <main>{children}</main>
+      </body>
     </html>
   )
 }

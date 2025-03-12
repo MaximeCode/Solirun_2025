@@ -1,11 +1,33 @@
 import React from "react"
+import Link from "next/link"
 
 export default function Header() {
   return (
-    <header>
-      <h1 className="text-center mb-4 text-3xl text-white font-extrabold md:text-5xl lg:text-6xl">
-        Bienvenue à la Solirun 2025
-      </h1>
+    <header className="bg-blue-600 text-white py-4">
+      <div className="container mx-auto flex justify-between items-center px-4">
+        <Link
+          href="/"
+          className="text-2xl font-semibold">
+          Solirun 2025
+        </Link>
+        <div className="text-white divide-x divide-white">
+          <Link
+            href="/Admin/AdminPanel"
+            className="pr-4 link link-hover">
+            Panneau d'administration
+          </Link>
+          <Link
+            href="/Admin/ManageClasses"
+            className="px-4 link link-hover">
+            Gérer les classes
+          </Link>
+          <Link
+            href="/Admin/ManageRuns"
+            className="pl-4 link link-hover">
+            Gérer les courses
+          </Link>
+        </div>
+      </div>
     </header>
   )
 }

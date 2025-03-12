@@ -1,9 +1,9 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
-import Classement from "@/Components/Ranking";
-import ClassementReel from "@/Components/RealTimeRanking";
-import { socket } from "@/utils/socket";
+import React, { useEffect, useState } from "react"
+import Classement from "@/Components/Ranking"
+import ClassementReel from "@/Components/RealTimeRanking"
+import { socket } from "@/utils/socket"
 
 function App() {
 	const [classesData, setClassesData] = useState([]);
