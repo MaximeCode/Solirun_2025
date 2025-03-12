@@ -1,14 +1,16 @@
-import React, { useState } from "react"
+import React from "react"
+import PropTypes from "prop-types"
 
 const RunCard = ({ id, time, classList, setSelectedRun, selectedRun }) => {
   const classArray = classList.split(",")
 
   return (
-    <div
+    <button
       className={`${
         selectedRun == id ? "bg-gray-200" : "bg-white"
-      } text-black shadow-lg rounded-xl p-6 mx-auto w-full max-w-md hover:cursor-pointer hover:scale-105 transition-transform duration-300`}
-      onClick={() => setSelectedRun(id) && console.log(selectedRun)}>
+      } text-black shadow-lg rounded-xl p-6 mx-auto w-full max-w-md hover:cursor-pointer hover:scale-105 transition-transform duration-300 text-left border-none`}
+      onClick={() => setSelectedRun(id)}
+      aria-pressed={selectedRun === id}>
       <h3 className="text-2xl font-bold text-center mb-4">Course #{id}</h3>
       <p className="text-lg text-center mb-4">
         ⏳ Heure de départ estimée :{" "}
@@ -28,8 +30,15 @@ const RunCard = ({ id, time, classList, setSelectedRun, selectedRun }) => {
           ))}
         </ul>
       </div>
-    </div>
+    </button>
   )
+}
+RunCard.propTypes = {
+  id: PropTypes.number.isRequired,
+  time: PropTypes.string.isRequired,
+  classList: PropTypes.string.isRequired,
+  setSelectedRun: PropTypes.func.isRequired,
+  selectedRun: PropTypes.number,
 }
 
 export default RunCard

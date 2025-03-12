@@ -74,17 +74,11 @@ try {
         break;
 
       case 'NextRuns':
-        fetchData("SELECT * FROM NextRuns", $conn);
+        fetchData("SELECT * FROM NextRuns", $conn); // View
         break;
 
-      case 'Runs':
-        $sql = "SELECT Classes.id AS Classes_id, Classes.name AS Classes_name, Classes.surname AS Classes_surname, Classes.color AS Classes_color, 
-          Classes.nbStudents AS Classes_nbStudents, Classes.codeClass AS Classes_codeClass,
-          Runners.theClass AS Runners_theClass, Runners.theRun AS Runners_theRun, Runners.laps AS Runners_laps,
-          Runs.id AS Runs_id, Runs.startTime AS Runs_startTime, Runs.endTime AS Runs_endTime, Runs.estimatedTime AS Runs_estimatedTime
-          FROM Classes 
-          INNER JOIN Runners ON Classes.id = Runners.theClass 
-          INNER JOIN Runs ON Runs.id = Runners.theRun";
+      case 'AllRuns':
+        $sql = "SELECT * FROM AllRuns"; // View which return estimatedTime, classIdList, classNameList
         fetchData($sql, $conn);
         break;
 
@@ -104,7 +98,6 @@ try {
         break;
     }
   } elseif ($_SERVER["REQUEST_METHOD"] === "POST") {
-    // error_log(print_r($data, true));
 
     error_log("Action : " . $data['action']);
     switch ($data['action']) {
@@ -210,6 +203,76 @@ try {
           showPettryJson([
             "error" => "Paramètres manquants pour l'insertion des classes"
           ]);
+        }
+        break;
+
+      case 'insertRun':
+        if (isset($data['estimatedTime']) && isset($data['class_idToAdd']) && count($data['class_idToAdd']) > 0) {
+          $conn->begin_transaction();
+          try {
+            error_log("Attempting to insert run");
+            $stmt = $conn->prepare("INSERT INTO Runs (estimatedTime) VALUES (?)");
+            $stmt->bind_param("s", $data['estimatedTime']);
+            if (!$stmt->execute()) {
+              throw new Exception("Failed to insert run: " . $stmt->error);
+            }
+            error_log("Run inserted successfully ✅");
+
+            // Get the ID of the last inserted run
+            $runId = $conn->insert_id;
+            error_log("Run ID: $runId");
+
+            // Link to Runners table
+            foreach ($data['class_idToAdd'] as $class_id) {
+              $stmt = $conn->prepare("INSERT INTO Runners (theClass, theRun) VALUES (?, ?)");
+              $stmt->bind_param("ii", $class_id, $runId);
+              if (!$stmt->execute()) {
+                throw new Exception("Failed to link class to run: " . $stmt->error);
+              }
+              error_log("Linked class $class_id to run " . $runId);
+            }
+          } catch (Exception $e) {
+            $conn->rollback();
+            error_log("Error in insertRun: " . $e->getMessage());
+            http_response_code(500);
+            showPettryJson(["error" => "Erreur lors de l'insertion de la course: " . $e->getMessage()]);
+          }
+          $conn->commit();
+        }
+        break;
+
+      case 'updateRun':
+        break;
+
+      case 'deleteRun':
+        if (isset($data['run_id'])) {
+          $conn->begin_transaction();
+          try {
+            $stmt = $conn->prepare("DELETE FROM Runners WHERE theRun = ?");
+            $stmt->bind_param("i", $data['run_id']);
+            if (!$stmt->execute()) {
+              throw new Exception("Failed to delete runners: " . $stmt->error);
+            }
+            error_log("Deleted runners successfully ✅");
+
+            $stmt = $conn->prepare("DELETE FROM Runs WHERE id = ?");
+            $stmt->bind_param("i", $data['run_id']);
+            if (!$stmt->execute()) {
+              throw new Exception("Failed to delete run: " . $stmt->error);
+            }
+            error_log("Deleted run successfully");
+
+            showPettryJson(["success" => "Course supprimée avec succès"]);
+          } catch (Exception $e) {
+            $conn->rollback();
+            error_log("Error in deleteRun: " . $e->getMessage());
+            http_response_code(500);
+            showPettryJson(["error" => "Erreur lors de la suppression de la course: " . $e->getMessage()]);
+          }
+          $conn->commit();
+        } else {
+          http_response_code(400);
+          showPettryJson(["error" => "Paramètres manquants pour la suppression de la course"]);
         }
         break;
 

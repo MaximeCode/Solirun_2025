@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useState, useEffect } from "react"
-import RunCard from "@/Components/RunCard"
+import RunCard from "@/Components/RunCardPanel"
 import { socket } from "@/utils/socket"
 
 function AdminPanel() {
@@ -39,7 +39,6 @@ function AdminPanel() {
         return response.json()
       })
       .then((data) => {
-        console.log(data)
         setRuns(data)
       })
   }, [isRunning])
@@ -169,7 +168,7 @@ function AdminPanel() {
             </p>
             <button
               onClick={handleClick}
-              className={`w-full py-3 px-4 rounded-md font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 
+              className={`w-full py-3 px-4 rounded-md font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 cursor-pointer
                 ${
                   isRunning
                     ? "bg-red-600 hover:bg-red-700 text-white focus:ring-red-500"
@@ -253,6 +252,7 @@ function AdminPanel() {
                   classList={run.classList}
                   setSelectedRun={setSelectedRun}
                   selectedRun={selectedRun}
+                  isForRuns={false}
                 />
               </div>
             ))}

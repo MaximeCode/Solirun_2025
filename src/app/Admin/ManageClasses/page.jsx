@@ -1,10 +1,11 @@
 "use client"
 
+import NewItem from "@/Components/NewItem"
 import ToastAlert, { showToast } from "@/Components/ToastAlert"
 import UpdateClass from "@/Components/UpdateClass"
 import { useState, useEffect } from "react"
 
-export default function AddClasses() {
+export default function ManageClasses() {
   const initClass = {
     name: "",
     nbStudents: 0,
@@ -69,7 +70,9 @@ export default function AddClasses() {
         console.log(response)
         if (!response.ok) {
           showToast("Erreur lors de l'insertion des classes ❌", true)
-          throw new Error("Erreur lors de l'insertion des classes en base de données")
+          throw new Error(
+            "Erreur lors de l'insertion des classes en base de données"
+          )
         }
         setDataRefresh(!dataRefresh)
         showToast("Classes enregistrées avec succès ✅", false)
@@ -209,26 +212,7 @@ export default function AddClasses() {
 
         {showAddClass == 1 ? (
           // + btn
-          <div className="flex items-center justify-center">
-            <button
-              onClick={() => setShowAddClass(2)}
-              className="p-6 size-auto btn border border-success rounded-lg shadow-sm">
-              <svg
-                className="w-12 h-12 text-success"
-                aria-hidden="true"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24">
-                <path
-                  stroke="currentColor"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M12 4v16m8-8H4"
-                />
-              </svg>
-            </button>
-          </div>
+          <NewItem setShow={() => setShowAddClass(2)} />
         ) : null}
       </div>
 

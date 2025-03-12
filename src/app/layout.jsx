@@ -3,9 +3,7 @@
 import "./globals.css"
 import { socket } from "../utils/socket"
 import { useEffect, useState } from "react"
-import Header from "@/Components/Header"
-// Link for Header
-import Link from "next/link"
+
 
 export default function RootLayout({ children }) {
   const [isConnected, setIsConnected] = useState(socket.connected)
@@ -26,12 +24,11 @@ export default function RootLayout({ children }) {
   }, [])
 
   return (
-    <html lang="en" data-theme="fantasy">
+    <html
+      lang="en"
+      data-theme="fantasy">
       <body className="h-full">
-        {/* Header */}
-        {window.location.pathname !== "/Ranking" && <Header />}
-        {/* Content */}
-        <div className="px-16 py-8">{children}</div>
+        <main>{children}</main>
       </body>
     </html>
   )

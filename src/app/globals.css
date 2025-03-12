@@ -53,10 +53,6 @@ body,
   animation: shake 0.3s ease-in-out;
 }
 
-button {
-  cursor: pointer;
-}
-
 @keyframes slideInRight {
   from {
     transform: translateX(100%);
