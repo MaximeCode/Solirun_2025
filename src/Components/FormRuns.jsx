@@ -36,7 +36,6 @@ export default function FormRuns({
           </h4>
           <select
             multiple
-            id="countries_multiple"
             className="space-y-2 bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
             onChange={(e) => {
               const selectedClasses = Array.from(

@@ -5,6 +5,7 @@ import ToastAlert, { showToast } from "@/Components/ToastAlert"
 import RunCardAdmin from "@/Components/RunCardAdmin"
 import FormRuns from "@/Components/FormRuns"
 import NewItem from "@/Components/NewItem"
+import UpdateRun from "@/Components/UpdateRun"
 
 export default function ManageRuns() {
   const initRuns = {
@@ -18,10 +19,11 @@ export default function ManageRuns() {
 
   const [classes, setClasses] = useState([])
 
-  const [updateStatus, setUpdateStatus] = useState(false) // false => Ne pas afficher, true => Afficher le form avec les valeurs à modifier
+  const [showUpdateRun, setShowUpdateRun] = useState(0) // 0 => Ne pas afficher, [nb] => Afficher le composant update pour la course avec l'id [nb]
 
   const getAllRuns = () => {
     console.log(" ---- Début getAllRuns")
+    setLoading(true)
     // Fetch all runs
     fetch("http://localhost:3030/api.php?action=AllRuns")
       .then((response) => {
@@ -39,20 +41,21 @@ export default function ManageRuns() {
           run.classNameList = run.classNameList.split(",")
         })
         setRuns(data)
-        setLoading(false)
         setShowAddRuns(1)
         console.log("Runs: ", data)
       })
       .catch((error) => {
         console.error("Error fetching runs:", error)
-        setLoading(false)
       })
       .then(() => {
         console.log(" ---- Fin getAllRuns")
+        setLoading(false)
       })
   }
 
   const getAllClasses = () => {
+    console.log(" ---- Début getAllClasses")
+    setLoading(true)
     // Fetch all classes
     fetch("http://localhost:3030/api.php?action=Classes")
       .then((response) => {
@@ -63,17 +66,22 @@ export default function ManageRuns() {
         return response.json()
       })
       .then((data) => {
-        // console.log("Classes data:", data)
         setClasses(data)
+        console.log("Classes: ", data)
       })
       .catch((error) => {
         console.error("Error fetching classes:", error)
+      })
+      .then(() => {
+        console.log(" ---- Fin getAllClasses")
+        setLoading(false)
       })
   }
 
   // Fonction pour insérer la nouvelle course dans la DB
   const saveRun = () => {
     console.log(" ---- SaveRun")
+    setLoading(true)
     // Envoi des courses vers l'API
     fetch("http://localhost:3030/api.php", {
       method: "POST",
@@ -105,6 +113,43 @@ export default function ManageRuns() {
       })
       .then(() => {
         console.log(" ---- Fin saveRun")
+        setLoading(false)
+      })
+  }
+
+  // Fonction pour mettre à jour une course dans la DB
+  const updateRun = (run_id, estimatedTime, classesToAdd, classesToRemove) => {
+    console.log(" ---- UpdateRun")
+    setLoading(true)
+    // Envoi des données vers l'API
+    fetch("http://localhost:3030/api.php", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        action: "updateRun",
+        run_id: run_id,
+        estimatedTime: estimatedTime,
+        class_idToAdd: classesToAdd,
+        class_idToRemove: classesToRemove,
+      }),
+    })
+      .then((response) => {
+        if (!response.ok) {
+          showToast("Erreur lors de la mise à jour de la course ❌", true)
+          throw new Error("Erreur lors de la mise à jour de la course")
+        }
+        showToast("Course mise à jour avec succès", false)
+        getAllRuns()
+      })
+      .catch((error) => {
+        console.error("Erreur:", error)
+        showToast(error.message, true)
+      })
+      .then(() => {
+        console.log(" ---- Fin update")
+        setLoading(false)
       })
   }
 
@@ -112,6 +157,7 @@ export default function ManageRuns() {
   const deleteRun = (id) => {
     console.log(" ---- DeleteRun")
     console.log("id à suppr : ", id)
+    setLoading(true)
     // Envoi de la requête pour supprimer la course
     fetch("http://localhost:3030/api.php", {
       method: "POST",
@@ -138,6 +184,10 @@ export default function ManageRuns() {
         console.error("Erreur:", error)
         showToast(error.message, true)
       })
+      .then(() => {
+        console.log(" ---- Fin deleteRun")
+        setLoading(false)
+      })
   }
 
   useEffect(() => {
@@ -155,6 +205,20 @@ export default function ManageRuns() {
 
       {loading && <span className="loading loading-bars loading-md"></span>}
 
+      {showUpdateRun > 0 && (
+        <UpdateRun
+          index={showUpdateRun}
+          run={runs.find((run) => run.id === showUpdateRun)}
+          setRuns={setRuns}
+          onCancel={() => setShowUpdateRun(0)}
+          onSuccess={() => {
+            setShowUpdateRun(0)
+          }}
+          showToast={showToast}
+          classes={classes}
+        />
+      )}
+
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
         {runs.map((run, index) => (
           <div key={run.id}>
@@ -163,9 +227,9 @@ export default function ManageRuns() {
               idTxt={index + 1}
               time={run.estimatedTime}
               className={run.classNameList}
-              updateStatus={updateStatus}
-              setUpdateStatus={setUpdateStatus}
+              setShowUpdateRun={setShowUpdateRun}
               deleteRuns={() => deleteRun(run.id)}
+              classes={classes}
             />
           </div>
         ))}

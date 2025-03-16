@@ -6,8 +6,7 @@ const RunCardAdmin = ({
   idTxt,
   time,
   className,
-  updateStatus,
-  setUpdateStatus,
+  setShowUpdateRun,
   deleteRuns,
 }) => {
   return (
@@ -16,7 +15,7 @@ const RunCardAdmin = ({
       {/* Edit & Bin */}
       <div className="absolute top-0 right-0 p-2 flex space-x-2">
         <svg
-          onClick={() => setUpdateStatus(true)}
+          onClick={() => setShowUpdateRun(id)}
           className="w-6 h-6 text-blue-500 cursor-pointer"
           aria-hidden="true"
           xmlns="http://www.w3.org/2000/svg"
@@ -78,7 +77,7 @@ RunCardAdmin.propTypes = {
   idTxt: PropTypes.number,
   time: PropTypes.string,
   className: PropTypes.array,
-  setUpdateStatus: PropTypes.func,
+  setShowUpdateRun: PropTypes.func,
   deleteRuns: PropTypes.func,
 }
 

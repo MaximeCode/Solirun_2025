@@ -242,6 +242,47 @@ try {
         break;
 
       case 'updateRun':
+        if (isset($data['run_id']) && isset($data['estimatedTime']) && isset($data['class_idToAdd']) && isset($data['class_idToRemove'])) {
+          $conn->begin_transaction();
+          try {
+            error_log("Attempting to update run");
+            $stmt = $conn->prepare("UPDATE Runs SET estimatedTime = ? WHERE id = ?");
+            $stmt->bind_param("si", $data['estimatedTime'], $data['run_id']);
+            if (!$stmt->execute()) {
+              throw new Exception("Failed to update run: " . $stmt->error);
+            }
+            error_log("Run updated successfully ✅");
+
+            // Link to Runners table
+            foreach ($data['class_idToAdd'] as $class_id) {
+              $stmt = $conn->prepare("INSERT INTO Runners (theClass, theRun) VALUES (?, ?)");
+              $stmt->bind_param("ii", $class_id, $data['run_id']);
+              if (!$stmt->execute()) {
+                throw new Exception("Failed to link class to run: " . $stmt->error);
+              }
+              error_log("Linked class $class_id to run " . $data['run_id']);
+            }
+
+            // Unlink from Runners table
+            foreach ($data['class_idToRemove'] as $class_id) {
+              $stmt = $conn->prepare("DELETE FROM Runners WHERE theClass = ? AND theRun = ?");
+              $stmt->bind_param("ii", $class_id, $data['run_id']);
+              if (!$stmt->execute()) {
+                throw new Exception("Failed to unlink class from run: " . $stmt->error);
+              }
+              error_log("Unlinked class $class_id from run " . $data['run_id']);
+            }
+          } catch (Exception $e) {
+            $conn->rollback();
+            error_log("Error in updateRun: " . $e->getMessage());
+            http_response_code(500);
+            showPettryJson(["error" => "Erreur lors de la mise à jour de la course: " . $e->getMessage()]);
+          }
+          $conn->commit();
+        } else {
+          http_response_code(400);
+          showPettryJson(["error" => "Paramètres manquants pour la mise à jour de la course"]);
+        }
         break;
 
       case 'deleteRun':

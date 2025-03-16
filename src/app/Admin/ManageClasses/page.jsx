@@ -135,7 +135,6 @@ export default function ManageClasses() {
             <h3 className="mb-2 text-2xl font-bold tracking-tight text-gray-900">
               {classe.name}
             </h3>
-            id = {classe.id}
             <h4 className="mb-4 text-lg font-medium text-gray-900">
               {classe.nbStudents} élèves
             </h4>
