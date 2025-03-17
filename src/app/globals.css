@@ -81,3 +81,108 @@ input::-webkit-inner-spin-button {
 input[type="number"] {
   -moz-appearance: textfield;
 }
+button {
+  cursor: pointer;
+}
+
+@keyframes samba {
+  0% { transform: rotate(0deg); }
+  25% { transform: rotate(5deg); }
+  50% { transform: rotate(-5deg); }
+  75% { transform: rotate(5deg); }
+  100% { transform: rotate(0deg); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes bouncePodium {
+  0% { transform: translateY(50px); opacity: 0; }
+  50% { transform: translateY(-10px); opacity: 0.8; }
+  100% { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes flash {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+@keyframes lepremierarrive {
+  0% { opacity: 1; transform: scale(1); }
+  20% { opacity: 0.8; }
+
+  /* Tremblement rapide simulant un roulement de tambour */
+  30%, 32%, 34%, 36%, 38%, 40%, 42%, 44%, 46%, 48% { 
+    transform: rotate(3deg); 
+  }
+  31%, 33%, 35%, 37%, 39%, 41%, 43%, 45%, 47%, 49% { 
+    transform: rotate(-3deg); 
+  }
+
+  /* Accélération du roulement */
+  50%, 52%, 54%, 56%, 58%, 60%, 62%, 64%, 66%, 68% { 
+    transform: rotate(5deg); 
+  }
+  51%, 53%, 55%, 57%, 59%, 61%, 63%, 65%, 67%, 69% { 
+    transform: rotate(-5deg); 
+  }
+
+  /* Climax du roulement avec rotation plus rapide */
+  70%, 72%, 74%, 76%, 78%, 80% { 
+    transform: rotate(7deg); 
+  }
+  71%, 73%, 75%, 77%, 79%, 81% { 
+    transform: rotate(-7deg); 
+  }
+
+  /* Flash final */
+  85%, 87%, 89%, 91%, 93%, 95%, 97%, 99% { 
+    opacity: 0; 
+  }
+  86%, 88%, 90%, 92%, 94%, 96%, 98%, 100% { 
+    opacity: 1; 
+  }
+
+  /* Grand final */
+  100% { 
+    opacity: 1; 
+    transform: scale(1.1) rotate(0deg); /* Légère mise en avant */
+  }
+}
+
+
+/* Ajout des classes Tailwind personnalisées */
+.animate-samba { animation: samba 1s infinite ease-in-out; }
+.animate-fadeIn { animation: fadeIn 1s ease-out; }
+.animate-bouncePodium { animation: bouncePodium 1s ease-in-out forwards; }
+.animate-flash { animation: flash 1.5s infinite; }
+.animate-boum { animation: shake 1s infinite; }
+.animate-podium {animation: lepremierarrive 3s ease-in-out infinite; }
+
+
+@keyframes explode {
+  0% {
+    opacity: 1;
+    transform: scale(0);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.5);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(2);
+  }
+}
+
+.firework {
+  position: absolute;
+  width: 15px;
+  height: 15px;
+  background: radial-gradient(circle, #ff0, orange, red, transparent);
+  border-radius: 50%;
+  opacity: 0;
+  animation: explode 1.5s ease-out infinite;
+}

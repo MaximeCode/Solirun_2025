@@ -24,6 +24,7 @@ const ClassementReel = () => {
   }, [classes]);
 
   useEffect(() => {
+    socket.emit("getClasses");
       // Écouter les mises à jour de isRunning
       socket.on("updateClasses", (classes) => {
         setclasses(classes);
