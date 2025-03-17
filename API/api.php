@@ -25,7 +25,7 @@ if ($_SERVER["REQUEST_METHOD"] === "OPTIONS") {
 $action = isset($_GET['action']) ? $_GET['action'] : null;
 $data = json_decode(file_get_contents("php://input"), true); // => Array with param in body in JSON
 
-function showPettryJson($data)
+function showPrettyJson($data)
 {
   echo json_encode($data, JSON_PRETTY_PRINT);
 }
@@ -54,7 +54,7 @@ function fetchData($sql, $conn, $params = [])
   }
 
   http_response_code(200);
-  showPettryJson($data); // Afficher un tableau vide [] si aucune donnée
+  showPrettyJson($data); // Afficher un tableau vide [] si aucune donnée
 
   $stmt->close();
 }
@@ -88,13 +88,13 @@ try {
           fetchData("SELECT Classes.id, Classes.name, Classes.surname AS alias, Classes.color, Classes.nbStudents AS students, Runners.laps FROM Classes INNER JOIN Runners ON Classes.id = Runners.theClass INNER JOIN Runs ON Runs.id = Runners.theRun WHERE Runs.id = ?", $conn, [$id]);
         } else {
           http_response_code(400); // Bad Request
-          showPettryJson(["error" => "Paramètre 'id' requis"]);
+          showPrettyJson(["error" => "Paramètre 'id' requis"]);
         }
         break;
 
       default:
         http_response_code(400); // Bad Request
-        showPettryJson(["error" => "Action invalide"]);
+        showPrettyJson(["error" => "Action invalide"]);
         break;
     }
   } elseif ($_SERVER["REQUEST_METHOD"] === "POST") {
@@ -107,15 +107,15 @@ try {
           $stmt->bind_param("i", $data['id']); // "i" pour integer
 
           if ($stmt->execute()) {
-            showPettryJson(["success" => "La course a été commencée avec succès"]);
+            showPrettyJson(["success" => "La course a été commencée avec succès"]);
           } else {
-            showPettryJson(["error" => "Erreur lors de l'arrêt de la course : " . $stmt->error]);
+            showPrettyJson(["error" => "Erreur lors de l'arrêt de la course : " . $stmt->error]);
           }
 
           $stmt->close();
         } else {
           http_response_code(400);
-          showPettryJson(["error" => "Paramètres manquants (id)"]);
+          showPrettyJson(["error" => "Paramètres manquants (id)"]);
         }
         break;
 
@@ -125,15 +125,15 @@ try {
           $stmt->bind_param("i", $data['id']); // "i" pour integer
 
           if ($stmt->execute()) {
-            showPettryJson(["success" => "La course a été terminée avec succès"]);
+            showPrettyJson(["success" => "La course a été terminée avec succès"]);
           } else {
-            showPettryJson(["error" => "Erreur lors de l'arrêt de la course : " . $stmt->error]);
+            showPrettyJson(["error" => "Erreur lors de l'arrêt de la course : " . $stmt->error]);
           }
 
           $stmt->close();
         } else {
           http_response_code(400);
-          showPettryJson(["error" => "Paramètres manquants (id)"]);
+          showPrettyJson(["error" => "Paramètres manquants (id)"]);
         }
         break;
 
@@ -143,15 +143,15 @@ try {
           $stmt->bind_param("iii", $data['laps'], $data['theClass'], $data['theRun']); // "i" pour integer
 
           if ($stmt->execute()) {
-            showPettryJson(["success" => "Le nombre de tours a été mis à jour avec succès"]);
+            showPrettyJson(["success" => "Le nombre de tours a été mis à jour avec succès"]);
           } else {
-            showPettryJson(["error" => "Erreur lors de la mise à jour du nombre de tours : " . $stmt->error]);
+            showPrettyJson(["error" => "Erreur lors de la mise à jour du nombre de tours : " . $stmt->error]);
           }
 
           $stmt->close();
         } else {
           http_response_code(400);
-          showPettryJson(["error" => "Paramètres manquants (theClass, theRun, laps)"]);
+          showPrettyJson(["error" => "Paramètres manquants (theClass, theRun, laps)"]);
         }
         break;
 
@@ -190,17 +190,17 @@ try {
             // Commit the transaction
             $conn->commit();
             error_log("Classes inserted successfully");
-            showPettryJson(["success" => "Classes insérées en DB avec succès"]);
+            showPrettyJson(["success" => "Classes insérées en DB avec succès"]);
           } catch (Exception $e) {
             // Rollback on error
             $conn->rollback();
             error_log("Error in insertAllClasses: " . $e->getMessage());
             http_response_code(500);
-            showPettryJson(["error" => "Erreur lors de l'insertion des classes: " . $e->getMessage()]);
+            showPrettyJson(["error" => "Erreur lors de l'insertion des classes: " . $e->getMessage()]);
           }
         } else {
           http_response_code(400);
-          showPettryJson([
+          showPrettyJson([
             "error" => "Paramètres manquants pour l'insertion des classes"
           ]);
         }
@@ -235,7 +235,7 @@ try {
             $conn->rollback();
             error_log("Error in insertRun: " . $e->getMessage());
             http_response_code(500);
-            showPettryJson(["error" => "Erreur lors de l'insertion de la course: " . $e->getMessage()]);
+            showPrettyJson(["error" => "Erreur lors de l'insertion de la course: " . $e->getMessage()]);
           }
           $conn->commit();
         }
@@ -276,12 +276,12 @@ try {
             $conn->rollback();
             error_log("Error in updateRun: " . $e->getMessage());
             http_response_code(500);
-            showPettryJson(["error" => "Erreur lors de la mise à jour de la course: " . $e->getMessage()]);
+            showPrettyJson(["error" => "Erreur lors de la mise à jour de la course: " . $e->getMessage()]);
           }
           $conn->commit();
         } else {
           http_response_code(400);
-          showPettryJson(["error" => "Paramètres manquants pour la mise à jour de la course"]);
+          showPrettyJson(["error" => "Paramètres manquants pour la mise à jour de la course"]);
         }
         break;
 
@@ -303,31 +303,31 @@ try {
             }
             error_log("Deleted run successfully");
 
-            showPettryJson(["success" => "Course supprimée avec succès"]);
+            showPrettyJson(["success" => "Course supprimée avec succès"]);
           } catch (Exception $e) {
             $conn->rollback();
             error_log("Error in deleteRun: " . $e->getMessage());
             http_response_code(500);
-            showPettryJson(["error" => "Erreur lors de la suppression de la course: " . $e->getMessage()]);
+            showPrettyJson(["error" => "Erreur lors de la suppression de la course: " . $e->getMessage()]);
           }
           $conn->commit();
         } else {
           http_response_code(400);
-          showPettryJson(["error" => "Paramètres manquants pour la suppression de la course"]);
+          showPrettyJson(["error" => "Paramètres manquants pour la suppression de la course"]);
         }
         break;
 
       default:
-        showPettryJson(["error" => "Action non reconnue. Utilisez 'select', 'update', ou 'delete'"]);
+        showPrettyJson(["error" => "Action non reconnue. Utilisez 'select', 'update', ou 'delete'"]);
         break;
     }
   } else {
     http_response_code(400);
-    showPettryJson(["error" => "Requête invalide"]);
+    showPrettyJson(["error" => "Requête invalide"]);
   }
 } catch (Exception $e) {
   http_response_code(500); // Internal Server Error
-  showPettryJson(["error" => "Erreur serveur : " . $e->getMessage()]);
+  showPrettyJson(["error" => "Erreur serveur : " . $e->getMessage()]);
 }
 
 // Fermer la connexion
