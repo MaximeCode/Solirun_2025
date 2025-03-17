@@ -45,37 +45,92 @@ export default function ManageClasses() {
     fetchClasses()
   }, [dataRefresh])
 
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, [showUpdateClass == false])
+
   // Fonction pour supprimer une classe
   const deleteClass = (classId) => {
+    if (!confirm("Vouslez vous vraiment supprimer la classe ?")){
+      return;
+    }
     // suppression de la classe avec l'id [classId] de classes
-    setClasses(classes.filter((classe) => classe.id !== classId))
-    const className = classes.find((classe) => classe.id === classId).name
-    showToast(`Classe ${className} supprimée avec succès`, false)
-  }
-
-  // Fonction pour insérer les nouvelles classes dans la DB
-  const saveClasses = () => {
-    // Envoi des classes vers l'API
     fetch("http://localhost:3030/api.php", {
-      method: "POST",
+      method : "POST",
       headers: {
-        "Content-Type": "application/json",
+        "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        action: "insertAllClasses",
-        classes: classes,
+        action: "deleteClass",
+        classId: classId,
       }),
     })
       .then((response) => {
         console.log(response)
         if (!response.ok) {
-          showToast("Erreur lors de l'insertion des classes ❌", true)
+          showToast("Erreur lors de l'insertion de la classe ❌", true)
           throw new Error(
-            "Erreur lors de l'insertion des classes en base de données"
+            "Erreur lors de l'insertion de la classe en base de données"
+          )
+        }
+        setDataRefresh(!dataRefresh)
+        showToast(`Classe supprimée avec succès ✅`, false)
+      })
+      .catch((error) => {
+        console.error("Erreur:", error)
+        showToast(error.message, true)
+      })
+  }
+
+  const saveClass = (classe) => {
+    fetch("http://localhost:3030/api.php", {
+      method : "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        action: "insertClass",
+        classe: classe,
+      }),
+    })
+      .then((response) => {
+        console.log(response)
+        if (!response.ok) {
+          showToast("Erreur lors de l'insertion de la classe ❌", true)
+          throw new Error(
+            "Erreur lors de l'insertion de la classe en base de données"
           )
         }
         setDataRefresh(!dataRefresh)
         showToast("Classes enregistrées avec succès ✅", false)
+      })
+      .catch((error) => {
+        console.error("Erreur:", error)
+        showToast(error.message, true)
+      })
+  }
+
+  const updateClass = (classe) => {
+    fetch("http://localhost:3030/api.php", {
+      method : "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        action: "updateClass",
+        classe: classe,
+      }),
+    })
+      .then((response) => {
+        console.log(response)
+        if (!response.ok) {
+          showToast("Erreur lors de la modification de la classe ❌", true)
+          throw new Error(
+            "Erreur lors de la modification de la classe en base de données"
+          )
+        }
+        setDataRefresh(!dataRefresh)
+        showToast("Classes modifiées avec succès ✅", false)
       })
       .catch((error) => {
         console.error("Erreur:", error)
@@ -96,7 +151,7 @@ export default function ManageClasses() {
       {showUpdateClass ? (
         <UpdateClass
           classe={classes.find((classe) => classe.id === showUpdateClass)}
-          setClasses={setClasses}
+          updateClassFunction={updateClass}
           onCancel={() => setShowUpdateClass(0)}
           onSuccess={() => {
             setShowUpdateClass(0)
@@ -189,7 +244,7 @@ export default function ManageClasses() {
                     alert("Veuillez remplir tous les champs")
                     return
                   }
-                  classes.push(newClass)
+                  saveClass(newClass)
                   setShowAddClass(1)
                   setNewClass(initClass)
                   showToast("Classe ajoutée avec succès !", false)
@@ -214,24 +269,6 @@ export default function ManageClasses() {
           <NewItem setShow={() => setShowAddClass(2)} />
         ) : null}
       </div>
-
-      {!showUpdateClass && (
-        <div className="flex gap-4 mt-8">
-          <button
-            className="btn text-white btn-success"
-            onClick={() => saveClasses()}>
-            Enregistrer
-          </button>
-          <button
-            className="btn btn-soft"
-            onClick={() => {
-              setDataRefresh(!dataRefresh)
-              showToast("Modifications annulées !", false)
-            }}>
-            Annuler
-          </button>
-        </div>
-      )}
     </div>
   )
 }

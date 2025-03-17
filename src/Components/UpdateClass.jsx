@@ -2,12 +2,13 @@ import React, { useState, useEffect } from "react"
 
 export default function UpdateClass({
   classe,
-  setClasses,
+  updateClassFunction,
   onCancel,
   onSuccess,
   showToast,
 }) {
   const [formData, setFormData] = useState({
+    id: 0,
     name: "",
     nbStudents: 0,
   })
@@ -16,6 +17,7 @@ export default function UpdateClass({
   useEffect(() => {
     if (classe) {
       setFormData({
+        id: classe.id,
         name: classe.name || "",
         nbStudents: classe.nbStudents || 0,
       })
@@ -33,18 +35,7 @@ export default function UpdateClass({
   // Update de la classe ds la list des classes avant l'envoi vers la db
   const updateClass = () => {
     setLoading(true)
-    setClasses((prevClasses) => {
-      return prevClasses.map((cl) => {
-        if (cl.id === classe.id) {
-          return {
-            ...cl,
-            name: formData.name,
-            nbStudents: formData.nbStudents,
-          }
-        }
-        return cl
-      })
-    })
+    updateClassFunction(formData)
     setLoading(false)
     showToast(`Classe ${formData.name} mise à jour avec succès`, false)
     onSuccess()

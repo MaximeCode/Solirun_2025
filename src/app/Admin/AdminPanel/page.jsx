@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import withAuth from '@/components/withAuth'
 import RunCard from "@/Components/RunCardPanel";
 import { socket } from "@/utils/socket";
 
@@ -270,4 +271,4 @@ function AdminPanel() {
 	);
 }
 
-export default AdminPanel;
+export default withAuth(AdminPanel);

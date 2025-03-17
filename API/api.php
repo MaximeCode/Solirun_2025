@@ -155,57 +155,114 @@ try {
         }
         break;
 
-      case 'insertAllClasses':
-        // Vérifier si les données nécessaires sont présentes
-        if (isset($data['classes'])) {
-          // Begin transaction for atomicity
+      case 'insertClass':
+        if (isset($data['classe'])) {
           $conn->begin_transaction();
 
           try {
-            error_log("Attempting to delete all classes");
-            // Delete all classes
-            $stmt = $conn->prepare("DELETE FROM Classes");
+            error_log("Attempting to insert class");
+            $stmt = $conn->prepare("INSERT INTO Classes (name, nbStudents, codeClass) VALUES (?, ?, ?)");
+
+            $class = $data["classe"];
+
+            $codeClass = strtoupper(substr($class['name'], 0, 3)) . substr($class['name'], -1);
+            $stmt->bind_param("sis", $class['name'], $class['nbStudents'], $codeClass);
+
             if (!$stmt->execute()) {
-              throw new Exception("Failed to delete classes: " . $stmt->error);
+              throw new Exception("Failed to insert class: " . $stmt->error);
             }
-            error_log("Classes deleted successfully");
+            error_log("Class inserted successfully ✅");
 
-            // Insert all new classes
-            foreach ($data['classes'] as $class) {
-              $stmt = $conn->prepare("INSERT INTO Classes (name, nbStudents, codeClass) VALUES (?, ?, ?)");
-              if (!$stmt) {
-                throw new Exception("Failed to prepare insert statement: " . $conn->error);
-              }
-
-              $codeClass = strtoupper(substr($class['name'], 0, 3)) . substr($class['name'], -1);
-              $stmt->bind_param("sis", $class['name'], $class['nbStudents'], $codeClass);
-
-              if (!$stmt->execute()) {
-                throw new Exception("Failed to insert class: " . $stmt->error);
-              }
-
-              error_log("Inserted class: " . $class['name']);
-            }
-
-            // Commit the transaction
-            $conn->commit();
-            error_log("Classes inserted successfully");
-            showPrettyJson(["success" => "Classes insérées en DB avec succès"]);
+            // Get the ID of the last inserted run
+            $classId = $conn->insert_id;
+            error_log("Class ID: $classId");
           } catch (Exception $e) {
-            // Rollback on error
             $conn->rollback();
-            error_log("Error in insertAllClasses: " . $e->getMessage());
+            error_log("Error in insertClass: " . $e->getMessage());
             http_response_code(500);
-            showPrettyJson(["error" => "Erreur lors de l'insertion des classes: " . $e->getMessage()]);
+            showPrettyJson(["error" => "Erreur lors de l'insertion de la classe: " . $e->getMessage()]);
           }
-        } else {
-          http_response_code(400);
-          showPrettyJson([
-            "error" => "Paramètres manquants pour l'insertion des classes"
-          ]);
+          $conn->commit();
         }
         break;
+        case 'updateClass':
+          if (isset($data['classe'])) {
+              $class = $data["classe"];
+              
+              // Vérification des données obligatoires
+              if (!isset($class['name'], $class['nbStudents'], $class['id'])) {
+                  http_response_code(400);
+                  showPrettyJson(["error" => "Données manquantes pour la mise à jour de la classe"]);
+                  break;
+              }
+      
+              // Sécurisation de l'ID (conversion en entier)
+              $class['id'] = (int)$class['id'];
+      
+              // Génération du codeClass avec sécurité
+              if (strlen($class['name']) >= 3) {
+                  $codeClass = strtoupper(substr($class['name'], 0, 3)) . substr($class['name'], -1);
+              } else {
+                  $codeClass = strtoupper($class['name']); // Si trop court, prend tout
+              }
 
+              error_log("Classe reçue: " . json_encode($class));
+      
+              $conn->begin_transaction();
+              try {
+                  error_log("Attempting to update class");
+      
+                  $stmt = $conn->prepare("UPDATE Classes SET name = ?, nbStudents = ?, codeClass = ? WHERE id = ?");
+                  if (!$stmt) {
+                      throw new Exception("Erreur de préparation de la requête: " . $conn->error);
+                  }
+      
+                  $stmt->bind_param("sssi", $class['name'], $class['nbStudents'], $codeClass, $class['id']);
+      
+                  if (!$stmt->execute()) {
+                      throw new Exception("Échec de mise à jour de la classe: " . $stmt->error);
+                  }
+      
+                  error_log("Class updated successfully ✅");
+      
+                  $stmt->close(); // ✅ Fermeture du statement
+                  $conn->commit(); // ✅ Commit après succès
+              } catch (Exception $e) {
+                  $conn->rollback(); // ✅ Rollback en cas d'erreur
+                  error_log("Error in updateClass: " . $e->getMessage());
+                  http_response_code(500);
+                  showPrettyJson(["error" => "Erreur lors de la mise à jour de la classe: " . $e->getMessage()]);
+              }
+          } else {
+              http_response_code(400);
+              showPrettyJson(["error" => "Paramètres manquants pour la mise à jour de la classe"]);
+          }
+          break;
+      case 'deleteClass':
+        if (isset($data['classId'])) {
+          $conn->begin_transaction();
+          try {
+            $stmt = $conn->prepare("DELETE FROM Classes WHERE id = ?");
+
+            $stmt->bind_param("i", $data["classId"]);
+            if (!$stmt->execute()) {
+              throw new Exception("Failed to delete classe: " . $stmt->error);
+            }
+            error_log("Deleted classe successfully ✅");
+
+            showPrettyJson(["success" => "Classe supprimée avec succès"]);
+          } catch (Exception $e) {
+            $conn->rollback();
+            error_log("Error in deleteClass: " . $e->getMessage());
+            http_response_code(500);
+            showPrettyJson(["error" => "Erreur lors de la suppression de la classe: " . $e->getMessage()]);
+          }
+          $conn->commit();
+        } else {
+          http_response_code(400);
+          showPrettyJson(["error" => "Paramètres manquants pour la suppression de la classe"]);
+        }
+        break;
       case 'insertRun':
         if (isset($data['estimatedTime']) && isset($data['class_idToAdd']) && count($data['class_idToAdd']) > 0) {
           $conn->begin_transaction();
@@ -316,6 +373,78 @@ try {
           showPrettyJson(["error" => "Paramètres manquants pour la suppression de la course"]);
         }
         break;
+
+        case 'login':
+          if (isset($data['username']) && isset($data['password'])) {
+              // Préparation de la requête sécurisée
+              $stmt = $conn->prepare("SELECT id, username, password FROM Logins WHERE username = ?");
+              $stmt->bind_param("s", $data['username']);
+              $stmt->execute();
+              $result = $stmt->get_result();
+              
+              if ($result->num_rows === 1) {
+                  $user = $result->fetch_assoc();
+                  
+                  // Vérifier le mot de passe
+                  if (password_verify($data['password'], $user['password'])) {
+                      // Génération d'un identifiant de session simple
+                      $session_token = bin2hex(random_bytes(32));
+                      
+                      // Stockage du token en base de données
+                      $stmt = $conn->prepare("UPDATE Logins SET session_token = ?, last_login = NOW() WHERE id = ?");
+                      $stmt->bind_param("si", $session_token, $user['id']);
+                      $stmt->execute();
+                      
+                      showPrettyJson([
+                          "success" => true,
+                          "message" => "Connexion réussie",
+                          "token" => $session_token,
+                          "userId" => $user['id'],
+                          "username" => $user['username']
+                      ]);
+                  } else {
+                      http_response_code(401);
+                      showPrettyJson(["error" => "Mot de passe incorrect"]);
+                  }
+              } else {
+                  http_response_code(401);
+                  showPrettyJson(["error" => "Utilisateur non trouvé"]);
+              }
+              
+              $stmt->close();
+          } else {
+              http_response_code(400);
+              showPrettyJson(["error" => "Paramètres manquants (username, password)"]);
+          }
+          break;
+      
+      case 'verifyToken':
+          if (isset($data['token'])) {
+              // Vérifier le token dans la base de données
+              $stmt = $conn->prepare("SELECT id, username FROM Logins WHERE session_token = ?");
+              $stmt->bind_param("s", $data['token']);
+              $stmt->execute();
+              $result = $stmt->get_result();
+              
+              if ($result->num_rows === 1) {
+                  $user = $result->fetch_assoc();
+                  showPrettyJson([
+                      "success" => true,
+                      "message" => "Token valide",
+                      "userId" => $user['id'],
+                      "username" => $user['username']
+                  ]);
+              } else {
+                  http_response_code(401);
+                  showPrettyJson(["error" => "Token invalide ou expiré"]);
+              }
+              
+              $stmt->close();
+          } else {
+              http_response_code(400);
+              showPrettyJson(["error" => "Paramètre 'token' manquant"]);
+          }
+          break;
 
       default:
         showPrettyJson(["error" => "Action non reconnue. Utilisez 'select', 'update', ou 'delete'"]);
