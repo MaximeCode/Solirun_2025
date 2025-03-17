@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import RunCard from "@/Components/RunCard";
+import RunCard from "@/Components/RunCardPanel";
 import { socket } from "@/utils/socket";
 
 function AdminPanel() {
