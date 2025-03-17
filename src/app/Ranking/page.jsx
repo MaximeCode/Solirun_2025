@@ -46,8 +46,8 @@ function App() {
   return (
     <>
       <div className="fixed top-0 left-0 bg-gradient-to-br from-gray-900 via-gray-750 to-gray-900 h-screen w-screen -z-1"></div>
-      <div>
-        <div className="px-16 py-16">
+      <div className="max-h-screen">
+        <div className="px-9 pt-10">
           {!isRunning ? (
             <>
               {loading && (
