@@ -31,13 +31,13 @@ const ClassCard = ({ position, name, alias, color, students, laps }) => {
         </div>
 
         {/* Surnom de la classe */}
-        <h3 className={`text-4xl font-bold mt-4 ${getTextColor(color)}`}>{alias}</h3>
+        <h3 className={`text-4xl font-bold mt-4 ${getTextColor(color) || "text-gray-500"}`}>{alias}</h3>
 
         {/* Nom de la classe */}
-        <p className={`italic text-4xl ${getTextColor(color)}`}>{name}</p>
+        <p className={`italic text-4xl ${getTextColor(color) || "text-gray-500"}`}>{name}</p>
 
         {/* Nombre d'élèves */}
-        <p className={`text-4xl mt-2 font-semibold ${getTextColor(color)}`}>👨‍🎓 {students} élèves</p>
+        <p className={`text-4xl mt-2 font-semibold ${getTextColor(color) || "text-gray-500"}`}>👨‍🎓 {students} élèves</p>
 
         {/* Nombre de tours */}
         <p className={`text-4xl mt-2 ${getTextColor(color)}`}>

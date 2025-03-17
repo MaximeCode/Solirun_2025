@@ -3,8 +3,8 @@ const http = require("http");
 
 const server = http.createServer();
 const allowedOrigins = [
-	"http://192.168.168.100:3000",
-	"http://192.168.168.209:3000",
+	"http://192.168.124.100:3000",
+	"http://192.168.124.227:3000",
 	"http://localhost:3000",
 ];
 
