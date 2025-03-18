@@ -1,67 +1,117 @@
-import React, { useState, useEffect } from "react"
-import PropTypes from "prop-types"
+import React, { useState, useEffect } from "react";
+import PropTypes from "prop-types";
 
 export default function UpdateRun({
   index,
   run,
-  setRuns,
   onCancel,
-  onSuccess,
   showToast,
   classes,
+  getAllRuns,
 }) {
+  useEffect(() => {
+    console.log("run: ", run);
+  }, []);
+
   const [formData, setFormData] = useState({
     estimatedTime: run.estimatedTime || "00:00",
-    class_idList: run.class_idList || ["Rien"],
-  })
-  const [loading, setLoading] = useState(false) // true => Afficher the loader, false => Ne rien afficher
+    class_idList: run.classIdList || ["Rien"],
+  });
+
+  const [loading, setLoading] = useState(false); // true => Afficher the loader, false => Ne rien afficher
+  const [searchTerm, setSearchTerm] = useState(""); // State for search input
 
   useEffect(() => {
     if (formData) {
-      console.log("formData: ", formData)
+      console.log("formData: ", formData);
     }
-  }, [formData])
-
-  console.log("classIdList: ", formData.class_idList)
-  classes.map((classe) => {
-    // console.log("classe: ", classe)
-    formData.class_idList.includes(classe.id)
-      ? console.log(`classe ${classe.name} selected`)
-      : console.log(`classe ${classe.name} not selected`)
-  })
+  }, [formData]);
 
   const handleChange = (e) => {
-    const { name, value } = e.target
+    const { name, value } = e.target;
     setFormData({
       ...formData,
       [name]: value,
-    })
-  }
-
-  // Update de la run ds la list des runs avant l'envoi vers la db
-  const updateRun = () => {
-    setLoading(true)
-    setRuns((prevRuns) => {
-      return prevRuns.map((cl) => {
-        if (cl.id === run.id) {
-          return {
-            ...cl,
-            estimatedTime: formData.estimatedTime,
-            class_idList: formData.class_idList,
-          }
-        }
-        return cl
-      })
-    })
-    setLoading(false)
-    showToast(`Course mise à jour avec succès`, false)
-    onSuccess()
-  }
+    });
+  };
 
   const handleSubmit = (e) => {
-    e.preventDefault()
-    updateRun()
-  }
+    e.preventDefault();
+    updateRun(
+      run.id,
+      formData.estimatedTime,
+      formData.class_idList,
+      run.classIdList
+    );
+  };
+
+  // Function to toggle class selection
+  const toggleClass = (classId) => {
+    setFormData((prevData) => {
+      // Check if the class is already selected
+      if (prevData.class_idList.includes(classId)) {
+        // Remove the class if already selected
+        return {
+          ...prevData,
+          class_idList: prevData.class_idList.filter((id) => id !== classId),
+        };
+      } else {
+        // Add the class if not selected
+        return {
+          ...prevData,
+          class_idList: [...prevData.class_idList, classId],
+        };
+      }
+    });
+  };
+
+  // Filter classes based on search term
+  const filteredClasses = classes.filter((classe) =>
+    classe.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  // Fonction pour mettre à jour une course dans la DB
+  const updateRun = (run_id, estimatedTime, newListId, oldListId) => {
+    console.log(" ---- UpdateRun");
+    setLoading(true);
+    // Envoi des données vers l'API
+    fetch("http://localhost:3030/api.php", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        action: "updateRun",
+        run_id: run_id,
+        estimatedTime: estimatedTime,
+        newListId: newListId,
+        oldListId: oldListId,
+      }),
+    })
+      .then((response) => {
+        if (!response.ok) {
+          showToast("Erreur lors de la mise à jour de la course ❌", true);
+          throw new Error("Erreur lors de la mise à jour de la course");
+        }
+        showToast("Course mise à jour avec succès ✅", false);
+      })
+      .catch((error) => {
+        console.error("Erreur:", error);
+        showToast(error.message, true);
+        setLoading(false);
+        throw new Error("Erreur lors de la mise à jour de la course");
+      })
+      .then(() => {
+        console.log(" ---- Fin update");
+        setLoading(false);
+        setFormData({
+          estimatedTime: "",
+          class_idList: [],
+        });
+        onCancel();
+        getAllRuns();
+      });
+  };
 
   return (
     <div className="w-100 mx-auto space-y-6 bg-info/75 text-white rounded-lg shadow-lg p-6 mb-6 ${updateStatus != null ? 'hidden' : 'block'}">
@@ -86,7 +136,7 @@ export default function UpdateRun({
             type="time"
             id="estimatedTime"
             name="estimatedTime"
-            className="w-3/4 mx-auto mb-4 text-lg text-gray-900 border-b-2 border-gray-200 input input-ghost pl-4"
+            className="w-3/4 mx-auto mb-4 text-lg text-gray-900 bg-gray-100 border-b-2 border-gray-200 input input-ghost pl-4"
             value={formData.estimatedTime}
             onChange={handleChange}
           />
@@ -96,31 +146,49 @@ export default function UpdateRun({
           <h4 className="text-xl font-semibold text-center mb-2">
             Sélectionnez les classes participantes :
           </h4>
-          <select
-            multiple
-            name="class_idList"
-            value={formData.class_idList}
-            className="space-y-2 bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
-            onChange={(e) => {
-              const selectedClasses = Array.from(
-                e.target.selectedOptions,
-                (option) => option.value
-              )
-              setFormData({ ...formData, class_idList: selectedClasses })
-            }}>
-            {classes.map((classe) => (
-              <option
-                key={classe.id}
-                value={classe.id}
-                className={`p-2 bg-gray-200 rounded-md text-center font-medium ${
-                  formData.class_idList.includes(classe.id)
-                    ? "bg-blue-500 text-white"
-                    : ""
-                }`}>
-                {classe.name}
-              </option>
-            ))}
-          </select>
+
+          {/* Search input */}
+          <div className="mb-3">
+            <div className="relative">
+              <input
+                type="text"
+                placeholder="Rechercher une classe..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+              {searchTerm && (
+                <button
+                  type="button"
+                  className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                  onClick={() => setSearchTerm("")}>
+                  ✕
+                </button>
+              )}
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-2 h-48 overflow-y-auto border-1 border-blue-300 rounded-md inset-shadow-lg inset-shadow-blue-500">
+            {filteredClasses.length > 0 ? (
+              filteredClasses.map((classe) => (
+                <button
+                  type="button"
+                  key={classe.id}
+                  onClick={() => toggleClass(classe.id.toString())}
+                  className={`cursor-pointer p-2 rounded-md font-medium text-center transition-colors flex justify-center items-center ${
+                    formData.class_idList.toString().includes(classe.id)
+                      ? "bg-blue-500 text-white"
+                      : "bg-gray-200 hover:bg-gray-300"
+                  }`}>
+                  {classe.name}
+                </button>
+              ))
+            ) : (
+              <div className="col-span-3 flex justify-center items-center h-32 text-gray-500">
+                Aucune classe ne correspond à votre recherche
+              </div>
+            )}
+          </div>
         </div>
 
         {loading && <span className="loading loading-bars loading-md"></span>}
@@ -135,11 +203,11 @@ export default function UpdateRun({
           <button
             type="button"
             onClick={() => {
-              onCancel()
+              onCancel();
               setFormData({
                 estimatedTime: "",
                 class_idList: [],
-              })
+              });
             }}
             className="btn btn-soft">
             Annuler
@@ -147,15 +215,14 @@ export default function UpdateRun({
         </div>
       </form>
     </div>
-  )
+  );
 }
 
 UpdateRun.propTypes = {
   index: PropTypes.number.isRequired,
   run: PropTypes.object.isRequired,
-  setRuns: PropTypes.func.isRequired,
   onCancel: PropTypes.func.isRequired,
-  onSuccess: PropTypes.func.isRequired,
+  getAllRuns: PropTypes.func.isRequired,
   showToast: PropTypes.func.isRequired,
   classes: PropTypes.array.isRequired,
-}
+};

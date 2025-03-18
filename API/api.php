@@ -85,7 +85,7 @@ try {
       case 'ClassesRunning':
         if (isset($_GET['id'])) {
           $id = $_GET['id'];
-          fetchData("SELECT Classes.id, Classes.name, Classes.surname AS alias, Classes.color, Classes.nbStudents AS students, Runners.laps FROM Classes INNER JOIN Runners ON Classes.id = Runners.theClass INNER JOIN Runs ON Runs.id = Runners.theRun WHERE Runs.id = ?", $conn, [$id]);
+          fetchData("SELECT Classes.id, Classes.name, Classes.color, Classes.nbStudents AS students, Runners.laps FROM Classes INNER JOIN Runners ON Classes.id = Runners.theClass INNER JOIN Runs ON Runs.id = Runners.theRun WHERE Runs.id = ?", $conn, [$id]);
         } else {
           http_response_code(400); // Bad Request
           showPrettyJson(["error" => "Paramètre 'id' requis"]);
@@ -242,7 +242,8 @@ try {
         break;
 
       case 'updateRun':
-        if (isset($data['run_id']) && isset($data['estimatedTime']) && isset($data['class_idToAdd']) && isset($data['class_idToRemove'])) {
+        if (isset($data['run_id']) && isset($data['estimatedTime']) && isset($data['newListId']) && isset($data['oldListId'])) {
+          error_log("Updating run: " . $data['run_id'] . " with estimated time: " . $data['estimatedTime'] . " and classes to add: " . implode(", ", $data['newListId']) . " and classes to remove: " . implode(", ", $data['oldListId']));
           $conn->begin_transaction();
           try {
             error_log("Attempting to update run");
@@ -253,8 +254,18 @@ try {
             }
             error_log("Run updated successfully ✅");
 
+            // Unlink to Runners table
+            foreach ($data['oldListId'] as $class_id) {
+              $stmt = $conn->prepare("DELETE FROM Runners WHERE theClass = ? AND theRun = ?");
+              $stmt->bind_param("ii", $class_id, $data['run_id']);
+              if (!$stmt->execute()) {
+                throw new Exception("Failed to unlink class from run: " . $stmt->error);
+              }
+              error_log("Unlinked class $class_id from run " . $data['run_id']);
+            }
+
             // Link to Runners table
-            foreach ($data['class_idToAdd'] as $class_id) {
+            foreach ($data['newListId'] as $class_id) {
               $stmt = $conn->prepare("INSERT INTO Runners (theClass, theRun) VALUES (?, ?)");
               $stmt->bind_param("ii", $class_id, $data['run_id']);
               if (!$stmt->execute()) {
@@ -263,24 +274,16 @@ try {
               error_log("Linked class $class_id to run " . $data['run_id']);
             }
 
-            // Unlink from Runners table
-            foreach ($data['class_idToRemove'] as $class_id) {
-              $stmt = $conn->prepare("DELETE FROM Runners WHERE theClass = ? AND theRun = ?");
-              $stmt->bind_param("ii", $class_id, $data['run_id']);
-              if (!$stmt->execute()) {
-                throw new Exception("Failed to unlink class from run: " . $stmt->error);
-              }
-              error_log("Unlinked class $class_id from run " . $data['run_id']);
-            }
+            showPrettyJson(["success" => "Course mise à jour avec succès"]);
           } catch (Exception $e) {
             $conn->rollback();
             error_log("Error in updateRun: " . $e->getMessage());
-            http_response_code(500);
+            http_response_code(550);
             showPrettyJson(["error" => "Erreur lors de la mise à jour de la course: " . $e->getMessage()]);
           }
           $conn->commit();
         } else {
-          http_response_code(400);
+          http_response_code(450);
           showPrettyJson(["error" => "Paramètres manquants pour la mise à jour de la course"]);
         }
         break;

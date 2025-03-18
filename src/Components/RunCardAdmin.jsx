@@ -1,14 +1,50 @@
-import React from "react"
-import PropTypes from "prop-types"
+import React from "react";
+import PropTypes from "prop-types";
 
 const RunCardAdmin = ({
   id,
-  idTxt,
   time,
   className,
   setShowUpdateRun,
   deleteRuns,
+  run,
 }) => {
+  // Determine run status
+  const getRunStatus = () => {
+    console.log(run);
+    if (run.startTime !== null) {
+      if (run.endTime !== null) {
+        return 2; // Terminée
+      }
+      return 1; // En cours
+    }
+    return 0; // Pas encore commencée
+  };
+
+  const renderStatusMessage = () => {
+    if (status === 2) {
+      return (
+        <p className="text-center text-xl font-semibold text-green-500">
+          Terminée !
+        </p>
+      );
+    } else if (status === 1) {
+      return (
+        <p className="text-center text-xl font-semibold text-blue-500">
+          En cours...
+        </p>
+      );
+    } else {
+      return (
+        <p className="text-lg text-center mb-4">
+          ⏳ Heure de départ estimée :{" "}
+          <span className="font-semibold">{time}</span>
+        </p>
+      );
+    }
+  };
+
+  const status = getRunStatus();
   return (
     <div
       className={`text-black shadow-lg rounded-xl p-6 mx-auto w-full max-w-md transition-transform duration-300 text-left border-none cursor-default relative space-y-4`}>
@@ -50,11 +86,8 @@ const RunCardAdmin = ({
           />
         </svg>
       </div>
-      <h3 className="text-2xl font-bold text-center mb-4">Course #{idTxt}</h3>
-      <p className="text-lg text-center mb-4">
-        ⏳ Heure de départ estimée :{" "}
-        <span className="font-semibold">{time}</span>
-      </p>
+      <h3 className="text-2xl font-bold text-center mb-4">Course #{id}</h3>
+      {renderStatusMessage()}
       <div className="bg-gray-100 border border-gray-200 text-black p-4 rounded-lg">
         <h4 className="text-xl font-semibold text-center mb-2">
           Classes participantes :
@@ -70,15 +103,15 @@ const RunCardAdmin = ({
         </ul>
       </div>
     </div>
-  )
-}
+  );
+};
 RunCardAdmin.propTypes = {
   id: PropTypes.number,
-  idTxt: PropTypes.number,
   time: PropTypes.string,
   className: PropTypes.array,
   setShowUpdateRun: PropTypes.func,
   deleteRuns: PropTypes.func,
-}
+  run: PropTypes.object,
+};
 
-export default RunCardAdmin
+export default RunCardAdmin;
