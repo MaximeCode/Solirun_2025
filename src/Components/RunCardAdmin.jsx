@@ -93,9 +93,9 @@ const RunCardAdmin = ({
           Classes participantes :
         </h4>
         <ul className="space-y-2">
-          {className.map((classe, index) => (
+          {className.map((classe) => (
             <li
-              key={index}
+              key={classe}
               className="p-2 bg-gray-200 rounded-md text-center font-medium">
               {classe}
             </li>

@@ -1,5 +1,7 @@
 <?php
 
+class PersonalException extends Exception {}
+
 header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Methods: GET, POST, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type, Authorization");
@@ -166,7 +168,7 @@ try {
             // Delete all classes
             $stmt = $conn->prepare("DELETE FROM Classes");
             if (!$stmt->execute()) {
-              throw new Exception("Failed to delete classes: " . $stmt->error);
+              throw new PersonalException("Failed to delete classes: " . $stmt->error);
             }
             error_log("Classes deleted successfully");
 
@@ -174,14 +176,14 @@ try {
             foreach ($data['classes'] as $class) {
               $stmt = $conn->prepare("INSERT INTO Classes (name, nbStudents, codeClass) VALUES (?, ?, ?)");
               if (!$stmt) {
-                throw new Exception("Failed to prepare insert statement: " . $conn->error);
+                throw new PersonalException("Failed to prepare insert statement: " . $conn->error);
               }
 
               $codeClass = strtoupper(substr($class['name'], 0, 3)) . substr($class['name'], -1);
               $stmt->bind_param("sis", $class['name'], $class['nbStudents'], $codeClass);
 
               if (!$stmt->execute()) {
-                throw new Exception("Failed to insert class: " . $stmt->error);
+                throw new PersonalException("Failed to insert class: " . $stmt->error);
               }
 
               error_log("Inserted class: " . $class['name']);
@@ -191,7 +193,7 @@ try {
             $conn->commit();
             error_log("Classes inserted successfully");
             showPrettyJson(["success" => "Classes insérées en DB avec succès"]);
-          } catch (Exception $e) {
+          } catch (PersonalException $e) {
             // Rollback on error
             $conn->rollback();
             error_log("Error in insertAllClasses: " . $e->getMessage());
@@ -214,7 +216,7 @@ try {
             $stmt = $conn->prepare("INSERT INTO Runs (estimatedTime) VALUES (?)");
             $stmt->bind_param("s", $data['estimatedTime']);
             if (!$stmt->execute()) {
-              throw new Exception("Failed to insert run: " . $stmt->error);
+              throw new PersonalException("Failed to insert run: " . $stmt->error);
             }
             error_log("Run inserted successfully ✅");
 
@@ -227,11 +229,11 @@ try {
               $stmt = $conn->prepare("INSERT INTO Runners (theClass, theRun) VALUES (?, ?)");
               $stmt->bind_param("ii", $class_id, $runId);
               if (!$stmt->execute()) {
-                throw new Exception("Failed to link class to run: " . $stmt->error);
+                throw new PersonalException("Failed to link class to run: " . $stmt->error);
               }
               error_log("Linked class $class_id to run " . $runId);
             }
-          } catch (Exception $e) {
+          } catch (PersonalException $e) {
             $conn->rollback();
             error_log("Error in insertRun: " . $e->getMessage());
             http_response_code(500);
@@ -250,7 +252,7 @@ try {
             $stmt = $conn->prepare("UPDATE Runs SET estimatedTime = ? WHERE id = ?");
             $stmt->bind_param("si", $data['estimatedTime'], $data['run_id']);
             if (!$stmt->execute()) {
-              throw new Exception("Failed to update run: " . $stmt->error);
+              throw new PersonalException("Failed to update run: " . $stmt->error);
             }
             error_log("Run updated successfully ✅");
 
@@ -259,7 +261,7 @@ try {
               $stmt = $conn->prepare("DELETE FROM Runners WHERE theClass = ? AND theRun = ?");
               $stmt->bind_param("ii", $class_id, $data['run_id']);
               if (!$stmt->execute()) {
-                throw new Exception("Failed to unlink class from run: " . $stmt->error);
+                throw new PersonalException("Failed to unlink class from run: " . $stmt->error);
               }
               error_log("Unlinked class $class_id from run " . $data['run_id']);
             }
@@ -269,13 +271,13 @@ try {
               $stmt = $conn->prepare("INSERT INTO Runners (theClass, theRun) VALUES (?, ?)");
               $stmt->bind_param("ii", $class_id, $data['run_id']);
               if (!$stmt->execute()) {
-                throw new Exception("Failed to link class to run: " . $stmt->error);
+                throw new PersonalException("Failed to link class to run: " . $stmt->error);
               }
               error_log("Linked class $class_id to run " . $data['run_id']);
             }
 
             showPrettyJson(["success" => "Course mise à jour avec succès"]);
-          } catch (Exception $e) {
+          } catch (PersonalException $e) {
             $conn->rollback();
             error_log("Error in updateRun: " . $e->getMessage());
             http_response_code(550);
@@ -295,19 +297,19 @@ try {
             $stmt = $conn->prepare("DELETE FROM Runners WHERE theRun = ?");
             $stmt->bind_param("i", $data['run_id']);
             if (!$stmt->execute()) {
-              throw new Exception("Failed to delete runners: " . $stmt->error);
+              throw new PersonalException("Failed to delete runners: " . $stmt->error);
             }
             error_log("Deleted runners successfully ✅");
 
             $stmt = $conn->prepare("DELETE FROM Runs WHERE id = ?");
             $stmt->bind_param("i", $data['run_id']);
             if (!$stmt->execute()) {
-              throw new Exception("Failed to delete run: " . $stmt->error);
+              throw new PersonalException("Failed to delete run: " . $stmt->error);
             }
             error_log("Deleted run successfully");
 
             showPrettyJson(["success" => "Course supprimée avec succès"]);
-          } catch (Exception $e) {
+          } catch (PersonalException $e) {
             $conn->rollback();
             error_log("Error in deleteRun: " . $e->getMessage());
             http_response_code(500);
@@ -328,7 +330,7 @@ try {
     http_response_code(400);
     showPrettyJson(["error" => "Requête invalide"]);
   }
-} catch (Exception $e) {
+} catch (PersonalException $e) {
   http_response_code(500); // Internal Server Error
   showPrettyJson(["error" => "Erreur serveur : " . $e->getMessage()]);
 }

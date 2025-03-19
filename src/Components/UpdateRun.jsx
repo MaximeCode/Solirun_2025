@@ -169,23 +169,28 @@ export default function UpdateRun({
           </div>
 
           <div className="grid grid-cols-2 md:grid-cols-3 gap-2 h-48 overflow-y-auto border-1 border-blue-300 rounded-md inset-shadow-lg inset-shadow-blue-500">
-            {filteredClasses.length > 0 ? (
+            {filteredClasses.length > 0 &&
               filteredClasses.map((classe) => (
                 <button
                   type="button"
                   key={classe.id}
                   onClick={() => toggleClass(classe.id.toString())}
                   className={`cursor-pointer p-2 rounded-md font-medium text-center transition-colors flex justify-center items-center ${
-                    formData.class_idList.toString().includes(classe.id)
+                    formData.class_idList.includes(classe.id.toString())
                       ? "bg-blue-500 text-white"
                       : "bg-gray-200 hover:bg-gray-300"
                   }`}>
                   {classe.name}
                 </button>
-              ))
-            ) : (
+              ))}
+            {filteredClasses.length === 0 && searchTerm !== "" && (
               <div className="col-span-3 flex justify-center items-center h-32 text-gray-500">
                 Aucune classe ne correspond à votre recherche
+              </div>
+            )}
+            {filteredClasses.length === 0 && searchTerm === "" && (
+              <div className="col-span-3 flex justify-center items-center h-32 text-gray-500">
+                Aucune classe n'est disponible
               </div>
             )}
           </div>

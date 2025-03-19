@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from "react"
+import React, { useState, useEffect } from "react";
+import PropTypes from "prop-types";
 
 export default function UpdateClass({
   classe,
@@ -10,29 +11,29 @@ export default function UpdateClass({
   const [formData, setFormData] = useState({
     name: "",
     nbStudents: 0,
-  })
-  const [loading, setLoading] = useState(false) // true => Afficher the loader, false => Ne rien afficher
+  });
+  const [loading, setLoading] = useState(false); // true => Afficher the loader, false => Ne rien afficher
 
   useEffect(() => {
     if (classe) {
       setFormData({
         name: classe.name || "",
         nbStudents: classe.nbStudents || 0,
-      })
+      });
     }
-  }, [classe])
+  }, [classe]);
 
   const handleChange = (e) => {
-    const { name, value } = e.target
+    const { name, value } = e.target;
     setFormData({
       ...formData,
       [name]: value,
-    })
-  }
+    });
+  };
 
   // Update de la classe ds la list des classes avant l'envoi vers la db
   const updateClass = () => {
-    setLoading(true)
+    setLoading(true);
     setClasses((prevClasses) => {
       return prevClasses.map((cl) => {
         if (cl.id === classe.id) {
@@ -40,20 +41,20 @@ export default function UpdateClass({
             ...cl,
             name: formData.name,
             nbStudents: formData.nbStudents,
-          }
+          };
         }
-        return cl
-      })
-    })
-    setLoading(false)
-    showToast(`Classe ${formData.name} mise à jour avec succès`, false)
-    onSuccess()
-  }
+        return cl;
+      });
+    });
+    setLoading(false);
+    showToast(`Classe ${formData.name} mise à jour avec succès`, false);
+    onSuccess();
+  };
 
   const handleSubmit = (e) => {
-    e.preventDefault()
-    updateClass()
-  }
+    e.preventDefault();
+    updateClass();
+  };
 
   return (
     <div className="w-100 mx-auto space-y-6 border border-gray-200 rounded-lg shadow-sm p-6 ${updateStatus != null ? 'hidden' : 'block'}">
@@ -120,5 +121,17 @@ export default function UpdateClass({
         </div>
       </form>
     </div>
-  )
+  );
 }
+
+UpdateClass.propTypes = {
+  classe: PropTypes.shape({
+    id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+    name: PropTypes.string,
+    nbStudents: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  }).isRequired,
+  setClasses: PropTypes.func.isRequired,
+  onCancel: PropTypes.func.isRequired,
+  onSuccess: PropTypes.func.isRequired,
+  showToast: PropTypes.func.isRequired,
+};

@@ -1,47 +1,47 @@
-"use client"
+"use client";
 
-import React, { useEffect, useState } from "react"
-import Classement from "@/Components/Ranking"
-import ClassementReel from "@/Components/RealTimeRanking"
-import { socket } from "@/utils/socket"
+import React, { useEffect, useState } from "react";
+import Classement from "@/Components/Ranking";
+import ClassementReel from "@/Components/RealTimeRanking";
+import { socket } from "@/utils/socket";
 
 function App() {
-  const [classesData, setClassesData] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(null)
-  const [isRunning, setIsRunning] = useState(false)
+  const [classesData, setClassesData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [isRunning, setIsRunning] = useState(false);
 
   useEffect(() => {
     setTimeout(() => {
       fetch("http://localhost:3030/api.php?action=Ranking")
         .then((response) => {
           if (!response.ok) {
-            throw new Error("Erreur lors de la récupération des données")
+            throw new Error("Erreur lors de la récupération des données");
           }
-          return response.json()
+          return response.json();
         })
         .then((data) => {
-          setClassesData(data)
-          setLoading(false)
+          setClassesData(data);
+          setLoading(false);
         })
         .catch((err) => {
-          setError(err.message)
-          setLoading(false)
-        })
-    }, 50)
-  }, [isRunning])
+          setError(err.message);
+          setLoading(false);
+        });
+    }, 50);
+  }, [isRunning]);
 
   useEffect(() => {
-    socket.emit("getIsRunning")
+    socket.emit("getIsRunning");
     // Écouter les mises à jour de isRunning
     socket.on("updateIsRunning", (state) => {
-      setIsRunning(state)
-    })
+      setIsRunning(state);
+    });
 
     return () => {
-      socket.off("updateIsRunning")
-    }
-  }, [])
+      socket.off("updateIsRunning");
+    };
+  }, []);
 
   return (
     <>
@@ -62,7 +62,7 @@ function App() {
         </div>
       </div>
     </>
-  )
+  );
 }
 
-export default App
+export default App;
