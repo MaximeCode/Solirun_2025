@@ -374,52 +374,58 @@ try {
         }
         break;
 
-        case 'login':
-          if (isset($data['username']) && isset($data['password'])) {
-              // Préparation de la requête sécurisée
-              $stmt = $conn->prepare("SELECT id, username, password FROM Logins WHERE username = ?");
-              $stmt->bind_param("s", $data['username']);
-              $stmt->execute();
-              $result = $stmt->get_result();
-              
-              if ($result->num_rows === 1) {
-                  $user = $result->fetch_assoc();
-                  
-                  // Vérifier le mot de passe
-                  if (password_verify($data['password'], $user['password'])) {
-                      // Génération d'un identifiant de session simple
-                      $session_token = bin2hex(random_bytes(32));
-                      
-                      // Stockage du token en base de données
-                      $stmt = $conn->prepare("UPDATE Logins SET session_token = ?, last_login = NOW() WHERE id = ?");
-                      $stmt->bind_param("si", $session_token, $user['id']);
-                      $stmt->execute();
-                      
-                      showPrettyJson([
-                          "success" => true,
-                          "message" => "Connexion réussie",
-                          "token" => $session_token,
-                          "userId" => $user['id'],
-                          "username" => $user['username']
-                      ]);
-                  } else {
-                      http_response_code(401);
-                      showPrettyJson(["error" => "Mot de passe incorrect"]);
-                  }
-              } else {
-                  http_response_code(401);
-                  showPrettyJson(["error" => "Utilisateur non trouvé"]);
-              }
-              
-              $stmt->close();
-          } else {
-              http_response_code(400);
-              showPrettyJson(["error" => "Paramètres manquants (username, password)"]);
-          }
-          break;
+      case 'login':
+        error_log(json_encode($data));
+        if (isset($data['username']) && isset($data['password'])) {
+            // Préparation de la requête sécurisée
+            error_log(json_encode($data['username']));
+            $stmt = $conn->prepare("SELECT id, username, password FROM Logins WHERE username = ?");
+            $stmt->bind_param("s", $data['username']);
+            $stmt->execute();
+            $result = $stmt->get_result();
+
+            if ($result->num_rows === 1) {
+                $user = $result->fetch_assoc();
+                error_log(json_encode($user));
+                
+                
+                // Vérifier le mot de passe
+                if ($data['password'] === $user['password']) {
+                  error_log("password good !");
+                    // Génération d'un identifiant de session simple
+                    $session_token = bin2hex(random_bytes(32));
+                    
+                    // Stockage du token en base de données
+                    $stmt = $conn->prepare("UPDATE Logins SET session_token = ?, last_login = NOW() WHERE id = ?");
+                    $stmt->bind_param("si", $session_token, $user['id']);
+                    $stmt->execute();
+                    
+                    showPrettyJson([
+                        "success" => true,
+                        "message" => "Connexion réussie",
+                        "token" => $session_token,
+                        "userId" => $user['id'],
+                        "username" => $user['username']
+                    ]);
+                } else {
+                    http_response_code(401);
+                    showPrettyJson(["error" => "Mot de passe incorrect"]);
+                }
+            } else {
+                http_response_code(401);
+                showPrettyJson(["error" => "Utilisateur non trouvé"]);
+            }
+            
+            $stmt->close();
+        } else {
+            http_response_code(400);
+            showPrettyJson(["error" => "Paramètres manquants (username, password)"]);
+        }
+        break;
       
       case 'verifyToken':
           if (isset($data['token'])) {
+            error_log(json_encode($data));
               // Vérifier le token dans la base de données
               $stmt = $conn->prepare("SELECT id, username FROM Logins WHERE session_token = ?");
               $stmt->bind_param("s", $data['token']);
@@ -428,12 +434,14 @@ try {
               
               if ($result->num_rows === 1) {
                   $user = $result->fetch_assoc();
-                  showPrettyJson([
-                      "success" => true,
-                      "message" => "Token valide",
-                      "userId" => $user['id'],
-                      "username" => $user['username']
-                  ]);
+                  $response = [
+                    "success" => true,
+                    "message" => "Token valide",
+                    "userId" => $user['id'],
+                    "username" => $user['username']
+                  ];
+                  showPrettyJson($response);
+                  error_log(json_encode($response));
               } else {
                   http_response_code(401);
                   showPrettyJson(["error" => "Token invalide ou expiré"]);

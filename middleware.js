@@ -6,8 +6,9 @@ export async function middleware(request) {
 
   // Vérifier si l'utilisateur accède à une page Admin
   if (pathname.startsWith('/Admin')) {
-    // Récupérer le token depuis les cookies
+    // Récupérer le token
     const token = request.cookies.get('token')?.value;
+    console.log("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
 
     // Si pas de token, rediriger vers la page de login
     if (!token) {
@@ -16,13 +17,13 @@ export async function middleware(request) {
 
     try {
       // Vérifier le token auprès de l'API
-      const response = await fetch('http://localhost:3030/api.php', {
-        method: 'POST',
+      const response = await fetch("http://localhost:3030/api.php", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          action: 'verifyToken',
+          action: "verifyToken",
           token: token
         }),
       });
