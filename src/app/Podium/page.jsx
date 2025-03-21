@@ -53,6 +53,7 @@ function Podium() {
   const [showFirst, setShowFirst] = useState(false);
   const [showThird, setShowThird] = useState(false);
   const [PodiumData, setPodiumData] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     console.log("Fetching data...");
@@ -65,6 +66,7 @@ function Podium() {
       })
       .then((data) => {
         setPodiumData(data);
+        setLoading(false);
       });
 
     setTimeout(() => setShowThird(true), 1000); // 3ème place après 1s
@@ -73,12 +75,24 @@ function Podium() {
 
     // Delay the start of fireworks
     setTimeout(() => {
+      if (PodiumData.length === 0) return;
       window.ConfettiPage.play();
     }, 6000);
   }, []);
 
   const renderContent = () => {
     if (PodiumData.length === 0) {
+      if (loading) {
+        return (
+          <div className="bg-gradient-to-br from-gray-900 via-gray-750 to-gray-900 h-screen w-screen">
+            <div className="h-screen flex items-center justify-center text-white">
+              <h1 className="text-2xl font-bold text-center animate-fadeIn">
+                Chargement des données...
+              </h1>
+            </div>
+          </div>
+        );
+      }
       return (
         <div className="bg-gradient-to-br from-gray-900 via-gray-750 to-gray-900 h-screen w-screen">
           <button
