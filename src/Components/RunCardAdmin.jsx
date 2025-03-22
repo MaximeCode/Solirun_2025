@@ -69,7 +69,7 @@ const RunCardAdmin = ({
         </svg>
 
         <svg
-          onClick={() => deleteRuns(id)}
+          onClick={() => document.getElementById("my_modal").showModal()}
           className="w-6 h-6 text-red-500 cursor-pointer"
           aria-hidden="true"
           xmlns="http://www.w3.org/2000/svg"
@@ -102,6 +102,43 @@ const RunCardAdmin = ({
           ))}
         </ul>
       </div>
+      <dialog
+        id="my_modal"
+        className="modal">
+        <div className="modal-box border-2 border-blue-500">
+          <h3 className="font-bold text-lg text-blue-500">
+            Suppression de la course #{id}
+          </h3>
+          <hr className="text-blue-500 mt-2" />
+          <p className="py-4">
+            Êtes-vous sûr de vouloir supprimer cette course ?
+          </p>
+          <p className="text-red-500 font-bold">
+            Les classes participantes seront définitivement supprimées du
+            classement si la course est terminée.
+          </p>
+          <div className="modal-action">
+            <form method="dialog">
+              <div className="space-x-4">
+                <button
+                  onClick={() => deleteRuns(id)}
+                  className="btn btn-outline btn-error">
+                  Supprimer
+                </button>
+                <button className="btn">Annuler</button>
+              </div>
+              <button className="btn btn-md btn-circle btn-ghost absolute right-2 top-2 text-blue-500">
+                ✕
+              </button>
+            </form>
+          </div>
+        </div>
+        <form
+          method="dialog"
+          className="modal-backdrop">
+          <button>close</button>
+        </form>
+      </dialog>
     </div>
   );
 };

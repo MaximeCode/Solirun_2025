@@ -142,7 +142,6 @@ export default function ManageRuns() {
 
   // Fonction pour supprimer une course de la DB
   const deleteRun = (id) => {
-    if (!confirm("Voulez-vous vraiment supprimer cette course ?")) return;
     console.log(" ---- DeleteRun");
     setLoading(true);
     // Envoi de la requête pour supprimer la course
