@@ -24,11 +24,12 @@ const Classement = ({ data }) => {
             </h3>
             <div className="space-y-2">
               {sortedData.slice(0, 3).map((classe, index) => (
-                <ClassePodiumItem
-                  key={classe.id}
-                  rank={index + 1}
-                  classe={classe}
-                />
+                <div key={classe.id}>
+                  <ClassePodiumItem
+                    rank={index + 1}
+                    classe={classe}
+                  />
+                </div>
               ))}
             </div>
           </div>
@@ -36,11 +37,12 @@ const Classement = ({ data }) => {
           <div className="mt-6 bg-orange-100 rounded-lg p-4">
             <div className="space-y-2">
               {sortedData.slice(3).map((classe, index) => (
-                <ClasseItem
-                  key={classe.id}
-                  rank={index + 4}
-                  classe={classe}
-                />
+                <div key={classe.id}>
+                  <ClasseItem
+                    rank={index + 4}
+                    classe={classe}
+                  />
+                </div>
               ))}
             </div>
           </div>

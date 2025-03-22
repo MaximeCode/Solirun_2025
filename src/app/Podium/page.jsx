@@ -6,7 +6,6 @@ import Image from "next/image";
 
 // Extracted component for a podium position
 const PodiumPosition = ({
-  position,
   data,
   isVisible,
   height,
@@ -39,7 +38,6 @@ const PodiumPosition = ({
 };
 
 PodiumPosition.propTypes = {
-  position: PropTypes.number.isRequired,
   data: PropTypes.object,
   isVisible: PropTypes.bool,
   height: PropTypes.string.isRequired,
@@ -72,13 +70,15 @@ function Podium() {
     setTimeout(() => setShowThird(true), 1000); // 3ème place après 1s
     setTimeout(() => setShowSecond(true), 2000); // 2ème place après 2s
     setTimeout(() => setShowFirst(true), 5000); // 1ère place après 5s
-
-    // Delay the start of fireworks
-    setTimeout(() => {
-      if (PodiumData.length === 0) return;
-      window.ConfettiPage.play();
-    }, 6000);
   }, []);
+
+  useEffect(() => {
+    if (PodiumData.length > 0) {
+      setTimeout(() => {
+        window.ConfettiPage.play();
+      }, 6000); // Déclencher les confettis 6s après la mise à jour
+    }
+  }, [PodiumData]);
 
   const renderContent = () => {
     if (PodiumData.length === 0) {
@@ -95,11 +95,6 @@ function Podium() {
       }
       return (
         <div className="bg-gradient-to-br from-gray-900 via-gray-750 to-gray-900 h-screen w-screen">
-          <button
-            className="absolute top-0 left-0 p-4 text-white"
-            onClick={() => window.history.back()}>
-            🡠 Retour
-          </button>
           <div className="h-screen flex items-center justify-center text-red-500">
             <h1 className="text-2xl font-bold text-center animate-fadeIn">
               Aucune course n'a été couru pour le moment !
@@ -111,8 +106,18 @@ function Podium() {
 
     return (
       <>
-        <div className="absolute top-10 left-1/12">
-          <div>Logo Solirun</div>
+        <div
+          className="absolute top-10 left-1/12 bg-white rounded-lg opacity-0 animate-fadeIn"
+          style={{
+            animationDelay: "6s",
+            animationFillMode: "forwards",
+          }}>
+          <Image
+            src="/logo_Solirun2025.jpg"
+            width={200}
+            height={200}
+            alt="Logo Solirun 2025"
+          />
         </div>
 
         <div
@@ -140,7 +145,6 @@ function Podium() {
 
             <div className="flex items-end justify-center gap-6 w-full">
               <PodiumPosition
-                position={2}
                 data={PodiumData[1]}
                 isVisible={showSecond}
                 height="70"
@@ -150,7 +154,6 @@ function Podium() {
               />
 
               <PodiumPosition
-                position={1}
                 data={PodiumData[0]}
                 isVisible={showFirst}
                 height="100"
@@ -160,7 +163,6 @@ function Podium() {
               />
 
               <PodiumPosition
-                position={3}
                 data={PodiumData[2]}
                 isVisible={showThird}
                 height="40"
