@@ -1,25 +1,25 @@
-"use client"
+"use client";
 
-import NewItem from "@/Components/NewItem"
-import ToastAlert, { showToast } from "@/Components/ToastAlert"
-import UpdateClass from "@/Components/UpdateClass"
-import { useState, useEffect } from "react"
+import NewItem from "@/Components/NewItem";
+import ToastAlert, { showToast } from "@/Components/ToastAlert";
+import UpdateClass from "@/Components/UpdateClass";
+import { useState, useEffect } from "react";
 
 export default function ManageClasses() {
   const initClass = {
     name: "",
     nbStudents: 0,
-  }
+  };
 
-  const [classes, setClasses] = useState([])
+  const [classes, setClasses] = useState([]);
 
-  const [loading, setLoading] = useState(true)
-  const [showUpdateClass, setShowUpdateClass] = useState(0) // 0 => Ne pas afficher, [nb] => Afficher le composant update pour la classe avec l'id [nb]
-  const [dataRefresh, setDataRefresh] = useState(false)
+  const [loading, setLoading] = useState(true);
+  const [showUpdateClass, setShowUpdateClass] = useState(0); // 0 => Ne pas afficher, [nb] => Afficher le composant update pour la classe avec l'id [nb]
+  const [dataRefresh, setDataRefresh] = useState(false);
 
   // Add class
-  const [showAddClass, setShowAddClass] = useState(0) // 0 => Ne pas afficher, 1 => Afficher le +, 2 => Afficher le formulaire
-  const [newClass, setNewClass] = useState(initClass)
+  const [showAddClass, setShowAddClass] = useState(0); // 0 => Ne pas afficher, 1 => Afficher le +, 2 => Afficher le formulaire
+  const [newClass, setNewClass] = useState(initClass);
 
   useEffect(() => {
     // Fonction pour récupérer les scores depuis l'API PHP
@@ -28,22 +28,26 @@ export default function ManageClasses() {
         // Appel à l'API pour obtenir les classes
         const response = await fetch(
           "http://localhost:3030/api.php?action=Classes"
-        )
+        );
         // Convertir la réponse en format JSON
-        const data = await response.json()
+        const data = await response.json();
         // Mettre à jour l'état avec les données récupérées
-        setClasses(data)
+        setClasses(data);
       } catch (error) {
-        showToast(error.message, true)
+        showToast(error.message, true);
       } finally {
-        setLoading(false)
-        setShowAddClass(1)
+        setLoading(false);
+        setShowAddClass(1);
       }
     }
 
     // Appeler la fonction pour récupérer les classes
-    fetchClasses()
-  }, [dataRefresh])
+    fetchClasses();
+  }, [dataRefresh]);
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, [!showUpdateClass]);
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -66,7 +70,7 @@ export default function ManageClasses() {
       }),
     })
       .then((response) => {
-        console.log(response)
+        console.log(response);
         if (!response.ok) {
           showToast("Erreur lors de l'insertion de la classe ❌", true)
           throw new Error(
@@ -101,14 +105,14 @@ export default function ManageClasses() {
             "Erreur lors de l'insertion de la classe en base de données"
           )
         }
-        setDataRefresh(!dataRefresh)
-        showToast("Classes enregistrées avec succès ✅", false)
+        setDataRefresh(!dataRefresh);
+        showToast(`Classe supprimée avec succès ✅`, false);
       })
       .catch((error) => {
-        console.error("Erreur:", error)
-        showToast(error.message, true)
-      })
-  }
+        console.error("Erreur:", error);
+        showToast(error.message, true);
+      });
+  };
 
   const updateClass = (classe) => {
     fetch("http://localhost:3030/api.php", {
@@ -154,7 +158,7 @@ export default function ManageClasses() {
           updateClassFunction={updateClass}
           onCancel={() => setShowUpdateClass(0)}
           onSuccess={() => {
-            setShowUpdateClass(0)
+            setShowUpdateClass(0);
           }}
           showToast={showToast}
         />
@@ -163,9 +167,9 @@ export default function ManageClasses() {
       <p className="my-4">Nombre de classes participantes: {classes.length}</p>
 
       <div className="grid grid-cols-1 gap-4 justify-items-center md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-        {classes.map((classe, index) => (
+        {classes.map((classe) => (
           <div
-            key={index}
+            key={classe.id}
             className="w-75 p-6 bg-white border border-gray-200 rounded-lg shadow-sm relative">
             {/* Bin to del the class */}
             <div className="absolute top-0 right-0 p-2">
@@ -241,13 +245,13 @@ export default function ManageClasses() {
                 className="btn btn-success"
                 onClick={() => {
                   if (newClass.name === "" || newClass.nbStudents === 0) {
-                    alert("Veuillez remplir tous les champs")
-                    return
+                    alert("Veuillez remplir tous les champs");
+                    return;
                   }
-                  saveClass(newClass)
-                  setShowAddClass(1)
-                  setNewClass(initClass)
-                  showToast("Classe ajoutée avec succès !", false)
+                  saveClass(newClass);
+                  setShowAddClass(1);
+                  setNewClass(initClass);
+                  showToast("Classe ajoutée avec succès !", false);
                 }}>
                 Ajouter
               </button>
@@ -255,8 +259,8 @@ export default function ManageClasses() {
               <button
                 className="btn btn-soft"
                 onClick={() => {
-                  setShowAddClass(1)
-                  setNewClass(initClass)
+                  setShowAddClass(1);
+                  setNewClass(initClass);
                 }}>
                 Annuler
               </button>
@@ -270,5 +274,5 @@ export default function ManageClasses() {
         ) : null}
       </div>
     </div>
-  )
+  );
 }

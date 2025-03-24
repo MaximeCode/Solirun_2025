@@ -1,3 +1,6 @@
+import React from "react";
+import PropTypes from "prop-types";
+
 export default function NewItem({ setShow }) {
   return (
     <div className="flex items-center justify-center">
@@ -20,5 +23,9 @@ export default function NewItem({ setShow }) {
         </svg>
       </button>
     </div>
-  )
+  );
 }
+
+NewItem.propTypes = {
+  setShow: PropTypes.func.isRequired,
+};

@@ -1,8 +1,8 @@
-import React from "react"
-import PropTypes from "prop-types"
+import React from "react";
+import PropTypes from "prop-types";
 
 const RunCard = ({ id, time, classList, setSelectedRun, selectedRun }) => {
-  const classArray = classList.split(",")
+  const classArray = classList.split(",");
 
   return (
     <button
@@ -21,9 +21,9 @@ const RunCard = ({ id, time, classList, setSelectedRun, selectedRun }) => {
           Classes participantes :
         </h4>
         <ul className="space-y-2">
-          {classArray.map((classe, index) => (
+          {classArray.map((classe) => (
             <li
-              key={index}
+              key={`${id}-${classe}`}
               className="p-2 bg-gray-200 rounded-md text-center font-medium">
               {classe}
             </li>
@@ -31,14 +31,14 @@ const RunCard = ({ id, time, classList, setSelectedRun, selectedRun }) => {
         </ul>
       </div>
     </button>
-  )
-}
+  );
+};
 RunCard.propTypes = {
   id: PropTypes.number.isRequired,
   time: PropTypes.string.isRequired,
   classList: PropTypes.string.isRequired,
   setSelectedRun: PropTypes.func.isRequired,
   selectedRun: PropTypes.number,
-}
+};
 
-export default RunCard
+export default RunCard;

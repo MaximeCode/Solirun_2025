@@ -1,35 +1,36 @@
-import React, { useState, useEffect } from "react"
-import { socket } from "@/utils/socket"
+import React, { useState, useEffect } from "react";
+import { socket } from "@/utils/socket";
+import PropTypes from "prop-types";
 
 const ClassManager = ({ classe, setClasse }) => {
-  const [laps, setLaps] = useState(classe.laps || 0)
+  const [laps, setLaps] = useState(classe.laps || 0);
 
   useEffect(() => {
     socket.on("updateClasses", () => {
-      socket.emit("getClassById", classe.id)
-    })
+      socket.emit("getClassById", classe.id);
+    });
     socket.on("receiveClass", (response) => {
-      setLaps(response.laps) // Met à jour le nombre de tours
-    })
+      setLaps(response.laps); // Met à jour le nombre de tours
+    });
 
     return () => {
-      socket.off("receiveClass") // Nettoyage lors du démontage du composant
-    }
-  }, [])
+      socket.off("receiveClass"); // Nettoyage lors du démontage du composant
+    };
+  }, []);
 
   const handleTourUpdate = (id, increment) => {
     // Émettre l'événement pour mettre à jour les tours
-    socket.emit("updateToursById", { id, increment })
+    socket.emit("updateToursById", { id, increment });
 
     // Émettre un événement pour récupérer la classe mise à jour
-    socket.emit("getClassById", id)
-  }
+    socket.emit("getClassById", id);
+  };
 
   const BackToManager = () => {
     // Émettre un événement pour désélectionner la classe
-    socket.emit("UnUseClasse", classe)
-    setClasse(null)
-  }
+    socket.emit("UnUseClasse", classe);
+    setClasse(null);
+  };
   return (
     <div className="flex items-center justify-center h-screen relative">
       {/* Bouton retour */}
@@ -87,7 +88,17 @@ const ClassManager = ({ classe, setClasse }) => {
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
+ClassManager.propTypes = {
+  classe: PropTypes.shape({
+    id: PropTypes.string.isRequired,
+    name: PropTypes.string.isRequired,
+    alias: PropTypes.string.isRequired,
+    students: PropTypes.number.isRequired,
+    laps: PropTypes.number,
+  }).isRequired,
+  setClasse: PropTypes.func.isRequired,
+};
 
-export default ClassManager
+export default ClassManager;

@@ -95,5 +95,13 @@ const Classement = ({ data }) => {
 		</div>
 	);
 };
+Classement.propTypes = {
+  data: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.string.isRequired,
+      laps: PropTypes.number.isRequired,
+    })
+  ).isRequired,
+};
 
 export default Classement;

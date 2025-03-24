@@ -1,14 +1,50 @@
-import React from "react"
-import PropTypes from "prop-types"
+import React from "react";
+import PropTypes from "prop-types";
 
 const RunCardAdmin = ({
   id,
-  idTxt,
   time,
   className,
   setShowUpdateRun,
   deleteRuns,
+  run,
 }) => {
+  // Determine run status
+  const getRunStatus = () => {
+    console.log(run);
+    if (run.startTime !== null) {
+      if (run.endTime !== null) {
+        return 2; // Terminée
+      }
+      return 1; // En cours
+    }
+    return 0; // Pas encore commencée
+  };
+
+  const renderStatusMessage = () => {
+    if (status === 2) {
+      return (
+        <p className="text-center text-xl font-semibold text-green-500">
+          Terminée !
+        </p>
+      );
+    } else if (status === 1) {
+      return (
+        <p className="text-center text-xl font-semibold text-blue-500">
+          En cours...
+        </p>
+      );
+    } else {
+      return (
+        <p className="text-lg text-center mb-4">
+          ⏳ Heure de départ estimée :{" "}
+          <span className="font-semibold">{time}</span>
+        </p>
+      );
+    }
+  };
+
+  const status = getRunStatus();
   return (
     <div
       className={`text-black shadow-lg rounded-xl p-6 mx-auto w-full max-w-md transition-transform duration-300 text-left border-none cursor-default relative space-y-4`}>
@@ -33,7 +69,7 @@ const RunCardAdmin = ({
         </svg>
 
         <svg
-          onClick={() => deleteRuns(id)}
+          onClick={() => document.getElementById(`my_modal_${id}`).showModal()}
           className="w-6 h-6 text-red-500 cursor-pointer"
           aria-hidden="true"
           xmlns="http://www.w3.org/2000/svg"
@@ -50,35 +86,69 @@ const RunCardAdmin = ({
           />
         </svg>
       </div>
-      <h3 className="text-2xl font-bold text-center mb-4">Course #{idTxt}</h3>
-      <p className="text-lg text-center mb-4">
-        ⏳ Heure de départ estimée :{" "}
-        <span className="font-semibold">{time}</span>
-      </p>
+      <h3 className="text-2xl font-bold text-center mb-4">Course #{id}</h3>
+      {renderStatusMessage()}
       <div className="bg-gray-100 border border-gray-200 text-black p-4 rounded-lg">
         <h4 className="text-xl font-semibold text-center mb-2">
           Classes participantes :
         </h4>
         <ul className="space-y-2">
-          {className.map((classe, index) => (
+          {className.map((classe) => (
             <li
-              key={index}
+              key={classe}
               className="p-2 bg-gray-200 rounded-md text-center font-medium">
               {classe}
             </li>
           ))}
         </ul>
       </div>
+      <dialog
+        id={`my_modal_${id}`}
+        className="modal">
+        <div className="modal-box border-2 border-blue-500">
+          <h3 className="font-bold text-lg text-blue-500">
+            Suppression de la course #{id}
+          </h3>
+          <hr className="text-blue-500 mt-2" />
+          <p className="py-4">
+            Êtes-vous sûr de vouloir supprimer cette course ?
+          </p>
+          <p className="text-red-500 font-bold">
+            Les classes participantes seront définitivement supprimées du
+            classement si la course est terminée.
+          </p>
+          <div className="modal-action">
+            <form method="dialog">
+              <div className="space-x-4">
+                <button
+                  onClick={() => deleteRuns(id)}
+                  className="btn btn-outline btn-error">
+                  Supprimer
+                </button>
+                <button className="btn">Annuler</button>
+              </div>
+              <button className="btn btn-md btn-circle btn-ghost absolute right-2 top-2 text-blue-500">
+                ✕
+              </button>
+            </form>
+          </div>
+        </div>
+        <form
+          method="dialog"
+          className="modal-backdrop">
+          <button>close</button>
+        </form>
+      </dialog>
     </div>
-  )
-}
+  );
+};
 RunCardAdmin.propTypes = {
   id: PropTypes.number,
-  idTxt: PropTypes.number,
   time: PropTypes.string,
   className: PropTypes.array,
   setShowUpdateRun: PropTypes.func,
   deleteRuns: PropTypes.func,
-}
+  run: PropTypes.object,
+};
 
-export default RunCardAdmin
+export default RunCardAdmin;

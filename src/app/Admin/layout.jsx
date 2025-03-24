@@ -4,6 +4,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Header from "@/Components/Header";
+import PropTypes from "prop-types";
 
 export default function AdminLayout({ children }) {
 	const [authenticated, setAuthenticated] = useState(false);
@@ -120,3 +121,7 @@ export default function AdminLayout({ children }) {
 		</div>
 	) : null;
 }
+
+AdminLayout.propTypes = {
+	children: PropTypes.node.isRequired,
+  };

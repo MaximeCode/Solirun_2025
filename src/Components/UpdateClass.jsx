@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from "react"
+import PropTypes from "prop-types";
+import React, { useState, useEffect } from "react";
 
 export default function UpdateClass({
   classe,
@@ -11,8 +12,8 @@ export default function UpdateClass({
     id: 0,
     name: "",
     nbStudents: 0,
-  })
-  const [loading, setLoading] = useState(false) // true => Afficher the loader, false => Ne rien afficher
+  });
+  const [loading, setLoading] = useState(false); // true => Afficher the loader, false => Ne rien afficher
 
   useEffect(() => {
     if (classe) {
@@ -20,17 +21,17 @@ export default function UpdateClass({
         id: classe.id,
         name: classe.name || "",
         nbStudents: classe.nbStudents || 0,
-      })
+      });
     }
-  }, [classe])
+  }, [classe]);
 
   const handleChange = (e) => {
-    const { name, value } = e.target
+    const { name, value } = e.target;
     setFormData({
       ...formData,
       [name]: value,
-    })
-  }
+    });
+  };
 
   // Update de la classe ds la list des classes avant l'envoi vers la db
   const updateClass = () => {
@@ -42,9 +43,9 @@ export default function UpdateClass({
   }
 
   const handleSubmit = (e) => {
-    e.preventDefault()
-    updateClass()
-  }
+    e.preventDefault();
+    updateClass();
+  };
 
   return (
     <div className="w-100 mx-auto space-y-6 border border-gray-200 rounded-lg shadow-sm p-6 ${updateStatus != null ? 'hidden' : 'block'}">
@@ -111,5 +112,13 @@ export default function UpdateClass({
         </div>
       </form>
     </div>
-  )
+  );
 }
+
+UpdateClass.propTypes = {
+  classe: PropTypes.object,
+  updateClassFunction: PropTypes.func.isRequired,
+  onCancel: PropTypes.func.isRequired,
+  onSuccess: PropTypes.func.isRequired,
+  showToast: PropTypes.func.isRequired,
+};

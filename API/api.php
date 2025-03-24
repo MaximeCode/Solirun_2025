@@ -1,5 +1,7 @@
 <?php
 
+class PersonalException extends Exception {}
+
 header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Methods: GET, POST, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type, Authorization");
@@ -85,7 +87,7 @@ try {
       case 'ClassesRunning':
         if (isset($_GET['id'])) {
           $id = $_GET['id'];
-          fetchData("SELECT Classes.id, Classes.name, Classes.surname AS alias, Classes.color, Classes.nbStudents AS students, Runners.laps FROM Classes INNER JOIN Runners ON Classes.id = Runners.theClass INNER JOIN Runs ON Runs.id = Runners.theRun WHERE Runs.id = ?", $conn, [$id]);
+          fetchData("SELECT Classes.id, Classes.name, Classes.color, Classes.nbStudents AS students, Runners.laps FROM Classes INNER JOIN Runners ON Classes.id = Runners.theClass INNER JOIN Runs ON Runs.id = Runners.theRun WHERE Runs.id = ?", $conn, [$id]);
         } else {
           http_response_code(400); // Bad Request
           showPrettyJson(["error" => "Paramètre 'id' requis"]);
@@ -169,7 +171,7 @@ try {
             $stmt->bind_param("sis", $class['name'], $class['nbStudents'], $codeClass);
 
             if (!$stmt->execute()) {
-              throw new Exception("Failed to insert class: " . $stmt->error);
+              throw new PersonalException("Failed to insert class: " . $stmt->error);
             }
             error_log("Class inserted successfully ✅");
 
@@ -185,59 +187,59 @@ try {
           $conn->commit();
         }
         break;
-        case 'updateClass':
-          if (isset($data['classe'])) {
-              $class = $data["classe"];
-              
-              // Vérification des données obligatoires
-              if (!isset($class['name'], $class['nbStudents'], $class['id'])) {
-                  http_response_code(400);
-                  showPrettyJson(["error" => "Données manquantes pour la mise à jour de la classe"]);
-                  break;
-              }
-      
-              // Sécurisation de l'ID (conversion en entier)
-              $class['id'] = (int)$class['id'];
-      
-              // Génération du codeClass avec sécurité
-              if (strlen($class['name']) >= 3) {
-                  $codeClass = strtoupper(substr($class['name'], 0, 3)) . substr($class['name'], -1);
-              } else {
-                  $codeClass = strtoupper($class['name']); // Si trop court, prend tout
-              }
+      case 'updateClass':
+        if (isset($data['classe'])) {
+          $class = $data["classe"];
 
-              error_log("Classe reçue: " . json_encode($class));
-      
-              $conn->begin_transaction();
-              try {
-                  error_log("Attempting to update class");
-      
-                  $stmt = $conn->prepare("UPDATE Classes SET name = ?, nbStudents = ?, codeClass = ? WHERE id = ?");
-                  if (!$stmt) {
-                      throw new Exception("Erreur de préparation de la requête: " . $conn->error);
-                  }
-      
-                  $stmt->bind_param("sssi", $class['name'], $class['nbStudents'], $codeClass, $class['id']);
-      
-                  if (!$stmt->execute()) {
-                      throw new Exception("Échec de mise à jour de la classe: " . $stmt->error);
-                  }
-      
-                  error_log("Class updated successfully ✅");
-      
-                  $stmt->close(); // ✅ Fermeture du statement
-                  $conn->commit(); // ✅ Commit après succès
-              } catch (Exception $e) {
-                  $conn->rollback(); // ✅ Rollback en cas d'erreur
-                  error_log("Error in updateClass: " . $e->getMessage());
-                  http_response_code(500);
-                  showPrettyJson(["error" => "Erreur lors de la mise à jour de la classe: " . $e->getMessage()]);
-              }
-          } else {
-              http_response_code(400);
-              showPrettyJson(["error" => "Paramètres manquants pour la mise à jour de la classe"]);
+          // Vérification des données obligatoires
+          if (!isset($class['name'], $class['nbStudents'], $class['id'])) {
+            http_response_code(400);
+            showPrettyJson(["error" => "Données manquantes pour la mise à jour de la classe"]);
+            break;
           }
-          break;
+
+          // Sécurisation de l'ID (conversion en entier)
+          $class['id'] = (int)$class['id'];
+
+          // Génération du codeClass avec sécurité
+          if (strlen($class['name']) >= 3) {
+            $codeClass = strtoupper(substr($class['name'], 0, 3)) . substr($class['name'], -1);
+          } else {
+            $codeClass = strtoupper($class['name']); // Si trop court, prend tout
+          }
+
+          error_log("Classe reçue: " . json_encode($class));
+
+          $conn->begin_transaction();
+          try {
+            error_log("Attempting to update class");
+
+            $stmt = $conn->prepare("UPDATE Classes SET name = ?, nbStudents = ?, codeClass = ? WHERE id = ?");
+            if (!$stmt) {
+              throw new PersonalException("Erreur de préparation de la requête: " . $conn->error);
+            }
+
+            $stmt->bind_param("sssi", $class['name'], $class['nbStudents'], $codeClass, $class['id']);
+
+            if (!$stmt->execute()) {
+              throw new PersonalException("Échec de mise à jour de la classe: " . $stmt->error);
+            }
+
+            error_log("Class updated successfully ✅");
+
+            $stmt->close(); // ✅ Fermeture du statement
+            $conn->commit(); // ✅ Commit après succès
+          } catch (Exception $e) {
+            $conn->rollback(); // ✅ Rollback en cas d'erreur
+            error_log("Error in updateClass: " . $e->getMessage());
+            http_response_code(500);
+            showPrettyJson(["error" => "Erreur lors de la mise à jour de la classe: " . $e->getMessage()]);
+          }
+        } else {
+          http_response_code(400);
+          showPrettyJson(["error" => "Paramètres manquants pour la mise à jour de la classe"]);
+        }
+        break;
       case 'deleteClass':
         if (isset($data['classId'])) {
           $conn->begin_transaction();
@@ -246,12 +248,13 @@ try {
 
             $stmt->bind_param("i", $data["classId"]);
             if (!$stmt->execute()) {
-              throw new Exception("Failed to delete classe: " . $stmt->error);
+              throw new PersonalException("Failed to delete classe: " . $stmt->error);
             }
             error_log("Deleted classe successfully ✅");
 
             showPrettyJson(["success" => "Classe supprimée avec succès"]);
           } catch (Exception $e) {
+
             $conn->rollback();
             error_log("Error in deleteClass: " . $e->getMessage());
             http_response_code(500);
@@ -271,7 +274,7 @@ try {
             $stmt = $conn->prepare("INSERT INTO Runs (estimatedTime) VALUES (?)");
             $stmt->bind_param("s", $data['estimatedTime']);
             if (!$stmt->execute()) {
-              throw new Exception("Failed to insert run: " . $stmt->error);
+              throw new PersonalException("Failed to insert run: " . $stmt->error);
             }
             error_log("Run inserted successfully ✅");
 
@@ -284,11 +287,11 @@ try {
               $stmt = $conn->prepare("INSERT INTO Runners (theClass, theRun) VALUES (?, ?)");
               $stmt->bind_param("ii", $class_id, $runId);
               if (!$stmt->execute()) {
-                throw new Exception("Failed to link class to run: " . $stmt->error);
+                throw new PersonalException("Failed to link class to run: " . $stmt->error);
               }
               error_log("Linked class $class_id to run " . $runId);
             }
-          } catch (Exception $e) {
+          } catch (PersonalException $e) {
             $conn->rollback();
             error_log("Error in insertRun: " . $e->getMessage());
             http_response_code(500);
@@ -299,45 +302,48 @@ try {
         break;
 
       case 'updateRun':
-        if (isset($data['run_id']) && isset($data['estimatedTime']) && isset($data['class_idToAdd']) && isset($data['class_idToRemove'])) {
+        if (isset($data['run_id']) && isset($data['estimatedTime']) && isset($data['newListId']) && isset($data['oldListId'])) {
+          error_log("Updating run: " . $data['run_id'] . " with estimated time: " . $data['estimatedTime'] . " and classes to add: " . implode(", ", $data['newListId']) . " and classes to remove: " . implode(", ", $data['oldListId']));
           $conn->begin_transaction();
           try {
             error_log("Attempting to update run");
             $stmt = $conn->prepare("UPDATE Runs SET estimatedTime = ? WHERE id = ?");
             $stmt->bind_param("si", $data['estimatedTime'], $data['run_id']);
             if (!$stmt->execute()) {
-              throw new Exception("Failed to update run: " . $stmt->error);
+              throw new PersonalException("Failed to update run: " . $stmt->error);
             }
             error_log("Run updated successfully ✅");
 
+            // Unlink to Runners table
+            foreach ($data['oldListId'] as $class_id) {
+              $stmt = $conn->prepare("DELETE FROM Runners WHERE theClass = ? AND theRun = ?");
+              $stmt->bind_param("ii", $class_id, $data['run_id']);
+              if (!$stmt->execute()) {
+                throw new PersonalException("Failed to unlink class from run: " . $stmt->error);
+              }
+              error_log("Unlinked class $class_id from run " . $data['run_id']);
+            }
+
             // Link to Runners table
-            foreach ($data['class_idToAdd'] as $class_id) {
+            foreach ($data['newListId'] as $class_id) {
               $stmt = $conn->prepare("INSERT INTO Runners (theClass, theRun) VALUES (?, ?)");
               $stmt->bind_param("ii", $class_id, $data['run_id']);
               if (!$stmt->execute()) {
-                throw new Exception("Failed to link class to run: " . $stmt->error);
+                throw new PersonalException("Failed to link class to run: " . $stmt->error);
               }
               error_log("Linked class $class_id to run " . $data['run_id']);
             }
 
-            // Unlink from Runners table
-            foreach ($data['class_idToRemove'] as $class_id) {
-              $stmt = $conn->prepare("DELETE FROM Runners WHERE theClass = ? AND theRun = ?");
-              $stmt->bind_param("ii", $class_id, $data['run_id']);
-              if (!$stmt->execute()) {
-                throw new Exception("Failed to unlink class from run: " . $stmt->error);
-              }
-              error_log("Unlinked class $class_id from run " . $data['run_id']);
-            }
-          } catch (Exception $e) {
+            showPrettyJson(["success" => "Course mise à jour avec succès"]);
+          } catch (PersonalException $e) {
             $conn->rollback();
             error_log("Error in updateRun: " . $e->getMessage());
-            http_response_code(500);
+            http_response_code(550);
             showPrettyJson(["error" => "Erreur lors de la mise à jour de la course: " . $e->getMessage()]);
           }
           $conn->commit();
         } else {
-          http_response_code(400);
+          http_response_code(450);
           showPrettyJson(["error" => "Paramètres manquants pour la mise à jour de la course"]);
         }
         break;
@@ -349,19 +355,19 @@ try {
             $stmt = $conn->prepare("DELETE FROM Runners WHERE theRun = ?");
             $stmt->bind_param("i", $data['run_id']);
             if (!$stmt->execute()) {
-              throw new Exception("Failed to delete runners: " . $stmt->error);
+              throw new PersonalException("Failed to delete runners: " . $stmt->error);
             }
             error_log("Deleted runners successfully ✅");
 
             $stmt = $conn->prepare("DELETE FROM Runs WHERE id = ?");
             $stmt->bind_param("i", $data['run_id']);
             if (!$stmt->execute()) {
-              throw new Exception("Failed to delete run: " . $stmt->error);
+              throw new PersonalException("Failed to delete run: " . $stmt->error);
             }
             error_log("Deleted run successfully");
 
             showPrettyJson(["success" => "Course supprimée avec succès"]);
-          } catch (Exception $e) {
+          } catch (PersonalException $e) {
             $conn->rollback();
             error_log("Error in deleteRun: " . $e->getMessage());
             http_response_code(500);
@@ -460,7 +466,7 @@ try {
     http_response_code(400);
     showPrettyJson(["error" => "Requête invalide"]);
   }
-} catch (Exception $e) {
+} catch (PersonalException $e) {
   http_response_code(500); // Internal Server Error
   showPrettyJson(["error" => "Erreur serveur : " . $e->getMessage()]);
 }
