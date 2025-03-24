@@ -22,7 +22,7 @@ export default function HomePage() {
   return (
     <div className="relative flex flex-col items-center justify-center min-h-screen bg-black text-white overflow-hidden">
       {/* Background Animation */}
-      <div className="absolute inset-0 z-0 bg-gradient-to-br from-indigo-900 via-black to-gray-900 opacity-50 blur-3xl animate-pulse"></div>
+      <div className="absolute inset-0 z-0 bg-gradient-to-br from-indigo-800 via-black to-fuchsia-800 opacity-75 blur-3xl animate-pulse"></div>
       
       {/* Moving Circle */}
       <motion.div 

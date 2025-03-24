@@ -1,12 +1,10 @@
-"use client";
-
 import React, { useEffect, useState } from "react";
 import ClassCard from "./RealTimeClassCard";
 import { socket } from "@/utils/socket";
 import Clock from "./Clock";
 
 const ClassementReel = () => {
-  const [classes, setclasses] = useState([]);
+  const [classes, setClasses] = useState([]);
   const [sortedClasses, setSortedClasses] = useState([...classes]);
 
   useEffect(() => {
@@ -26,7 +24,7 @@ const ClassementReel = () => {
     socket.emit("getClasses");
     // Écouter les mises à jour de isRunning
     socket.on("updateClasses", (classes) => {
-      setclasses(classes);
+      setClasses(classes);
     });
 
     return () => {
@@ -36,21 +34,21 @@ const ClassementReel = () => {
 
   return (
     <>
-      <div className="bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg rounded-xl p-8 mx-auto">
+      <div className="text-white rounded-xl p-8 mx-auto mb-12">
         <Clock />
-        <h2 className="text-4xl font-extrabold text-center mb-8 font-outline-2">
+        <h2 className="text-5xl font-extrabold text-center mb-6 font-outline-2 leading-tight">
           Classement des Classes
         </h2>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 px-4 mt-24">
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 px-6 mt-12">
         {sortedClasses.map((classe, index) => (
           <div
             key={classe.id}
-            className={`transition-all duration-500 ${
-              classe.movingUp
-                ? "transform -translate-y-2 scale-105 shadow-2xl"
-                : ""
-            }`}>
+            className={`transition-all duration-500 ease-in-out ${
+              classe.movingUp ? "transform -translate-y-3 scale-105 shadow-2xl" : ""
+            }`}
+          >
             <ClassCard
               position={index}
               id={classe.id}

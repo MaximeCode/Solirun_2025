@@ -26,9 +26,8 @@ const Classement = ({ data }) => {
 					container.scrollHeight
 				) {
 					// Fin du scroll, pause et retour en haut
-					clearInterval(scrollInterval);
 					timeout = setTimeout(() => {
-						container.scrollTo({ top: 0, behavior: "smooth" });
+						container.scrollBy({ top: -SCROLL_SPEED, behavior: "smooth" });
 						setTimeout(startScrolling, SCROLL_DELAY); // Redémarre le scroll après 3s
 					}, SCROLL_DELAY);
 				} else {
@@ -46,7 +45,7 @@ const Classement = ({ data }) => {
 	}, [sortedData.length]);
 
 	return (
-		<div className="bg-gray-800 h-max w-full text-white shadow-lg rounded-xl p-8 mx-auto flex flex-col">
+		<div className="h-max w-full text-white shadow-lg rounded-xl p-8 mx-auto flex flex-col">
 			<Clock />
 			<h2 className="text-6xl font-extrabold text-center mb-8">
 				Classement général
@@ -94,14 +93,6 @@ const Classement = ({ data }) => {
 			)}
 		</div>
 	);
-};
-Classement.propTypes = {
-  data: PropTypes.arrayOf(
-    PropTypes.shape({
-      id: PropTypes.string.isRequired,
-      laps: PropTypes.number.isRequired,
-    })
-  ).isRequired,
 };
 
 export default Classement;

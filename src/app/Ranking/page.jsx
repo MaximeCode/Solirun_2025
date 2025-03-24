@@ -33,35 +33,39 @@ function App() {
 
   useEffect(() => {
     socket.emit("getIsRunning");
-    // Écouter les mises à jour de isRunning
     socket.on("updateIsRunning", (state) => {
       setIsRunning(state);
     });
-
     return () => {
       socket.off("updateIsRunning");
     };
   }, []);
 
   return (
-    <>
-      <div className="fixed top-0 left-0 bg-gradient-to-br from-gray-900 via-gray-750 to-gray-900 h-screen w-screen -z-1"></div>
-      <div className="max-h-screen">
-        <div className="px-9 pt-10">
-          {!isRunning ? (
-            <>
-              {loading && (
-                <p className="text-white">Chargement des données...</p>
-              )}
-              {error && <p className="text-red-500">Erreur : {error}</p>}
-              {!loading && !error && <Classement data={classesData} />}
-            </>
-          ) : (
+    <div className="relative flex flex-col items-center justify-center min-h-screen bg-black text-white overflow-hidden">
+      {/* Background Animation */}
+      <div className="absolute inset-0 z-0 bg-gradient-to-br from-indigo-900 via-black to-gray-900 opacity-60 blur-2xl animate-pulse"></div>
+      
+      <div className="relative z-10 max-h-screen w-full px-9 pt-10">
+        {!isRunning ? (
+          <>
+            {loading && (
+              <p className="text-white text-center text-xl animate-pulse">Chargement des données...</p>
+            )}
+            {error && <p className="text-red-500 text-center">Erreur : {error}</p>}
+            {!loading && !error && (
+              <div className="p-6 bg-gradient-to-br from-indigo-900 via-indigo-950 to-fuchsia-900 bg-opacity-40 rounded-xl shadow-lg shadow-blue-500/50">
+                <Classement data={classesData} />
+              </div>
+            )}
+          </>
+        ) : (
+          <div className="p-6 bg-gradient-to-br from-indigo-900 via-indigo-950 to-fuchsia-900 bg-opacity-40 rounded-xl shadow-lg shadow-blue-500/50">
             <ClassementReel />
-          )}
-        </div>
+          </div>
+        )}
       </div>
-    </>
+    </div>
   );
 }
 
