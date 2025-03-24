@@ -75,7 +75,7 @@ export default function UpdateRun({
     console.log(" ---- UpdateRun");
     setLoading(true);
     // Envoi des données vers l'API
-    fetch("http://localhost:3030/api.php", {
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/api.php`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
