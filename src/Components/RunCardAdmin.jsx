@@ -107,7 +107,7 @@ const RunCardAdmin = ({
         className="modal">
         <div className="modal-box border-2 border-blue-500">
           <h3 className="font-bold text-lg text-blue-500">
-            Suppression de la course #{id}
+            Suppression de la course <span className="font-extrabold">#{id}</span>
           </h3>
           <hr className="text-blue-500 mt-2" />
           <p className="py-4">
