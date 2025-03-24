@@ -388,10 +388,8 @@ try {
                 $user = $result->fetch_assoc();
                 error_log(json_encode($user));
                 
-                
-                // Vérifier le mot de passe
-                if ($data['password'] === $user['password']) {
-                  error_log("password good !");
+                // Vérifier le mot de passe avec password_verify
+                if (password_verify($data['password'], $user['password'])) {
                     // Génération d'un identifiant de session simple
                     $session_token = bin2hex(random_bytes(32));
                     
@@ -422,10 +420,10 @@ try {
             showPrettyJson(["error" => "Paramètres manquants (username, password)"]);
         }
         break;
-      
+        
       case 'verifyToken':
           if (isset($data['token'])) {
-            error_log(json_encode($data));
+              error_log(json_encode($data));
               // Vérifier le token dans la base de données
               $stmt = $conn->prepare("SELECT id, username FROM Logins WHERE session_token = ?");
               $stmt->bind_param("s", $data['token']);
@@ -435,10 +433,10 @@ try {
               if ($result->num_rows === 1) {
                   $user = $result->fetch_assoc();
                   $response = [
-                    "success" => true,
-                    "message" => "Token valide",
-                    "userId" => $user['id'],
-                    "username" => $user['username']
+                      "success" => true,
+                      "message" => "Token valide",
+                      "userId" => $user['id'],
+                      "username" => $user['username']
                   ];
                   showPrettyJson($response);
                   error_log(json_encode($response));
@@ -470,3 +468,4 @@ try {
 // Fermer la connexion
 $conn->close();
 die();
+
