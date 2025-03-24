@@ -1,5 +1,5 @@
-import React from "react"
-import PropTypes from "prop-types"
+import React from "react";
+import PropTypes from "prop-types";
 
 export default function FormRuns({
   runs,
@@ -41,8 +41,8 @@ export default function FormRuns({
               const selectedClasses = Array.from(
                 e.target.selectedOptions,
                 (option) => option.value
-              )
-              setNewRuns({ ...newRuns, classList: selectedClasses })
+              );
+              setNewRuns({ ...newRuns, classList: selectedClasses });
             }}>
             {classes.map((classe) => (
               <option
@@ -63,10 +63,10 @@ export default function FormRuns({
                 newRuns.estimatedTime === "" ||
                 newRuns.classList.length === 0
               ) {
-                alert("Veuillez remplir tous les champs")
-                return
+                alert("Veuillez remplir tous les champs");
+                return;
               }
-              saveRun(newRuns)
+              saveRun(newRuns);
             }}>
             Ajouter
           </button>
@@ -79,7 +79,7 @@ export default function FormRuns({
         </div>
       </div>
     </div>
-  )
+  );
 }
 
 FormRuns.propTypes = {
@@ -89,4 +89,4 @@ FormRuns.propTypes = {
   setNewRuns: PropTypes.func.isRequired,
   saveRun: PropTypes.func.isRequired,
   onCancel: PropTypes.func.isRequired,
-}
+};

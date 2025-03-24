@@ -1,14 +1,14 @@
-"use client"
+"use client";
 
-import Link from "next/link"
-import { useEffect, useState } from "react"
+import Link from "next/link";
+import { useEffect, useState } from "react";
 
 export default function Home() {
-  const [loaded, setLoaded] = useState(false)
+  const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
-    setLoaded(true)
-  }, [])
+    setLoaded(true);
+  }, []);
 
   return (
     <div className="relative flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-800 text-white overflow-hidden">
@@ -22,7 +22,7 @@ export default function Home() {
         }`}>
         {/* Animated Title */}
         <h1 className="text-6xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500 animate-fadeInUp p-6">
-          ⚡ Bienvenue sur la Course Ultime ⚡
+          ⚡ Bienvenue sur la Solirun 2025 ⚡
         </h1>
         <p className="text-lg text-gray-300 mt-4 animate-fadeIn delay-300">
           Suivez les classements en direct et gérez vos équipes avec style !

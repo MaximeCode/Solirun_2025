@@ -1,7 +1,7 @@
-"use client"
+"use client";
 
-import Header from "@/Components/Header"
-import PropTypes from "prop-types"
+import Header from "@/Components/Header";
+import PropTypes from "prop-types";
 
 export default function AdminLayout({ children }) {
   return (
@@ -10,9 +10,9 @@ export default function AdminLayout({ children }) {
 
       <main className="container mx-auto px-4 py-8">{children}</main>
     </div>
-  )
+  );
 }
 
 AdminLayout.propTypes = {
   children: PropTypes.node.isRequired,
-}
+};

@@ -1,7 +1,6 @@
-"use client"
+"use client";
 
-import React from "react";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import ClassCard from "./RealTimeClassCard";
 import { socket } from "@/utils/socket";
 import Clock from "./Clock";
@@ -25,15 +24,15 @@ const ClassementReel = () => {
 
   useEffect(() => {
     socket.emit("getClasses");
-      // Écouter les mises à jour de isRunning
-      socket.on("updateClasses", (classes) => {
-        setclasses(classes);
-      });
-  
-      return () => {
-        socket.off("updateClasses");
-      };
-    }, []);
+    // Écouter les mises à jour de isRunning
+    socket.on("updateClasses", (classes) => {
+      setclasses(classes);
+    });
+
+    return () => {
+      socket.off("updateClasses");
+    };
+  }, []);
 
   return (
     <>
@@ -48,10 +47,19 @@ const ClassementReel = () => {
           <div
             key={classe.id}
             className={`transition-all duration-500 ${
-              classe.movingUp ? "transform -translate-y-2 scale-105 shadow-2xl" : ""
-            }`}
-          >
-            <ClassCard position={index} id={classe.id} name={classe.name} alias={classe.alias} color={classe.color} students={classe.students} laps={classe.laps} />
+              classe.movingUp
+                ? "transform -translate-y-2 scale-105 shadow-2xl"
+                : ""
+            }`}>
+            <ClassCard
+              position={index}
+              id={classe.id}
+              name={classe.name}
+              alias={classe.alias}
+              color={classe.color}
+              students={classe.students}
+              laps={classe.laps}
+            />
           </div>
         ))}
       </div>
