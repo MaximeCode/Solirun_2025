@@ -69,7 +69,7 @@ const RunCardAdmin = ({
         </svg>
 
         <svg
-          onClick={() => document.getElementById("my_modal").showModal()}
+          onClick={() => document.getElementById(`my_modal_${id}`).showModal()}
           className="w-6 h-6 text-red-500 cursor-pointer"
           aria-hidden="true"
           xmlns="http://www.w3.org/2000/svg"
@@ -103,7 +103,7 @@ const RunCardAdmin = ({
         </ul>
       </div>
       <dialog
-        id="my_modal"
+        id={`my_modal_${id}`}
         className="modal">
         <div className="modal-box border-2 border-blue-500">
           <h3 className="font-bold text-lg text-blue-500">
