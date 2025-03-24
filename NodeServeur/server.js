@@ -2,21 +2,10 @@ const { Server } = require("socket.io");
 const http = require("http");
 
 const server = http.createServer();
-const allowedOrigins = [
-	"http://192.168.168.100:3000",
-	"http://192.168.168.209:3000",
-	"http://localhost:3000",
-];
 
 const io = new Server(server, {
 	cors: {
-		origin: (origin, callback) => {
-			if (!origin || allowedOrigins.includes(origin)) {
-				callback(null, true);
-			} else {
-				callback(new Error("Not allowed by CORS"));
-			}
-		},
+		origin: "*",  // Permet toutes les origines
 		methods: ["GET", "POST"],
 	},
 });
