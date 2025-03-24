@@ -1,1 +1,165 @@
 @import "tailwindcss";
+
+@plugin "daisyui" {
+  themes: light --default, fantasy, night;
+}
+
+@layer base {
+  .font-outline-1 {
+    -webkit-text-stroke: 1px #000000;
+  }
+
+  .font-outline-2 {
+    -webkit-text-stroke: 2px #000000;
+  }
+
+  .font-outline-4 {
+    -webkit-text-stroke: 4px #000000;
+  }
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+@keyframes shake {
+
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+
+  25% {
+    transform: translateX(-5px);
+    scale: 105%;
+  }
+
+  50% {
+    transform: translateX(5px);
+    scale: 110%;
+  }
+
+  75% {
+    transform: translateX(-5px);
+    scale: 105%;
+  }
+}
+
+.animate-shake {
+  animation: shake 0.3s ease-in-out;
+}
+
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.animate-slideInRight {
+  animation: slideInRight 0.3s ease-out forwards;
+}
+
+/* Retirer les flèches de l input type number */
+/* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type="number"] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+button {
+  cursor: pointer;
+}
+
+@keyframes samba {
+  0% { transform: rotate(0deg); }
+  25% { transform: rotate(5deg); }
+  50% { transform: rotate(-5deg); }
+  75% { transform: rotate(5deg); }
+  100% { transform: rotate(0deg); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes bouncePodium {
+  0% { transform: translateY(50px); opacity: 0; }
+  50% { transform: translateY(-10px); opacity: 0.8; }
+  100% { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes flash {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+@keyframes lepremierarrive {
+  0% { opacity: 1; transform: scale(1); }
+  20% { opacity: 0.8; }
+
+  /* Flash final */
+  85%, 87%, 89%, 91%, 93%, 95%, 97%, 99% { 
+    opacity: 0; 
+  }
+  86%, 88%, 90%, 92%, 94%, 96%, 98%, 100% { 
+    opacity: 1; 
+  }
+
+  /* Grand final */
+  100% { 
+    opacity: 1; 
+    transform: scale(1.1) rotate(0deg); /* Légère mise en avant */
+  }
+}
+
+
+/* Ajout des classes Tailwind personnalisées */
+.animate-samba { animation: samba 1s infinite ease-in-out; }
+.animate-fadeIn { animation: fadeIn 1s ease-out; }
+.animate-bouncePodium { animation: bouncePodium 1s ease-in-out forwards; }
+.animate-flash { animation: flash 1.5s infinite; }
+.animate-boum { animation: shake 1s infinite; }
+.animate-podium {animation: lepremierarrive 3s ease-in-out infinite; }
+
+
+@keyframes explode {
+  0% {
+    opacity: 1;
+    transform: scale(0);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.5);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(2);
+  }
+}
+
+.firework {
+  position: absolute;
+  width: 15px;
+  height: 15px;
+  background: radial-gradient(circle, #ff0, orange, red, transparent);
+  border-radius: 50%;
+  opacity: 0;
+  animation: explode 1.5s ease-out infinite;
+}
