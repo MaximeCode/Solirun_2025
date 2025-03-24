@@ -181,6 +181,10 @@ export default function ManageRuns() {
     getAllClasses();
   }, []);
 
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, [showUpdateRun]);
+
   return (
     <div>
       <ToastAlert />

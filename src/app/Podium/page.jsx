@@ -107,22 +107,22 @@ function Podium() {
     return (
       <>
         <div
-          className="absolute top-10 left-1/12 bg-white rounded-lg opacity-0 animate-fadeIn"
+          className="absolute top-10 left-1/12 rounded-lg opacity-0 animate-fadeIn"
           style={{
             animationDelay: "6s",
             animationFillMode: "forwards",
           }}>
           <Image
-            src="/logo_Solirun2025.jpg"
-            width={200}
-            height={200}
+            src="/solirun_without_bg.png"
+            width={225}
+            height={225}
             alt="Logo Solirun 2025"
             className="rounded-lg"
           />
         </div>
 
         <div
-          className="absolute top-10 right-1/12 bg-white rounded-lg opacity-0 animate-fadeIn"
+          className="absolute top-10 right-1/12 rounded-lg opacity-0 animate-fadeIn"
           style={{
             animationDelay: "6s",
             animationFillMode: "forwards",
