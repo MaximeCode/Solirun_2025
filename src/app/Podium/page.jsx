@@ -117,6 +117,7 @@ function Podium() {
             width={200}
             height={200}
             alt="Logo Solirun 2025"
+            className="rounded-lg"
           />
         </div>
 
@@ -131,6 +132,7 @@ function Podium() {
             width={200}
             height={200}
             alt="Logo SIO Fulbert"
+            className="rounded-lg"
           />
         </div>
 
@@ -144,32 +146,67 @@ function Podium() {
             </h1>
 
             <div className="flex items-end justify-center gap-6 w-full">
-              <PodiumPosition
-                data={PodiumData[1]}
-                isVisible={showSecond}
-                height="70"
-                medal="🥈"
-                bgColor="bg-gray-400"
-                textColor="text-black"
-              />
+              <div
+                className={`flex flex-col items-center transition-all duration-1000 ease-in-out w-120 ${
+                  showSecond
+                    ? "opacity-100 translate-y-0"
+                    : "opacity-0 translate-y-10"
+                }`}>
+                <div className="text-4xl p-4 font-extrabold animate-samba w-full text-center">
+                  {PodiumData[1].name ?? "Chargement..."}
+                </div>
+                <div
+                  className={`text-6xl bg-gray-400 text-black font-bold w-100 flex items-center justify-center rounded-t-lg transition-all duration-1500 ease-in-out ${
+                    showSecond ? "h-70" : "h-0"
+                  }`}>
+                  🥈
+                </div>
+                <div className="text-4xl bg-gray-500 w-100 h-20 flex items-center justify-center font-bold rounded-b-lg">
+                  {PodiumData[1].laps ?? "Chargement..."} tours
+                </div>
+              </div>
 
-              <PodiumPosition
-                data={PodiumData[0]}
-                isVisible={showFirst}
-                height="100"
-                medal="🏆"
-                bgColor="bg-yellow-400"
-                textColor="text-black"
-              />
+              {/* 1ère place (au centre, plus haute) */}
+              <div
+                className={`flex flex-col items-center transition-all duration-1000 ease-in-out w-120 ${
+                  showFirst
+                    ? "opacity-100 translate-y-0"
+                    : "opacity-0 translate-y-10"
+                }`}>
+                <div className="text-4xl p-4 font-extrabold animate-samba">
+                  {PodiumData[0].name ?? "Chargement..."}
+                </div>
+                <div
+                  className={`text-6xl bg-yellow-400 text-black font-bold w-100 flex items-center justify-center rounded-t-lg transition-all duration-1500 ease-in-out ${
+                    showFirst ? "h-100" : "h-0"
+                  }`}>
+                  🏆
+                </div>
+                <div className="text-4xl bg-yellow-500 w-100 h-20 flex items-center justify-center font-bold rounded-b-lg">
+                  {PodiumData[0].laps ?? "Chargement..."} tours
+                </div>
+              </div>
 
-              <PodiumPosition
-                data={PodiumData[2]}
-                isVisible={showThird}
-                height="40"
-                medal="🥉"
-                bgColor="bg-orange-400"
-                textColor="text-black"
-              />
+              {/* 3ème place */}
+              <div
+                className={`flex flex-col items-center transition-all duration-1000 ease-in-out w-120 ${
+                  showThird
+                    ? "opacity-100 translate-y-0"
+                    : "opacity-0 translate-y-10"
+                }`}>
+                <div className="text-4xl p-4 font-extrabold animate-samba">
+                  {PodiumData[2].name ?? "Chargement..."}
+                </div>
+                <div
+                  className={`text-6xl bg-orange-400 text-black font-bold w-100 flex items-center justify-center rounded-t-lg transition-all duration-1500 ease-in-out ${
+                    showThird ? "h-40" : "h-0"
+                  }`}>
+                  🥉
+                </div>
+                <div className="text-4xl bg-orange-500 w-100 h-20 flex items-center justify-center font-bold rounded-b-lg ">
+                  {PodiumData[2].laps ?? "Chargement..."} tours
+                </div>
+              </div>
             </div>
 
             <p className="mt-8 text-4xl font-extrabold text-gray-300 animate-flash">
