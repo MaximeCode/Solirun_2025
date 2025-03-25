@@ -27,7 +27,7 @@ export default function ManageClasses() {
       try {
         // Appel à l'API pour obtenir les classes
         const response = await fetch(
-          "http://localhost:3030/api.php?action=Classes"
+          `${process.env.NEXT_PUBLIC_API_URL}/api.php?action=Classes`
         );
         // Convertir la réponse en format JSON
         const data = await response.json();
@@ -59,8 +59,8 @@ export default function ManageClasses() {
       return;
     }
     // suppression de la classe avec l'id [classId] de classes
-    fetch("http://localhost:3030/api.php", {
-      method : "POST",
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/api.php`, {
+      method: "POST",
       headers: {
         "Content-Type": "application/json"
       },
@@ -87,10 +87,10 @@ export default function ManageClasses() {
   }
 
   const saveClass = (classe) => {
-    fetch("http://localhost:3030/api.php", {
-      method : "POST",
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/api.php`, {
+      method: "POST",
       headers: {
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({
         action: "insertClass",
@@ -98,15 +98,15 @@ export default function ManageClasses() {
       }),
     })
       .then((response) => {
-        console.log(response)
+        console.log(response);
         if (!response.ok) {
-          showToast("Erreur lors de l'insertion de la classe ❌", true)
+          showToast("Erreur lors de l'insertion de la classe ❌", true);
           throw new Error(
             "Erreur lors de l'insertion de la classe en base de données"
-          )
+          );
         }
         setDataRefresh(!dataRefresh);
-        showToast(`Classe supprimée avec succès ✅`, false);
+        showToast("Classes enregistrées avec succès ✅", false);
       })
       .catch((error) => {
         console.error("Erreur:", error);
@@ -115,8 +115,8 @@ export default function ManageClasses() {
   };
 
   const updateClass = (classe) => {
-    fetch("http://localhost:3030/api.php", {
-      method : "POST",
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/api.php`, {
+      method: "POST",
       headers: {
         "Content-Type": "application/json"
       },

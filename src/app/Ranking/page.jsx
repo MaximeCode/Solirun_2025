@@ -13,7 +13,7 @@ function App() {
 
   useEffect(() => {
     setTimeout(() => {
-      fetch("http://localhost:3030/api.php?action=Ranking")
+      fetch(`${process.env.NEXT_PUBLIC_API_URL}/api.php?action=Ranking`)
         .then((response) => {
           if (!response.ok) {
             throw new Error("Erreur lors de la récupération des données");
