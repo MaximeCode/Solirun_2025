@@ -2,6 +2,7 @@ import React from "react";
 import PropTypes from "prop-types";
 
 const ClassCard = ({ position, classe }) => {
+	const color = classe.color;
 	// Styles dynamiques basés sur le classement
 	const positionStyles = [
 		"text-yellow-400", // 1ère position
