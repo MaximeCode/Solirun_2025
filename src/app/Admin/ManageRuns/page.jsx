@@ -25,6 +25,10 @@ export default function ManageRuns() {
   // Add teacher
   const [showTeacher, setShowTeacher] = useState(false);
 
+    useEffect(() => {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }, [showAddRuns]);
+
   const getAllRuns = () => {
     console.log(" ---- Début getAllRuns");
     setLoading(true);

@@ -16,7 +16,7 @@ let unUsedClasses = [];
 let usedClasses = new Map(); // Utilisation d’un Map() pour éviter les conflits
 
 const classColors = [
-		"#F4C542", // Jaune
+		"#ffab18", // Jaune
 		"#F44336", // Rouge
 		"#2196F3", // Bleu
 		"#4CAF50" // Vert

@@ -52,10 +52,6 @@ export default function ManageClasses() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, [!showUpdateClass]);
 
-  useEffect(() => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  }, [showUpdateClass == false])
-
   // Fonction pour supprimer une classe
   const deleteClass = (classId) => {
     // suppression de la classe avec l'id [classId] de classes
