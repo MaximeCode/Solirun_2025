@@ -38,13 +38,12 @@ export default function UpdateClass({
 
   // Update de la classe ds la list des classes avant l'envoi vers la db
   const updateClass = () => {
-    setLoading(true);
-    updateClassFunction(formData);
-
-    setLoading(false);
-    showToast(`Classe ${formData.name} mise à jour avec succès`, false);
-    onSuccess();
-  };
+    setLoading(true)
+    updateClassFunction(formData)
+    setLoading(false)
+    showToast(`Classe ${formData.name} mise à jour avec succès`, false)
+    onSuccess()
+  }
 
   const handleSubmit = (e) => {
     e.preventDefault();

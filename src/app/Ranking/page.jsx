@@ -6,64 +6,71 @@ import ClassementReel from "@/Components/RealTimeRanking";
 import { socket } from "@/utils/socket";
 
 function App() {
-  const [classesData, setClassesData] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [isRunning, setIsRunning] = useState(false);
+	const [classesData, setClassesData] = useState([]);
+	const [loading, setLoading] = useState(true);
+	const [error, setError] = useState(null);
+	const [isRunning, setIsRunning] = useState(false);
 
-  useEffect(() => {
-    setTimeout(() => {
-      fetch("http://localhost:3030/api.php?action=Ranking")
-        .then((response) => {
-          if (!response.ok) {
-            throw new Error("Erreur lors de la récupération des données");
-          }
-          return response.json();
-        })
-        .then((data) => {
-          setClassesData(data);
-          setLoading(false);
-        })
-        .catch((err) => {
-          setError(err.message);
-          setLoading(false);
-        });
-    }, 50);
-  }, [isRunning]);
+	useEffect(() => {
+		setTimeout(() => {
+			fetch(`${process.env.NEXT_PUBLIC_API_URL}/api.php?action=Ranking`)
+				.then((response) => {
+					if (!response.ok) {
+						throw new Error("Erreur lors de la récupération des données");
+					}
+					return response.json();
+				})
+				.then((data) => {
+					setClassesData(data);
+					setLoading(false);
+				})
+				.catch((err) => {
+					setError(err.message);
+					setLoading(false);
+				});
+		}, 50);
+	}, [isRunning]);
 
-  useEffect(() => {
-    socket.emit("getIsRunning");
-    // Écouter les mises à jour de isRunning
-    socket.on("updateIsRunning", (state) => {
-      setIsRunning(state);
-    });
+	useEffect(() => {
+		socket.emit("getIsRunning");
+		socket.on("updateIsRunning", (state) => {
+			setIsRunning(state);
+		});
+		return () => {
+			socket.off("updateIsRunning");
+		};
+	}, []);
 
-    return () => {
-      socket.off("updateIsRunning");
-    };
-  }, []);
+	return (
+		<div className="relative flex flex-col items-center justify-center min-h-screen bg-black text-white overflow-hidden">
+			{/* Background Animation */}
+			<div className="absolute inset-0 z-0 bg-gradient-to-br from-indigo-900 via-black to-gray-900 opacity-60 blur-2xl animate-pulse"></div>
 
-  return (
-    <>
-      <div className="fixed top-0 left-0 bg-gradient-to-br from-gray-900 via-gray-750 to-gray-900 h-screen w-screen -z-1"></div>
-      <div>
-        <div>
-          {/* Padding remove for auto scrolling */}
-          {!isRunning ? (
-            <>
-              {loading && (
-                <p className="text-white">Chargement des données...</p>
-              )}
-              {error && <p className="text-red-500">Erreur : {error}</p>}
-              {!loading && !error && <Classement data={classesData} />}
-            </>
-          ) : (
-            <ClassementReel />
-          )}
-        </div>
-      </div>
-    </>
-  );
+			<div className="relative z-10 max-h-screen w-full p-1">
+				{!isRunning ? (
+					<>
+						{loading && (
+							<p className="text-white text-center text-xl animate-pulse">
+								Chargement des données...
+							</p>
+						)}
+						{error && (
+							<p className="text-red-500 text-center">Erreur : {error}</p>
+						)}
+						{!loading && !error && (
+							<div className="p-6 bg-gradient-to-br from-purple-700 via-black to-purple-700 bg-opacity-40 rounded-xl animate-gradient">
+								<Classement data={classesData} />
+							</div>
+						)}
+					</>
+				) : (
+					<div className="p-6 bg-gradient-to-br from-black via-purple-950 to-black bg-opacity-40 rounded-xl animate-gradient h-screen">
+						<ClassementReel />
+					</div>
+				)}
+			</div>
+		</div>
+	);
 }
 
 export default App;

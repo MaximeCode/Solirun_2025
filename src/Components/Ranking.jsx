@@ -118,11 +118,9 @@ const Classement = ({ data }) => {
   return (
     <div
       ref={mainContainerRef}
-      className="bg-gray-800 text-white p-8 min-h-screen">
+      className="text-white p-8 min-h-screen">
       <Clock />
-      <h2 className="text-6xl font-extrabold text-center mb-8">
-        Scores
-        <br />
+      <h2 className="text-6xl font-extrabold text-center my-8">
         Classement général
       </h2>
       {sortedData.length > 0 ? (
@@ -151,7 +149,7 @@ const Classement = ({ data }) => {
               height: containerHeight,
               scrollbarWidth: "none", // Firefox
             }}
-            className="mt-6 bg-orange-100 rounded-lg p-4 overflow-y-auto scroll-smooth">
+            className="mt-6 bg-transparent rounded-lg py-4 overflow-y-auto scroll-smooth">
             {/* Hide scrollbar for Chrome, Safari and Opera */}
             <style jsx>{`
               div::-webkit-scrollbar {

@@ -29,7 +29,7 @@ export default function ManageRuns() {
     console.log(" ---- Début getAllRuns");
     setLoading(true);
     // Fetch all runs
-    fetch("http://localhost:3030/api.php?action=AllRuns")
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/api.php?action=AllRuns`)
       .then((response) => {
         console.log(response);
         if (!response.ok) {
@@ -60,7 +60,7 @@ export default function ManageRuns() {
     console.log(" ---- Début getAllClasses");
     setLoading(true);
     // Fetch all classes
-    fetch("http://localhost:3030/api.php?action=Classes")
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/api.php?action=Classes`)
       .then((response) => {
         if (!response.ok) {
           showToast("Erreur lors de la récupération des classes", true);
@@ -123,7 +123,7 @@ export default function ManageRuns() {
     console.log(" ---- SaveRun");
     setLoading(true);
     // Envoi des courses vers l'API
-    fetch("http://localhost:3030/api.php", {
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/api.php`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -162,7 +162,7 @@ export default function ManageRuns() {
     console.log(" ---- DeleteRun");
     setLoading(true);
     // Envoi de la requête pour supprimer la course
-    fetch("http://localhost:3030/api.php", {
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/api.php`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

@@ -1,68 +1,102 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { motion } from "framer-motion";
 
-export default function Home() {
+export default function HomePage() {
   const [loaded, setLoaded] = useState(false);
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
 
   useEffect(() => {
     setLoaded(true);
+    const handleMouseMove = (e) => {
+      setMousePosition({ x: e.clientX, y: e.clientY });
+    };
+    window.addEventListener("mousemove", handleMouseMove);
+    return () => {
+      window.removeEventListener("mousemove", handleMouseMove);
+    };
   }, []);
 
   return (
-    <div className="relative flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-800 text-white overflow-hidden">
+    <div className="relative flex flex-col items-center justify-center min-h-screen bg-black text-white overflow-hidden">
       {/* Background Animation */}
-      <div className="absolute inset-0 z-0 bg-black opacity-50 animate-pulse" />
+      <div className="absolute inset-0 z-0 bg-gradient-to-br from-indigo-800 via-black to-fuchsia-800 opacity-75 blur-3xl animate-pulse"></div>
+      
+      {/* Moving Circle */}
+      <motion.div 
+        className="absolute w-64 h-64 bg-purple-600 opacity-30 rounded-full blur-3xl"
+        style={{
+          left: mousePosition.x - 128, // 128px is half of 256px (w-64 = 16rem = 256px)
+          top: mousePosition.y - 128
+        }}
+        transition={{ type: "tween", ease: "easeOut", duration: 0.2 }}
+      ></motion.div>
 
       {/* Page Content */}
-      <div
-        className={`relative z-10 flex flex-col items-center transition-all duration-1000 ease-out transform ${
-          loaded ? "opacity-100 scale-100" : "opacity-0 scale-50"
-        }`}>
+      <motion.div 
+        initial={{ opacity: 0, scale: 0.8 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.8 }}
+        className="relative z-10 flex flex-col items-center text-center px-6">
+        
         {/* Animated Title */}
-        <h1 className="text-6xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500 animate-fadeInUp p-6">
-          ⚡ Bienvenue sur la Solirun 2025 ⚡
-        </h1>
-        <p className="text-lg text-gray-300 mt-4 animate-fadeIn delay-300">
+        <motion.h1 
+          initial={{ y: -50, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ duration: 1, delay: 0.3 }}
+          className="text-6xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-600 neon-text p-4">
+          ⚡ Bienvenue sur la Solirun ⚡
+        </motion.h1>
+        
+        <motion.p 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 1, delay: 0.6 }}
+          className="text-lg text-gray-300 mt-4">
           Suivez les classements en direct et gérez vos équipes avec style !
-        </p>
-
+        </motion.p>
+        
         {/* Navigation Links */}
-        <div className="mt-10 flex flex-wrap justify-center gap-6">
+        <motion.div 
+          initial={{ opacity: 0, y: 50 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1, delay: 0.9 }}
+          className="mt-10 flex flex-wrap justify-center gap-6">
+          
           <Link href="/Ranking">
-            <button className="px-6 py-3 text-lg font-bold text-white bg-blue-600 rounded-lg shadow-lg transition duration-300 transform hover:scale-105 hover:bg-blue-700 hover:shadow-blue-500/50">
+            <button className="px-6 py-3 text-lg font-bold text-white bg-gradient-to-r from-blue-500 to-cyan-500 rounded-xl shadow-lg hover:scale-110 transition transform duration-300">
               📊 Classements en temps réel
             </button>
           </Link>
           <Link href="/Podium">
-            <button className="px-6 py-3 text-lg font-bold text-white bg-yellow-500 rounded-lg shadow-lg transition duration-300 transform hover:scale-105 hover:bg-yellow-600 hover:shadow-yellow-500/50">
+            <button className="px-6 py-3 text-lg font-bold text-white bg-gradient-to-r from-yellow-500 to-amber-500 rounded-xl shadow-lg hover:scale-110 transition transform duration-300">
               🏆 Voir le Podium
             </button>
           </Link>
-          {/* Phone display for counters */}
           <Link href="/Manager">
-            <button className="px-6 py-3 text-lg font-bold text-white bg-green-500 rounded-lg shadow-lg transition duration-300 transform hover:scale-105 hover:bg-green-600 hover:shadow-green-500/50">
+            <button className="px-6 py-3 text-lg font-bold text-white bg-gradient-to-r from-green-500 to-lime-500 rounded-xl shadow-lg hover:scale-110 transition transform duration-300">
               🎮 Compteur de tours (mobile)
             </button>
           </Link>
           <Link href="/Admin/ManageClasses">
-            <button className="px-6 py-3 text-lg font-bold text-white bg-purple-600 rounded-lg shadow-lg transition duration-300 transform hover:scale-105 hover:bg-purple-700 hover:shadow-purple-500/50">
+            <button className="px-6 py-3 text-lg font-bold text-white bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl shadow-lg hover:scale-110 transition transform duration-300">
               🛠️ Ajouter des Classes
             </button>
           </Link>
           <Link href="/Admin/ManageRuns">
-            <button className="px-6 py-3 text-lg font-bold text-white bg-orange-500 rounded-lg shadow-lg transition duration-300 transform hover:scale-105 hover:bg-orange-600 hover:shadow-orange-500/50">
+            <button className="px-6 py-3 text-lg font-bold text-white bg-gradient-to-r from-orange-500 to-red-500 rounded-xl shadow-lg hover:scale-110 transition transform duration-300">
               🏁 Gérer les Courses
             </button>
           </Link>
           <Link href="/Admin/AdminPanel">
-            <button className="px-6 py-3 text-lg font-bold text-white bg-red-500 rounded-lg shadow-lg transition duration-300 transform hover:scale-105 hover:bg-red-600 hover:shadow-red-500/50">
+            <button className="px-6 py-3 text-lg font-bold text-white bg-gradient-to-r from-red-500 to-rose-500 rounded-xl shadow-lg hover:scale-110 transition transform duration-300">
               🔧 Panneau Admin
             </button>
           </Link>
-        </div>
-      </div>
+        </motion.div>
+      </motion.div>
     </div>
   );
 }
