@@ -10,8 +10,12 @@ const ClassementReel = () => {
   const [sortedClasses, setSortedClasses] = useState([...classes]);
 
   useEffect(() => {
+    // Retirer les classes prof
+    const classesWithoutProf = classes.filter((classe) => !classe.isTeacher);
     // Trie les classes par nombre de tours
-    const newSortedClasses = [...classes].sort((a, b) => b.laps - a.laps);
+    const newSortedClasses = [...classesWithoutProf].sort(
+      (a, b) => b.laps - a.laps
+    );
 
     // Ajoute une animation si la position change
     newSortedClasses.forEach((classe, index) => {
@@ -53,12 +57,7 @@ const ClassementReel = () => {
             }`}>
             <ClassCard
               position={index}
-              id={classe.id}
-              name={classe.name}
-              alias={classe.alias}
-              color={classe.color}
-              students={classe.students}
-              laps={classe.laps}
+              classe={classe}
             />
           </div>
         ))}

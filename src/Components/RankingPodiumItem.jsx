@@ -12,7 +12,7 @@ const ClassePodiumItem = ({ rank, classe }) => {
         {rank} {rank === 1 ? "er" : "ème"}
       </span>
       <span className="text-3xl text-center">{classe.name}</span>
-      <span className="text-3xl text-center">{classe.students} élèves</span>
+      <span className="text-3xl text-center">{classe.students} {classe.isTeacher ? "Profs" : "Élèves"}</span>
       <span className="text-3xl text-center">{classe.laps} Tours</span>
     </div>
   );
@@ -24,6 +24,7 @@ ClassePodiumItem.propTypes = {
     name: PropTypes.string.isRequired,
     students: PropTypes.number.isRequired,
     laps: PropTypes.number.isRequired,
+    isTeacher: PropTypes.bool.isRequired,
   }).isRequired,
 };
 

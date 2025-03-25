@@ -1,5 +1,6 @@
 import PropTypes from "prop-types";
 import React, { useState, useEffect } from "react";
+import ToggleIsTeacher from "./ToggleIsTeacher";
 
 export default function UpdateClass({
   classe,
@@ -12,6 +13,7 @@ export default function UpdateClass({
     id: 0,
     name: "",
     nbStudents: 0,
+    isTeacher: 0,
   });
   const [loading, setLoading] = useState(false); // true => Afficher the loader, false => Ne rien afficher
 
@@ -21,6 +23,7 @@ export default function UpdateClass({
         id: classe.id,
         name: classe.name || "",
         nbStudents: classe.nbStudents || 0,
+        isTeacher: classe.isTeacher || 0,
       });
     }
   }, [classe]);
@@ -94,6 +97,11 @@ export default function UpdateClass({
             required
           />
         </div>
+
+        <ToggleIsTeacher
+          newClass={formData}
+          setNewClass={setFormData}
+        />
 
         {loading && <span className="loading loading-bars loading-md"></span>}
 

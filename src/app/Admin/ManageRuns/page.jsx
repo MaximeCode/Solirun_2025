@@ -5,6 +5,7 @@ import ToastAlert, { showToast } from "@/Components/ToastAlert";
 import RunCardAdmin from "@/Components/RunCardAdmin";
 import NewItem from "@/Components/NewItem";
 import UpdateRun from "@/Components/UpdateRun";
+import ToggleShowTeacher from "@/Components/ToggleShowTeacher";
 
 export default function ManageRuns() {
   const initRuns = {
@@ -20,6 +21,9 @@ export default function ManageRuns() {
   const [classes, setClasses] = useState([]);
 
   const [showUpdateRun, setShowUpdateRun] = useState(0); // 0 => Ne pas afficher, [nb] => Afficher le composant update pour la course avec l'id [nb]
+
+  // Add teacher
+  const [showTeacher, setShowTeacher] = useState(false);
 
   const getAllRuns = () => {
     console.log(" ---- Début getAllRuns");
@@ -96,10 +100,23 @@ export default function ManageRuns() {
     });
   };
 
-  // Filter classes based on search term
-  const filteredClasses = classes.filter((classe) =>
-    classe.name.toLowerCase().includes(searchTerm.toLowerCase())
+  // Filter classes based on search term and if its student class
+  const filteredStudentsClasses = classes.filter(
+    (classe) =>
+      classe.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
+      !classe.isTeacher
   );
+
+  // Filter classes based on search term and if its teacher class
+  const filteredTeacherClasses = classes.filter(
+    (classe) =>
+      classe.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
+      classe.isTeacher
+  );
+
+  const filteredClasses = showTeacher
+    ? filteredTeacherClasses
+    : filteredStudentsClasses;
 
   // Fonction pour insérer la nouvelle course dans la DB
   const saveRun = () => {
@@ -185,6 +202,8 @@ export default function ManageRuns() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, [showUpdateRun]);
 
+  console.log("showUpdateRun", showUpdateRun);
+
   return (
     <div>
       <ToastAlert />
@@ -199,11 +218,12 @@ export default function ManageRuns() {
         <UpdateRun
           index={showUpdateRun}
           run={runs.find((run) => run.id === showUpdateRun)}
-          setRuns={setRuns}
           onCancel={() => setShowUpdateRun(0)}
           showToast={showToast}
           classes={classes}
           getAllRuns={getAllRuns}
+          showTeacher={showTeacher}
+          setShowTeacher={setShowTeacher}
         />
       )}
 
@@ -234,11 +254,17 @@ export default function ManageRuns() {
 
             <div className="bg-gray-100 border border-gray-200 text-black p-4 rounded-lg">
               <h4 className="text-xl font-semibold text-center mb-2">
-                Sélectionnez les classes participantes :
+                Sélectionnez les classes{" "}
+                {showTeacher ? "de professeurs" : "d'élèves"} participantes :
               </h4>
 
+              <ToggleShowTeacher
+                showTeacher={showTeacher}
+                setShowTeacher={setShowTeacher}
+              />
+
               {/* Search input */}
-              <div className="mb-3">
+              <div className="my-3">
                 <div className="relative">
                   <input
                     type="text"
@@ -314,9 +340,6 @@ export default function ManageRuns() {
           return (
             <div key={run.id}>
               <RunCardAdmin
-                id={run.id}
-                time={run.estimatedTime}
-                className={run.classNameList}
                 setShowUpdateRun={setShowUpdateRun}
                 deleteRuns={() => deleteRun(run.id)}
                 classes={classes}

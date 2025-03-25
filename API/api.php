@@ -87,7 +87,7 @@ try {
       case 'ClassesRunning':
         if (isset($_GET['id'])) {
           $id = $_GET['id'];
-          fetchData("SELECT Classes.id, Classes.name, Classes.color, Classes.nbStudents AS students, Runners.laps FROM Classes INNER JOIN Runners ON Classes.id = Runners.theClass INNER JOIN Runs ON Runs.id = Runners.theRun WHERE Runs.id = ?", $conn, [$id]);
+          fetchData("SELECT Classes.id, Classes.name, Classes.color, Classes.nbStudents AS students, Classes.isTeacher, Runners.laps FROM Classes INNER JOIN Runners ON Classes.id = Runners.theClass INNER JOIN Runs ON Runs.id = Runners.theRun WHERE Runs.id = ?", $conn, [$id]);
         } else {
           http_response_code(400); // Bad Request
           showPrettyJson(["error" => "Paramètre 'id' requis"]);
@@ -159,18 +159,15 @@ try {
 
       case 'insertClass':
         if (isset($data['classe'])) {
-
-
           $conn->begin_transaction();
-
           try {
             error_log("Attempting to insert class");
-            $stmt = $conn->prepare("INSERT INTO Classes (name, nbStudents, codeClass) VALUES (?, ?, ?)");
+            $stmt = $conn->prepare("INSERT INTO Classes (name, nbStudents, isTeacher, codeClass) VALUES (?, ?, ?, ?)");
 
             $class = $data["classe"];
 
             $codeClass = strtoupper(substr($class['name'], 0, 3)) . substr($class['name'], -1);
-            $stmt->bind_param("sis", $class['name'], $class['nbStudents'], $codeClass);
+            $stmt->bind_param("sisi", $class['name'], $class['nbStudents'], $class['isTeacher'], $codeClass);
 
             if (!$stmt->execute()) {
               throw new PersonalException("Failed to insert class: " . $stmt->error);
@@ -194,7 +191,7 @@ try {
           $class = $data["classe"];
 
           // Vérification des données obligatoires
-          if (!isset($class['name'], $class['nbStudents'], $class['id'])) {
+          if (!isset($class['name'], $class['nbStudents'], $class['isTeacher'], $class['id'])) {
             http_response_code(400);
             showPrettyJson(["error" => "Données manquantes pour la mise à jour de la classe"]);
             break;
@@ -216,12 +213,12 @@ try {
           try {
             error_log("Attempting to update class");
 
-            $stmt = $conn->prepare("UPDATE Classes SET name = ?, nbStudents = ?, codeClass = ? WHERE id = ?");
+            $stmt = $conn->prepare("UPDATE Classes SET name = ?, nbStudents = ?, isTeacher = ?, codeClass = ? WHERE id = ?");
             if (!$stmt) {
               throw new PersonalException("Erreur de préparation de la requête: " . $conn->error);
             }
 
-            $stmt->bind_param("sssi", $class['name'], $class['nbStudents'], $codeClass, $class['id']);
+            $stmt->bind_param("ssisi", $class['name'], $class['nbStudents'], $class['isTeacher'], $codeClass, $class['id']);
 
             if (!$stmt->execute()) {
               throw new PersonalException("Échec de mise à jour de la classe: " . $stmt->error);

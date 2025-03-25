@@ -1,7 +1,9 @@
 "use client";
 
 import NewItem from "@/Components/NewItem";
+import TeamTypeIcon from "@/Components/TeamTypeIcon";
 import ToastAlert, { showToast } from "@/Components/ToastAlert";
+import ToggleIsTeacher from "@/Components/ToggleIsTeacher";
 import UpdateClass from "@/Components/UpdateClass";
 import { useState, useEffect } from "react";
 
@@ -9,6 +11,7 @@ export default function ManageClasses() {
   const initClass = {
     name: "",
     nbStudents: 0,
+    isTeacher: 0,
   };
 
   const [classes, setClasses] = useState([]);
@@ -79,6 +82,7 @@ export default function ManageClasses() {
       });
   };
 
+  // Function to insert 1 class
   const saveClass = (classe) => {
     fetch("http://localhost:3030/api.php", {
       method: "POST",
@@ -164,7 +168,10 @@ export default function ManageClasses() {
           <div key={classe.id}>
             <div className="w-75 p-6 bg-white border border-gray-200 rounded-lg shadow-sm relative">
               {/* Bin to del the class */}
-              <div className="absolute top-0 right-0 p-2">
+              <div className="absolute top-0 right-0 p-2 flex space-x-2">
+                {/* icon Prof ou eleve */}
+                <TeamTypeIcon isTeacher={classe.isTeacher} />
+
                 <svg
                   onClick={() =>
                     document.getElementById(`my_modal_${classe.id}`).showModal()
@@ -268,11 +275,18 @@ export default function ManageClasses() {
 
             <input
               type="number"
-              placeholder="Nombre d'élèves"
+              placeholder={`Nombre ${
+                newClass.isTeacher ? "de professeurs" : "d'élèves"
+              }`}
               className="w-3/4 mb-4 text-lg font-medium text-gray-900 border-b-2 border-gray-200 input input-ghost p-0"
               onChange={(e) =>
                 setNewClass({ ...newClass, nbStudents: e.target.value })
               }
+            />
+
+            <ToggleIsTeacher
+              newClass={newClass}
+              setNewClass={setNewClass}
             />
 
             <div className="grid grid-cols-2 gap-4">

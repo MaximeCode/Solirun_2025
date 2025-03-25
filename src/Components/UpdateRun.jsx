@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
+import ToggleShowTeacher from "@/Components/ToggleShowTeacher";
 
 export default function UpdateRun({
   index,
@@ -8,7 +9,10 @@ export default function UpdateRun({
   showToast,
   classes,
   getAllRuns,
+  showTeacher,
+  setShowTeacher,
 }) {
+  console.log("run: ", run);
   useEffect(() => {
     console.log("run: ", run);
   }, []);
@@ -65,10 +69,23 @@ export default function UpdateRun({
     });
   };
 
-  // Filter classes based on search term
-  const filteredClasses = classes.filter((classe) =>
-    classe.name.toLowerCase().includes(searchTerm.toLowerCase())
+  // Filter classes based on search term and if its student class
+  const filteredStudentsClasses = classes.filter(
+    (classe) =>
+      classe.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
+      !classe.isTeacher
   );
+
+  // Filter classes based on search term and if its teacher class
+  const filteredTeacherClasses = classes.filter(
+    (classe) =>
+      classe.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
+      classe.isTeacher
+  );
+
+  const filteredClasses = showTeacher
+    ? filteredTeacherClasses
+    : filteredStudentsClasses;
 
   // Fonction pour mettre à jour une course dans la DB
   const updateRun = (run_id, estimatedTime, newListId, oldListId) => {
@@ -144,8 +161,15 @@ export default function UpdateRun({
 
         <div className="bg-gray-100 border border-gray-200 text-black p-4 rounded-lg">
           <h4 className="text-xl font-semibold text-center mb-2">
-            Sélectionnez les classes participantes :
+            Sélectionnez les{" "}
+            {showTeacher ? "équipes de professeurs" : "classes d'élèves"}{" "}
+            participantes :
           </h4>
+
+          <ToggleShowTeacher
+            showTeacher={showTeacher}
+            setShowTeacher={setShowTeacher}
+          />
 
           {/* Search input */}
           <div className="mb-3">
@@ -230,4 +254,6 @@ UpdateRun.propTypes = {
   getAllRuns: PropTypes.func.isRequired,
   showToast: PropTypes.func.isRequired,
   classes: PropTypes.array.isRequired,
+  showTeacher: PropTypes.bool.isRequired,
+  setShowTeacher: PropTypes.func.isRequired,
 };

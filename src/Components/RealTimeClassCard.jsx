@@ -1,7 +1,7 @@
 import React from "react";
 import PropTypes from "prop-types";
 
-const ClassCard = ({ position, name, alias, color, students, laps }) => {
+const ClassCard = ({ position, classe }) => {
   // Styles dynamiques basés sur le classement
   const positionStyles = [
     "text-yellow-400",
@@ -29,7 +29,7 @@ const ClassCard = ({ position, name, alias, color, students, laps }) => {
   return (
     <div
       className={`shadow-xl rounded-xl p-10 flex flex-col justify-center items-center text-center transform hover:scale-105 transition-all h-96`}
-      style={{ backgroundColor: color }}>
+      style={{ backgroundColor: classe.color }}>
       <div className="bg-black rounded-lg h-full w-full p-6">
         {/* Icône de position */}
         <div
@@ -42,27 +42,30 @@ const ClassCard = ({ position, name, alias, color, students, laps }) => {
         {/* Surnom de la classe */}
         <h3
           className={`text-4xl text-white font-bold mt-4 ${getTextColor(
-            color
+            classe.color
           )}`}>
-          {alias}
+          {classe.alias}
         </h3>
 
         {/* Nom de la classe */}
-        <p className={`italic text-white text-4xl ${getTextColor(color)}`}>
-          {name}
+        <p
+          className={`italic text-white text-4xl ${getTextColor(
+            classe.color
+          )}`}>
+          {classe.name}
         </p>
 
         {/* Nombre d'élèves */}
         <p
           className={`text-4xl text-white mt-2 font-semibold ${getTextColor(
-            color
+            classe.color
           )}`}>
-          👨‍🎓 {students} élèves
+          👨‍🎓 {classe.students} {classe.isTeacher ? "Profs" : "Élèves"}
         </p>
 
         {/* Nombre de tours */}
-        <p className={`text-4xl text-white mt-2 ${getTextColor(color)}`}>
-          🏁 Tours : <span className="font-bold">{laps}</span>
+        <p className={`text-4xl text-white mt-2 ${getTextColor(classe.color)}`}>
+          🏁 Tours : <span className="font-bold">{classe.laps}</span>
         </p>
       </div>
     </div>
@@ -71,11 +74,15 @@ const ClassCard = ({ position, name, alias, color, students, laps }) => {
 // Define PropTypes for the component
 ClassCard.propTypes = {
   position: PropTypes.number.isRequired,
-  name: PropTypes.string.isRequired,
-  alias: PropTypes.string.isRequired,
-  color: PropTypes.string.isRequired,
-  students: PropTypes.number.isRequired,
-  laps: PropTypes.number.isRequired,
+  classe: PropTypes.shape({
+    id: PropTypes.number.isRequired,
+    name: PropTypes.string.isRequired,
+    alias: PropTypes.string.isRequired,
+    students: PropTypes.number.isRequired,
+    laps: PropTypes.number.isRequired,
+    color: PropTypes.string.isRequired,
+    isTeacher: PropTypes.bool.isRequired,
+  }),
 };
 
 export default ClassCard;

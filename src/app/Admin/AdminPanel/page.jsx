@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import RunCard from "@/Components/RunCardPanel";
 import { socket } from "@/utils/socket";
+import TeamTypeIcon from "@/Components/TeamTypeIcon";
 
 function AdminPanel() {
   const [isRunning, setIsRunning] = useState(false);
@@ -14,6 +15,9 @@ function AdminPanel() {
     isRunning ? "Arrêter la Course" : "Démarrer la Course"
   );
 
+  const [classesWithoutProf, setClassesWithoutProf] = useState([]);
+  const [classesWithTeacher, setClassesWithTeacher] = useState([]);
+
   useEffect(() => {
     socket.emit("getIsRunning");
     socket.emit("getClasses");
@@ -21,6 +25,9 @@ function AdminPanel() {
     socket.on("updateIsRunning", setIsRunning);
     socket.on("updateClasses", (newClasses) => {
       setClasses(newClasses);
+      // trier les classes d'élèves et les équipes de prof
+      setClassesWithoutProf(newClasses.filter((classe) => !classe.isTeacher));
+      setClassesWithTeacher(newClasses.filter((classe) => classe.isTeacher));
     });
 
     return () => {
@@ -42,7 +49,6 @@ function AdminPanel() {
         return response.json();
       })
       .then((data) => {
-        console.log(data);
         setRuns(data);
       });
   }, [isRunning]);
@@ -56,6 +62,7 @@ function AdminPanel() {
   };
 
   const setRunningClasses = (newClasses) => {
+    console.log(newClasses);
     socket.emit("setClasses", newClasses);
   };
 
@@ -102,7 +109,12 @@ function AdminPanel() {
             return response.json();
           })
           .then((data) => {
-            setRunningClasses(data);
+            const classesWithZeroLaps = data.map((cls) => ({
+              ...cls,
+              laps: 0,
+            }));
+            setRunningClasses(classesWithZeroLaps);
+            console.log("Data when GET : ", data);
           });
       }
     } else {
@@ -203,39 +215,83 @@ function AdminPanel() {
           <div className="mt-24 text-center">
             <h2 className="text-2xl font-bold">🏁 Course en cours</h2>
             <p className="text-gray-600">
-              Les données de course sont mises à jour en temps réel.
+              Les données de la course sont mises à jour en temps réel.
             </p>
           </div>
 
-          <h2 className="text-xl font-semibold mt-6 mb-4 text-center">
-            Gestion des Classes
-          </h2>
+          {/* If there is at least 1 students classe, show : */}
+          {classesWithoutProf.length !== 0 && (
+            <>
+              <h2 className="text-xl font-semibold mt-6 mb-4 text-center flex items-center justify-center space-x-2">
+                <span>Gestion des classes d'élèves</span>
+                <TeamTypeIcon isTeacher={false} />
+              </h2>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 px-4">
-            {classes.map((classe) => (
-              <div
-                key={classe.id}
-                className="bg-white shadow-lg rounded-2xl p-6 flex flex-col items-center text-center">
-                <h3 className="text-lg font-bold">{classe.name}</h3>
-                <p className="text-gray-700 text-sm">
-                  Tours : <span className="font-semibold">{classe.laps}</span>
-                </p>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 px-4 mb-5">
+                {classesWithoutProf.map((classe) => (
+                  <div
+                    key={classe.id}
+                    className="bg-white shadow-lg rounded-2xl p-6 flex flex-col items-center text-center">
+                    <h3 className="text-lg font-bold">{classe.name}</h3>
+                    <p className="text-gray-700 text-sm">
+                      Tours :{" "}
+                      <span className="font-semibold">{classe.laps}</span>
+                    </p>
 
-                <div className="mt-4 flex gap-2">
-                  <button
-                    onClick={() => updateTours(classe.id, 1)}
-                    className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg transition hover:cursor-pointer">
-                    +1 Tour
-                  </button>
-                  <button
-                    onClick={() => updateTours(classe.id, -1)}
-                    className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition hover:cursor-pointer">
-                    -1 Tour
-                  </button>
-                </div>
+                    <div className="mt-4 flex gap-2">
+                      <button
+                        onClick={() => updateTours(classe.id, 1)}
+                        className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg transition hover:cursor-pointer">
+                        +1 Tour
+                      </button>
+                      <button
+                        onClick={() => updateTours(classe.id, -1)}
+                        className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition hover:cursor-pointer">
+                        -1 Tour
+                      </button>
+                    </div>
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
+            </>
+          )}
+
+          {/* If there is at least 1 teacher team, show this : */}
+          {classesWithTeacher.length !== 0 && (
+            <>
+              <h2 className="text-xl font-semibold mt-6 mb-4 text-center flex items-center justify-center space-x-2">
+                <span>Gestion des classes de professeurs</span>
+                <TeamTypeIcon isTeacher={true} />
+              </h2>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 px-4">
+                {classesWithTeacher.map((classe) => (
+                  <div
+                    key={classe.id}
+                    className="bg-white shadow-lg rounded-2xl p-6 flex flex-col items-center text-center">
+                    <h3 className="text-lg font-bold">{classe.name}</h3>
+                    <p className="text-gray-700 text-sm">
+                      Tours :{" "}
+                      <span className="font-semibold">{classe.laps}</span>
+                    </p>
+
+                    <div className="mt-4 flex gap-2">
+                      <button
+                        onClick={() => updateTours(classe.id, 1)}
+                        className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg transition hover:cursor-pointer">
+                        +1 Tour
+                      </button>
+                      <button
+                        onClick={() => updateTours(classe.id, -1)}
+                        className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition hover:cursor-pointer">
+                        -1 Tour
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </>
+          )}
         </>
       ) : (
         <>
