@@ -14,8 +14,16 @@ const Clock = () => {
   }, []);
 
   return (
-    <div className="text-center text-2xl font-bold font-outline-1">
-      <h2>Temps réel : {time.toLocaleTimeString()}</h2>
+    <div className="flex justify-center items-center mt-4">
+      <div className="relative bg-black px-6 py-3 rounded-xl shadow-lg shadow-fuchsia-500/50 border border-purple-500">
+        {/* Effet lumineux derrière */}
+        <div className="absolute inset-0 bg-fuchsia-300 opacity-1 blur-xl animate-pulse"></div>
+
+        {/* Texte de l'heure */}
+        <h2 className="relative text-4xl font-mono text-gray-300 font-bold tracking-widest">
+          {time.toLocaleTimeString()}
+        </h2>
+      </div>
     </div>
   );
 };
