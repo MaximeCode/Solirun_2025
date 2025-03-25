@@ -42,7 +42,7 @@ const ClassementReel = () => {
 		"text-gray-300", // 2ème position
 		"text-orange-400", // 3ème position
 	];
-	const icons = ["🏆", "🥈", "🥉", "😭"];
+	const icons = ["🏆", "🥈", "🥉", "👏"];
 	return (
 		<>
 			<div className="text-white rounded-xl p-8 mx-auto">

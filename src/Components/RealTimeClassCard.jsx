@@ -95,7 +95,7 @@ const ClassCard = ({ classe }) => {
 			{/* Card content */}
 			<div
 				className="
-				  bg-gray-200
+				  bg-white
 					flex 
 					flex-col 
 					justify-center 
