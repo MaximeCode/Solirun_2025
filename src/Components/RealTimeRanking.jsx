@@ -34,14 +34,14 @@ const ClassementReel = () => {
 
   return (
     <>
-      <div className="text-white rounded-xl p-8 mx-auto mb-12">
+      <div className="text-white rounded-xl p-8 mx-auto">
         <Clock />
-        <h2 className="text-5xl font-extrabold text-center mb-6 font-outline-2 leading-tight">
+        <h2 className="text-5xl font-extrabold text-center mt-10 leading-tight mb-34">
           Classement des Classes
         </h2>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 px-6 mt-12">
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-8 items-center h-auto">
         {sortedClasses.map((classe, index) => (
           <div
             key={classe.id}

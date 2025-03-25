@@ -15,6 +15,13 @@ let classes = [];
 let unUsedClasses = [];
 let usedClasses = new Map(); // Utilisation d’un Map() pour éviter les conflits
 
+const classColors = [
+		"#F4C542", // Jaune
+		"#F44336", // Rouge
+		"#2196F3", // Bleu
+		"#4CAF50" // Vert
+	];
+
 const updateAllClients = () => {
 	io.emit("updateClasses", classes);
 	io.emit("updateUnUsedClasses", unUsedClasses);
@@ -50,6 +57,9 @@ io.on("connection", (socket) => {
 	});
 
 	socket.on("setClasses", (newClasses) => {
+		for (let i = 0; i < newClasses.length; i++) {
+			newClasses[i].color = classColors[i];
+		}
 		classes = [...newClasses]; // Immutabilité
 		unUsedClasses = [...newClasses]; // Immutabilité
 		console.log("Running Classes :", classes);
@@ -59,8 +69,8 @@ io.on("connection", (socket) => {
 	socket.on("updateToursById", ({ id, increment }) => {
 		const requestedClass = classes.find((cls) => cls.id === id);
 		if (requestedClass) {
-			requestedClass.laps = Math.max(0, requestedClass.laps + increment);
-			console.log("classes:", requestedClass.name, "prend :", increment);
+			requestedClass.laps = Math.max(0, requestedClass.laps + (increment > 0 ? 1 : -1));
+			console.log("classes:", requestedClass.name, "prend :", (increment > 0 ? 1 : -1));
 			updateAllClients();
 		}
 	});

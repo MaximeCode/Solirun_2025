@@ -8,7 +8,6 @@ export async function middleware(request) {
   if (pathname.startsWith('/Admin')) {
     // Récupérer le token
     const token = request.cookies.get('token')?.value;
-    console.log("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
 
     // Si pas de token, rediriger vers la page de login
     if (!token) {

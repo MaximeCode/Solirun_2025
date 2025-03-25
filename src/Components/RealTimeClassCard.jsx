@@ -26,24 +26,78 @@ const ClassCard = ({ position, name, alias, color, students, laps }) => {
 		return hexToRgb(bgColor);
 	};
 
-	// Appliquer une couleur spécifique pour chaque classe
-	const classColors = [
-		"#F4C542", // Jaune
-		"#F44336", // Rouge
-		"#2196F3", // Bleu
-		"#4CAF50" // Vert
-	];
-
 	// Sélectionne la couleur en fonction de l'alias ou du nom de la classe
-	const classColor = classColors[position] || "#FFFFFF"; // Default to white if color is not found
+	const classColor = color || "#FFFFFF"; // Default to white if color is not found
 
 	return (
 		<div
-			className={`shadow-xl rounded-xl p-10 flex flex-col justify-center items-center text-center transform hover:scale-105 transition-all h-96`}
-			style={{ backgroundColor: classColor }}
+			className={`
+				relative 
+				shadow-xl 
+				rounded-xl 
+				p-3 
+				text-center 
+				transform 
+				transition-all 
+				h-96 
+				overflow-hidden
+				[animation:neon-pulse_2s_ease-in-out_infinite]
+				[@keyframes_neon-pulse]:from{opacity:0.7}
+				[@keyframes_neon-pulse]:to{opacity:0.5}
+			`}
+			style={{
+				"--neon-color": color,
+				boxShadow: `
+					0 0 10px 3px ${color}, 
+					0 0 20px 6px ${color}, 
+					0 0 30px 9px ${color}
+				`,
+				backgroundColor: color,
+			}}
 		>
-			<div className="bg-black rounded-lg h-full w-full p-6">
-				{/* Icône de position */}
+			{/* Neon border effect */}
+			<div
+				className="
+					absolute 
+					inset-0 
+					rounded-xl 
+					pointer-events-none
+					z-[1]
+				"
+				style={{
+					boxShadow: `
+						0 0 10px 3px ${color}, 
+						0 0 20px 6px ${color}, 
+						0 0 30px 9px ${color}
+					`,
+					opacity: 0.7,
+				}}
+			></div>
+
+			{/* Background blur effect */}
+			<div
+				className="absolute inset-0 -z-1 opacity-10 blur-xl animate-pulse"
+				style={{ backgroundColor: color }}
+			></div>
+
+			{/* Card content */}
+			<div
+				className="
+					bg-black 
+					flex 
+					flex-col 
+					justify-center 
+					space-y-3 
+					rounded-lg 
+					h-full 
+					w-full 
+					p-6 
+					relative 
+					z-10
+				"
+				style={{ borderColor: color }}
+			>
+				{/* Position Icon */}
 				<div
 					className={`text-5xl font-bold ${
 						positionStyles[position] || "text-gray-500"
@@ -52,7 +106,7 @@ const ClassCard = ({ position, name, alias, color, students, laps }) => {
 					{positionIcon}
 				</div>
 
-				{/* Surnom de la classe */}
+				{/* Class Nickname */}
 				<h3
 					className={`text-4xl text-white font-bold mt-4 ${getTextColor(
 						classColor
@@ -61,12 +115,12 @@ const ClassCard = ({ position, name, alias, color, students, laps }) => {
 					{alias}
 				</h3>
 
-				{/* Nom de la classe */}
+				{/* Class Name */}
 				<p className={`italic text-white text-4xl ${getTextColor(classColor)}`}>
 					{name}
 				</p>
 
-				{/* Nombre d'élèves */}
+				{/* Number of Students */}
 				<p
 					className={`text-4xl text-white mt-2 font-semibold ${getTextColor(
 						classColor
@@ -75,7 +129,7 @@ const ClassCard = ({ position, name, alias, color, students, laps }) => {
 					👨‍🎓 {students} élèves
 				</p>
 
-				{/* Nombre de tours */}
+				{/* Number of Laps */}
 				<p className={`text-4xl text-white mt-2 ${getTextColor(classColor)}`}>
 					🏁 Tours : <span className="font-bold">{laps}</span>
 				</p>

@@ -20,7 +20,7 @@ const Clock = () => {
         <div className="absolute inset-0 bg-fuchsia-300 opacity-1 blur-xl animate-pulse"></div>
 
         {/* Texte de l'heure */}
-        <h2 className="relative text-4xl font-mono text-gray-300 font-bold tracking-widest">
+        <h2 className="relative text-6xl font-mono text-gray-300 font-bold tracking-widest">
           {time.toLocaleTimeString()}
         </h2>
       </div>

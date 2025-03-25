@@ -7,7 +7,7 @@ const ClassePodiumItem = ({ rank, classe }) => {
     <div
       className={`grid grid-cols-4 items-center ${
         colors[rank - 1]
-      } p-3 rounded-lg font-bold text-black`}>
+      } p-3 rounded-lg font-extrabold text-black`}>
       <span className="text-4xl text-left">
         {rank} {rank === 1 ? "er" : "ème"}
       </span>
