@@ -17,7 +17,7 @@ export function useAuth() {
 
 			console.log("Token envoyé:", token);
 
-			fetch("http://localhost:3030/api.php", {
+			fetch(`${process.env.NEXT_PUBLIC_API_URL}/api.php`, {
 				method: "POST",
 				headers: {
 					"Content-Type": "application/json",

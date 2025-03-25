@@ -27,7 +27,7 @@ export default function AdminLayout({ children }) {
 				const controller = new AbortController();
 				const timeoutId = setTimeout(() => controller.abort(), 8000);
 
-				const response = await fetch("http://localhost:3030/api.php", {
+				const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api.php`, {
 					method: "POST",
 					headers: {
 						"Content-Type": "application/json",
