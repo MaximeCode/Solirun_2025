@@ -34,8 +34,10 @@ function Manager() {
   }, [!isRunning]);
 
   function handleClasse(classe) {
-    setSelectedClass(classe);
-    socket.emit("UseClasse", classe);
+    if (classe){
+      setSelectedClass(classe);
+      socket.emit("UseClasse", classe);
+    }
   }
 
   return (

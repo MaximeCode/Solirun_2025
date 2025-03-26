@@ -4,10 +4,22 @@ import PropTypes from "prop-types";
 const ClassSelector = ({ classes, isRunning, handleClasse }) => {
   const [PreSelectedClass, setPreSelectedClass] = useState(null);
   const [Classes, setClasses] = useState([]);
+  const [isError, setIsError] = useState(false);
 
   useEffect(() => {
     setClasses(classes);
   }, [classes]);
+
+  const handleSelection = () => {
+    if (PreSelectedClass) {
+      handleClasse(PreSelectedClass);
+      setIsError(false);
+    } else {
+      setIsError(true);
+      // Reset error state after animation
+      setTimeout(() => setIsError(false), 600);
+    }
+  };
 
   return (
     <div className="max-w-sm mx-auto p-4">
@@ -31,11 +43,14 @@ const ClassSelector = ({ classes, isRunning, handleClasse }) => {
             ))}
           </>
         )}
-        ;
       </div>
       <button
-        className="mt-4 p-2 bg-blue-500 text-white rounded-lg font-bold w-full"
-        onClick={() => handleClasse(PreSelectedClass)}>
+        onClick={handleSelection}
+        className={`mt-4 p-2 text-white rounded-lg font-bold w-full transition-all duration-300 ${
+          isError 
+            ? "bg-red-500 animate-shake" 
+            : "bg-blue-500 hover:bg-blue-600"
+        }`}>
         Séléctionner
       </button>
     </div>
