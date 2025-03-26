@@ -8,6 +8,8 @@ const ClassementReel = () => {
   const [classes, setClasses] = useState([]);
   const [sortedClasses, setSortedClasses] = useState([...classes]);
 
+  const icons = ["🥇", "🥈", "🥉", "👏"];
+
   useEffect(() => {
     // Retirer les classes prof
     const classesWithoutProf = classes.filter((classe) => !classe.isTeacher);
@@ -61,7 +63,7 @@ const ClassementReel = () => {
         : custom.movementDirection === 'down' 
           ? -custom.movementDistance 
           : 0,
-      zIndex: custom.movementDirection === 'up' ? 50 : 0,
+      zIndex: custom.movementDirection === 'up' ? 0 : 50,
       scale: custom.movementDirection === 'up' ? 1.05 : 1
     }),
     animate: {
@@ -70,8 +72,8 @@ const ClassementReel = () => {
       zIndex: 0,
       scale: 1,
       transition: {
-        duration: 1, // Durée de 2.5 secondes
-        ease: "easeInOut"
+        duration: 4, // Durée de 4 secondes
+        ease: "anticipate"
       }
     },
     hover: {
@@ -89,36 +91,48 @@ const ClassementReel = () => {
         </h2>
       </div>
 
-      <div className="relative grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-12">
-        <AnimatePresence>
-          {sortedClasses.map((classe, index) => (
-            <motion.div
-              key={classe.id}
-              layout
-              custom={classe}
-              initial="initial"
-              animate="animate"
-              whileHover="hover"
-              variants={cardVariants}
-              className={`
-                w-full 
-                ${index % 4 === 0 ? 'col-start-1' : 
-                  index % 4 === 1 ? 'col-start-2' : 
-                  index % 4 === 2 ? 'col-start-3' : 'col-start-4'}
-              `}
-              style={{ 
-                position: 'relative',
-                top: `${Math.floor(index / 4) * 120}px`, // Déplacement vertical par ligne
-                transition: 'top 2.5s ease-in-out'
-              }}
-            >
-              <ClassCard
-                position={index}
-                classe={classe}
-              />
-            </motion.div>
+      <div className="relative">
+        {/* Ligne d'icônes */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-12 mb-4">
+          {icons.map((icon, index) => (
+            <div key={index} className="text-center text-8xl mb-4">
+              {icon}
+            </div>
           ))}
-        </AnimatePresence>
+        </div>
+
+        {/* Grille des cartes */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-12">
+          <AnimatePresence>
+            {sortedClasses.map((classe, index) => (
+              <motion.div
+                key={classe.id}
+                layout
+                custom={classe}
+                initial="initial"
+                animate="animate"
+                whileHover="hover"
+                variants={cardVariants}
+                className={`
+                  w-full 
+                  ${index % 4 === 0 ? 'col-start-1' : 
+                    index % 4 === 1 ? 'col-start-2' : 
+                    index % 4 === 2 ? 'col-start-3' : 'col-start-4'}
+                `}
+                style={{ 
+                  position: 'relative',
+                  top: `${Math.floor(index / 4) * 120}px`, 
+                  transition: 'top 4s cubic-bezier(0.25, 0.1, 0.25, 1)'
+                }}
+              >
+                <ClassCard
+                  position={index}
+                  classe={classe}
+                />
+              </motion.div>
+            ))}
+          </AnimatePresence>
+        </div>
       </div>
     </>
   );
