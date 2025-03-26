@@ -10,7 +10,11 @@ function AdminPanel() {
   const [isRunning, setIsRunning] = useState(false);
   const [classes, setClasses] = useState([]);
   const [runs, setRuns] = useState([]);
-  const [selectedRun, setSelectedRun] = useState(null);
+  const [selectedRun, setSelectedRun] = useState(() => {
+    // Initialize from local storage if exists
+    const savedRun = localStorage.getItem("selectedRun");
+    return savedRun ? JSON.parse(savedRun) : null;
+  });
   const [error, setError] = useState(false);
   const [buttonText, setButtonText] = useState(
     isRunning ? "Arrêter la Course" : "Démarrer la Course"
@@ -53,6 +57,17 @@ function AdminPanel() {
         setRuns(data);
       });
   }, [isRunning]);
+
+  // Update local storage whenever selectedRun changes
+  useEffect(() => {
+    if (selectedRun) {
+      localStorage.setItem("selectedRun", JSON.stringify(selectedRun));
+    } else {
+      localStorage.removeItem("selectedRun");
+    }
+    console.log("Selected Run:", selectedRun);
+    console.log("localStorage :: ", localStorage);
+  }, [selectedRun]);
 
   const toggleIsRunning = () => {
     socket.emit("toggleIsRunning");
@@ -183,6 +198,7 @@ function AdminPanel() {
               en temps réel pour tous les utilisateurs.
             </p>
             <button
+              id="start-stop_run"
               onClick={handleClick}
               className={`w-full py-3 px-4 rounded-md font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 
                 ${
