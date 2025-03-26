@@ -19,7 +19,7 @@ export default function Login() {
 			console.log(token);
 
 			// Vérifier si le token est valide avant de rediriger
-			fetch("http://localhost:3030/api.php", {
+			fetch(`${process.env.NEXT_PUBLIC_API_URL}/api.php`, {
 				method: "POST",
 				headers: {
 					"Content-Type": "application/json",
@@ -57,7 +57,7 @@ export default function Login() {
 		const controller = new AbortController();
 		const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 secondes de timeout
 
-		fetch("http://localhost:3030/api.php", {
+		fetch(`${process.env.NEXT_PUBLIC_API_URL}/api.php`, {
 			method: "POST",
 			headers: {
 				"Content-Type": "application/json",
