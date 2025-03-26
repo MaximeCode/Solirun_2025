@@ -115,61 +115,72 @@ export default function Login() {
 
 	return (
 		<div className="flex items-center justify-center min-h-screen bg-black relative overflow-hidden">
-		{/* Effet néon animé */}
-		<div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-purple-600 opacity-30 blur-3xl animate-pulse"></div>
-		
-		<motion.div 
-			initial={{ opacity: 0, scale: 0.9 }}
-			animate={{ opacity: 1, scale: 1 }}
-			transition={{ duration: 0.5 }}
-			className="relative z-10 w-full max-w-md p-8 bg-gray-900 rounded-xl shadow-2xl border border-gray-800 backdrop-blur-lg bg-opacity-60">
-			
-			<h1 className="text-4xl font-extrabold text-center text-white neon-text">Connexion</h1>
-			
-			{error && (
-			<div className="p-4 text-sm text-red-400 bg-red-900 bg-opacity-40 rounded-md">
-				{error}
-			</div>
-			)}
+			{/* Effet néon animé */}
+			<div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-purple-600 opacity-30 blur-3xl animate-pulse"></div>
 
-			<form onSubmit={handleSubmit} className="space-y-6 mt-6">
-			<div className="space-y-2">
-				<label htmlFor="username" className="block text-sm font-medium text-gray-300">
-				Nom d'utilisateur
-				</label>
-				<input
-				id="username"
-				type="text"
-				value={username}
-				onChange={(e) => setUsername(e.target.value)}
-				required
-				className="w-full px-4 py-2 bg-gray-800 text-white border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
-				/>
-			</div>
-			
-			<div className="space-y-2">
-				<label htmlFor="password" className="block text-sm font-medium text-gray-300">
-				Mot de passe
-				</label>
-				<input
-				id="password"
-				type="password"
-				value={password}
-				onChange={(e) => setPassword(e.target.value)}
-				required
-				className="w-full px-4 py-2 bg-gray-800 text-white border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
-				/>
-			</div>
-			
-			<button
-				type="submit"
-				disabled={loading}
-				className="w-full px-4 py-2 text-white bg-gradient-to-r from-blue-500 to-purple-500 rounded-md hover:from-purple-500 hover:to-blue-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition-all duration-300 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+			<motion.div
+				initial={{ opacity: 0, scale: 0.9 }}
+				animate={{ opacity: 1, scale: 1 }}
+				transition={{ duration: 0.5 }}
+				className="relative z-10 w-full max-w-md p-8 bg-gray-900 rounded-xl shadow-2xl border border-gray-800 backdrop-blur-lg bg-opacity-60"
 			>
-				{loading ? "Connexion en cours..." : "Se connecter"}
-			</button>
-			</form>
-		</motion.div>
+				<h1 className="text-4xl font-extrabold text-center text-white neon-text">
+					Connexion
+				</h1>
+
+				{error && (
+					<div className="p-4 text-sm text-red-400 bg-red-900 bg-opacity-40 rounded-md">
+						{error}
+					</div>
+				)}
+
+				<form
+					onSubmit={handleSubmit}
+					className="space-y-6 mt-6"
+				>
+					<div className="space-y-2">
+						<label
+							htmlFor="username"
+							className="block text-sm font-medium text-gray-300"
+						>
+							Nom d'utilisateur
+						</label>
+						<input
+							id="username"
+							type="text"
+							value={username}
+							onChange={(e) => setUsername(e.target.value)}
+							required
+							className="w-full px-4 py-2 bg-gray-800 text-white border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+						/>
+					</div>
+
+					<div className="space-y-2">
+						<label
+							htmlFor="password"
+							className="block text-sm font-medium text-gray-300"
+						>
+							Mot de passe
+						</label>
+						<input
+							id="password"
+							type="password"
+							value={password}
+							onChange={(e) => setPassword(e.target.value)}
+							required
+							className="w-full px-4 py-2 bg-gray-800 text-white border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+						/>
+					</div>
+
+					<button
+						type="submit"
+						disabled={loading}
+						className="w-full px-4 py-2 text-white bg-gradient-to-r from-blue-500 to-purple-500 rounded-md hover:from-purple-500 hover:to-blue-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition-all duration-300 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+					>
+						{loading ? "Connexion en cours..." : "Se connecter"}
+					</button>
+				</form>
+			</motion.div>
 		</div>
 	);
 }

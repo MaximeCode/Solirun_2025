@@ -21,21 +21,23 @@ const ClassCard = ({ classe }) => {
 
 	const getBorderColor = (borderColor) => {
 		// Supprimer le # si présent
-		borderColor = borderColor.replace('#', '');
-	
+		borderColor = borderColor.replace("#", "");
+
 		// Convertir la couleur hexadécimale en valeurs RGB
 		const r = parseInt(borderColor.substr(0, 2), 16);
 		const g = parseInt(borderColor.substr(2, 2), 16);
 		const b = parseInt(borderColor.substr(4, 2), 16);
-	
+
 		// Réduire la luminosité de 20%
 		const factor = 0.8;
 		const darkerR = Math.max(0, Math.round(r * factor));
 		const darkerG = Math.max(0, Math.round(g * factor));
 		const darkerB = Math.max(0, Math.round(b * factor));
-	
+
 		// Convertir en couleur hexadécimale
-		return `#${darkerR.toString(16).padStart(2, '0')}${darkerG.toString(16).padStart(2, '0')}${darkerB.toString(16).padStart(2, '0')}`;
+		return `#${darkerR.toString(16).padStart(2, "0")}${darkerG
+			.toString(16)
+			.padStart(2, "0")}${darkerB.toString(16).padStart(2, "0")}`;
 	};
 
 	// Sélectionne la couleur en fonction de l'alias ou du nom de la classe
@@ -110,7 +112,6 @@ const ClassCard = ({ classe }) => {
 				"
 				style={{ borderColor: getBorderColor(classe.color) }}
 			>
-
 				{/* Nom de la classe */}
 				<p
 					className={`italic text-black text-5xl font-extrabold ${getTextColor(
@@ -130,7 +131,11 @@ const ClassCard = ({ classe }) => {
 				</p>
 
 				{/* Nombre de tours */}
-				<p className={`text-4xl text-black mt-2 font-bold ${getTextColor(classe.color)}`}>
+				<p
+					className={`text-4xl text-black mt-2 font-bold ${getTextColor(
+						classe.color
+					)}`}
+				>
 					🏁 Tours : <span className="">{classe.laps}</span>
 				</p>
 			</div>

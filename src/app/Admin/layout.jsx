@@ -27,16 +27,19 @@ export default function AdminLayout({ children }) {
 				const controller = new AbortController();
 				const timeoutId = setTimeout(() => controller.abort(), 8000);
 
-				const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api.php`, {
-					method: "POST",
-					headers: {
-						"Content-Type": "application/json",
-					},
-					body: JSON.stringify({
-						action: "verifyToken",
-						token: token,
-					}),
-				});
+				const response = await fetch(
+					`${process.env.NEXT_PUBLIC_API_URL}/api.php`,
+					{
+						method: "POST",
+						headers: {
+							"Content-Type": "application/json",
+						},
+						body: JSON.stringify({
+							action: "verifyToken",
+							token: token,
+						}),
+					}
+				);
 
 				clearTimeout(timeoutId);
 
@@ -124,4 +127,4 @@ export default function AdminLayout({ children }) {
 
 AdminLayout.propTypes = {
 	children: PropTypes.node.isRequired,
-  };
+};
