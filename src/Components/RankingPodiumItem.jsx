@@ -2,33 +2,32 @@ import React from "react";
 import PropTypes from "prop-types";
 
 const ClassePodiumItem = ({ rank, classe }) => {
-	const colors = ["bg-yellow-400", "bg-gray-300", "bg-orange-400"];
-	return (
-		<div
-			className={`grid grid-cols-4 items-center ${
-				colors[rank - 1]
-			} p-3 rounded-lg font-extrabold text-black`}
-		>
-			<span className="text-4xl text-left">
-				{rank} {rank === 1 ? "er" : "ème"}
-			</span>
-			<span className="text-3xl text-center">{classe.name}</span>
-			<span className="text-3xl text-center">
-				{classe.students} {classe.isTeacher ? "Profs" : "Élèves"}
-			</span>
-			<span className="text-3xl text-center">{classe.laps} Tours</span>
-		</div>
-	);
+  const colors = ["bg-yellow-400", "bg-gray-300", "bg-orange-400"];
+  return (
+    <div
+      className={`grid grid-cols-4 items-center ${
+        colors[rank - 1]
+      } p-3 rounded-lg font-extrabold text-black`}>
+      <span className="text-4xl text-left">
+        {rank} {rank === 1 ? "er" : "ème"}
+      </span>
+      <span className="text-3xl text-center">{classe.name}</span>
+      <span className="text-3xl text-center">
+        {classe.students} {classe.isTeacher ? "Profs" : "Élèves"}
+      </span>
+      <span className="text-3xl text-center">{classe.laps} Tours</span>
+    </div>
+  );
 };
 
 ClassePodiumItem.propTypes = {
-	rank: PropTypes.number.isRequired,
-	classe: PropTypes.shape({
-		name: PropTypes.string.isRequired,
-		students: PropTypes.number.isRequired,
-		laps: PropTypes.number.isRequired,
-		isTeacher: PropTypes.bool.isRequired,
-	}).isRequired,
+  rank: PropTypes.number.isRequired,
+  classe: PropTypes.shape({
+    name: PropTypes.string.isRequired,
+    students: PropTypes.number.isRequired,
+    laps: PropTypes.number.isRequired,
+    isTeacher: PropTypes.bool.isRequired,
+  }).isRequired,
 };
 
 export default ClassePodiumItem;

@@ -16,11 +16,11 @@ let unUsedClasses = [];
 let usedClasses = new Map(); // Utilisation d’un Map() pour éviter les conflits
 
 const classColors = [
-		"#ffab18", // Jaune
-		"#F44336", // Rouge
-		"#2196F3", // Bleu
-		"#4CAF50" // Vert
-	];
+	"#ffab18", // Jaune
+	"#F44336", // Rouge
+	"#2196F3", // Bleu
+	"#4CAF50" // Vert
+];
 
 const updateAllClients = () => {
 	io.emit("updateClasses", classes);
