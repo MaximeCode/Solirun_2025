@@ -2,21 +2,10 @@ const { Server } = require("socket.io");
 const http = require("http");
 
 const server = http.createServer();
-const allowedOrigins = [
-	"http://192.168.168.100:3000",
-	"http://192.168.168.209:3000",
-	"http://localhost:3000",
-];
 
 const io = new Server(server, {
 	cors: {
-		origin: (origin, callback) => {
-			if (!origin || allowedOrigins.includes(origin)) {
-				callback(null, true);
-			} else {
-				callback(new Error("Not allowed by CORS"));
-			}
-		},
+		origin: "*",  // Permet toutes les origines
 		methods: ["GET", "POST"],
 	},
 });
@@ -25,6 +14,13 @@ let isRunning = false;
 let classes = [];
 let unUsedClasses = [];
 let usedClasses = new Map(); // Utilisation d’un Map() pour éviter les conflits
+
+const classColors = [
+		"#ffab18", // Jaune
+		"#F44336", // Rouge
+		"#2196F3", // Bleu
+		"#4CAF50" // Vert
+	];
 
 const updateAllClients = () => {
 	io.emit("updateClasses", classes);
@@ -61,6 +57,9 @@ io.on("connection", (socket) => {
 	});
 
 	socket.on("setClasses", (newClasses) => {
+		for (let i = 0; i < newClasses.length; i++) {
+			newClasses[i].color = classColors[i];
+		}
 		classes = [...newClasses]; // Immutabilité
 		unUsedClasses = [...newClasses]; // Immutabilité
 		console.log("Running Classes :", classes);
@@ -70,8 +69,8 @@ io.on("connection", (socket) => {
 	socket.on("updateToursById", ({ id, increment }) => {
 		const requestedClass = classes.find((cls) => cls.id === id);
 		if (requestedClass) {
-			requestedClass.laps = Math.max(0, requestedClass.laps + increment);
-			console.log("classes:", requestedClass.name, "prend :", increment);
+			requestedClass.laps = Math.max(0, requestedClass.laps + (increment > 0 ? 1 : -1));
+			console.log("classes:", requestedClass.name, "prend :", (increment > 0 ? 1 : -1));
 			updateAllClients();
 		}
 	});

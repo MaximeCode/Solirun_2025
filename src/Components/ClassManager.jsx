@@ -65,7 +65,7 @@ const ClassManager = ({ classe, setClasse }) => {
 
         {/* Nombre d'élèves */}
         <div className="mt-4 text-4xl font-bold text-green-400">
-          {classe.students} élèves
+          {classe.students} {classe.isTeacher ? "Profs" : "Élèves"}
         </div>
 
         {/* Tours */}
@@ -97,6 +97,7 @@ ClassManager.propTypes = {
     alias: PropTypes.string.isRequired,
     students: PropTypes.number.isRequired,
     laps: PropTypes.number,
+    isTeacher: PropTypes.bool.isRequired,
   }).isRequired,
   setClasse: PropTypes.func.isRequired,
 };

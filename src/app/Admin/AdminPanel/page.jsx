@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { useAuth } from "@/hooks/useAuth";
 import RunCard from "@/Components/RunCardPanel";
 import { socket } from "@/utils/socket";
 import TeamTypeIcon from "@/Components/TeamTypeIcon";
@@ -41,7 +42,7 @@ function AdminPanel() {
   }, [isRunning]);
 
   useEffect(() => {
-    fetch("http://localhost:3030/api.php?action=NextRuns")
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/api.php?action=NextRuns`)
       .then((response) => {
         if (!response.ok) {
           throw new Error("Erreur lors de la récupération des données");
@@ -79,7 +80,7 @@ function AdminPanel() {
         }, 1000);
       } else {
         toggleIsRunning();
-        fetch("http://localhost:3030/api.php", {
+        fetch(`${process.env.NEXT_PUBLIC_API_URL}/api.php`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -94,7 +95,7 @@ function AdminPanel() {
           .catch((error) => console.error("Erreur:", error));
 
         fetch(
-          `http://localhost:3030/api.php?action=ClassesRunning&id=${selectedRun}`,
+          `${process.env.NEXT_PUBLIC_API_URL}/api.php?action=ClassesRunning&id=${selectedRun}`,
           {
             method: "GET",
             headers: {
@@ -120,7 +121,7 @@ function AdminPanel() {
     } else {
       toggleIsRunning();
       console.log(selectedRun);
-      fetch("http://localhost:3030/api.php", {
+      fetch(`${process.env.NEXT_PUBLIC_API_URL}/api.php`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -135,7 +136,7 @@ function AdminPanel() {
         .catch((error) => console.error("Erreur:", error));
 
       classes.map((classe, index) => {
-        fetch("http://localhost:3030/api.php", {
+        fetch(`${process.env.NEXT_PUBLIC_API_URL}/api.php`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
