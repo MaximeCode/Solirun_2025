@@ -16,7 +16,7 @@ export async function middleware(request) {
 
     try {
       // Vérifier le token auprès de l'API
-      const response = await fetch("http://localhost:3030/api.php", {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api.php`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
