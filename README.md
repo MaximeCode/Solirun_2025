@@ -58,15 +58,6 @@ npm install
 
 Chaque dossier peut contenir un fichier `.env` ou de configuration locale. Voici les exemples recommandés :
 
-### 🔧 Frontend `.env`
-
-Fichier : `/.env` (à la racine)
-
-```
-NEXT_PUBLIC_API_URL=http://votre_api:port
-NEXT_PUBLIC_SOCKET_URL=http://votre_websocket:port
-```
-
 ### 🔧 WebSocket `.env`
 
 Fichier : `/NodeServeur/.env`
@@ -91,6 +82,15 @@ return [
   'DB_USER' => 'NomUtilisateur',
   'DB_PASSWORD' => 'MotDePasse'
 ];
+```
+
+### 🔧 Frontend `.env`
+
+Fichier : `/.env` (à la racine)
+
+```
+NEXT_PUBLIC_API_URL=http://votre_api:port
+NEXT_PUBLIC_SOCKET_URL=http://votre_websocket:port
 ```
 
 ### 🔧 Scripts personnalisés (facultatif)
