@@ -27,8 +27,9 @@ Ce projet est une application complète composée de trois parties principales :
 * Node.js (recommandé : version 18.x ou supérieure)
 * npm
 * PHP 8.3 avec extensions `mysqli` et `pdo_mysql`
-* Un serveur de base de données (MariaDB conseillé)
+* Un serveur de base de données (MariaDB conseillé) avec ce [fichier de dump 📥](https://raw.githubusercontent.com/MaximeCode/Solirun_2025/main/sql/solirun_dump.sql)
 
+NB : le dump créer la base de données Solirun_2025 avec un jeu de données fonctionel. Les user et password administrateur dans l'appli sont user : 'admin' et password : 'admin'
 ---
 
 ## 🚀 Installation
