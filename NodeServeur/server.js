@@ -1,5 +1,9 @@
+require("dotenv").config();
+
 const { Server } = require("socket.io");
 const http = require("http");
+
+const PORT = process.env.PORT || 5000;
 
 const server = http.createServer();
 
@@ -114,6 +118,6 @@ io.on("connection", (socket) => {
 	});
 });
 
-server.listen(5000, () => {
-	console.log("Serveur WebSocket en écoute sur http://localhost:5000");
+server.listen(PORT, () => {
+	console.log("Serveur WebSocket en écoute sur http://*:", PORT);
 });

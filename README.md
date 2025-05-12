@@ -1,36 +1,160 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🏃‍♂️ Solirun - Next.js App, API & WebSocket Server
 
-## Getting Started
+Ce projet est une application complète composée de trois parties principales :
 
-First, run the development server:
+* 🌐 **Next.js App** — Frontend React moderne
+* 📡 **WebSocket Server** — Communication en temps réel
+* 🛠️ **API Server** — Backend REST (ou GraphQL)
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+---
+
+## 📁 Structure du projet
+
+```
+/Solirun_2025
+│
+├── /API              # Serveur API (PHP)
+├── /NodeServeur      # Serveur WebSocket (Node.js)
+├── /                 # Application frontend (Next.js)
+├── package.json      # Dépendances et scripts globaux
+└── README.md
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+---
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+## 💪 Prérequis
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+* Node.js (recommandé : version 18.x ou supérieure)
+* npm
+* PHP 8.3 avec extensions `mysqli` et `pdo_mysql`
+* Un serveur de base de données (MariaDB conseillé)
 
-## Learn More
+---
 
-To learn more about Next.js, take a look at the following resources:
+## 🚀 Installation
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Clone le dépôt :
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```bash
+git clone https://github.com/MaximeCode/Solirun_2025
+cd Solirun_2025
+```
 
-## Deploy on Vercel
+Installe les dépendances :
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```bash
+# Pour l'application Next.js (racine du projet)
+npm install
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+# Pour le serveur WebSocket
+cd NodeServeur
+npm install
+```
+
+---
+
+## ⚙️ Configuration
+
+Chaque dossier peut contenir un fichier `.env` ou de configuration locale. Voici les exemples recommandés :
+
+### 🔧 Frontend `.env`
+
+Fichier : `/.env` (à la racine)
+
+```
+NEXT_PUBLIC_API_URL=http://votre_api:port
+NEXT_PUBLIC_SOCKET_URL=http://votre_websocket:port
+```
+
+### 🔧 WebSocket `.env`
+
+Fichier : `/NodeServeur/.env`
+
+```
+PORT=5000
+```
+
+### 🔧 API PHP
+
+Fichier : `/API/config.php`
+
+```php
+<?php
+
+defined('SECURE_ACCESS') or die('Accès direct au fichier non autorisé');
+
+return [
+  'DB_HOST' => 'IP_HOST_DB',
+  'DB_PORT' => 'PORT',
+  'DB_NAME' => 'NomDeLaBase',
+  'DB_USER' => 'NomUtilisateur',
+  'DB_PASSWORD' => 'MotDePasse'
+];
+```
+
+### 🔧 Scripts personnalisés (facultatif)
+
+Dans `package.json` (racine) :
+
+```json
+"scripts": {
+  "dev": "next dev --turbopack -H 'votre_IP' -p 'votre_port'",
+  "build": "next build",
+  "start": "next start -H 'votre_IP' -p 'votre_port'",
+  "lint": "next lint"
+}
+```
+
+---
+
+## ▶️ Démarrage
+
+### 1. Lancer l'API
+
+```bash
+cd API
+php -S votre_ip:votre_port
+```
+
+### 2. Lancer le serveur WebSocket
+
+```bash
+cd NodeServeur
+node server.js
+```
+
+Par défaut, il écoute sur `http://localhost:5000`
+
+### 3. Lancer l'application Next.js
+
+#### En développement :
+
+```bash
+cd /
+npm run dev
+```
+
+Accessible par défaut sur : [http://localhost:3000](http://localhost:3000)
+
+#### En production :
+
+```bash
+cd /
+npm run build
+npm run start
+```
+
+---
+
+## 📬 Contact
+
+Pour toute question ou bug :
+
+* 📧 [baptiste.vidal@lyceefulbert.fr](mailto:baptiste.vidal@lyceefulbert.fr)
+* 📧 [maxime.baude@lyceefulbert.fr](mailto:maxime.baude@lyceefulbert.fr)
+
+---
+
+## 📄 Licence
+
+Ce projet est distribué sous la licence **MIT**.
