@@ -1,8 +1,4 @@
--- MariaDB dump 10.19  Distrib 10.11.11-MariaDB, for debian-linux-gnu (x86_64)
---
--- Host: localhost    Database: Solirun_2025
--- ------------------------------------------------------
--- Server version	10.11.11-MariaDB-0+deb12u1
+/*M!999999\- enable the sandbox mode */ 
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -15,18 +11,9 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
---
--- Current Database: `Solirun_2025`
---
-
 CREATE DATABASE /*!32312 IF NOT EXISTS*/ `Solirun_2025` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci */;
 
 USE `Solirun_2025`;
-
---
--- Temporary table structure for view `AllRuns`
---
-
 DROP TABLE IF EXISTS `AllRuns`;
 /*!50001 DROP VIEW IF EXISTS `AllRuns`*/;
 SET @saved_cs_client     = @@character_set_client;
@@ -39,11 +26,6 @@ SET character_set_client = utf8mb4;
   1 AS `classIdList`,
   1 AS `classNameList` */;
 SET character_set_client = @saved_cs_client;
-
---
--- Table structure for table `Classes`
---
-
 DROP TABLE IF EXISTS `Classes`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8mb4 */;
@@ -57,10 +39,6 @@ CREATE TABLE `Classes` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=55 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `Classes`
---
 
 LOCK TABLES `Classes` WRITE;
 /*!40000 ALTER TABLE `Classes` DISABLE KEYS */;
@@ -115,11 +93,6 @@ INSERT INTO `Classes` VALUES
 (53,'SIO','FFFFFF',19,'SIOO',0);
 /*!40000 ALTER TABLE `Classes` ENABLE KEYS */;
 UNLOCK TABLES;
-
---
--- Table structure for table `Logins`
---
-
 DROP TABLE IF EXISTS `Logins`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8mb4 */;
@@ -136,21 +109,12 @@ CREATE TABLE `Logins` (
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
---
--- Dumping data for table `Logins`
---
-
 LOCK TABLES `Logins` WRITE;
 /*!40000 ALTER TABLE `Logins` DISABLE KEYS */;
 INSERT INTO `Logins` VALUES
 (1,'admin','$2y$10$8.pSelV7rctgO.k1qvT.verOMbnnNRkjuAqL1byu/K6qS4vOorrGi',1,'ba497f07778dae5841aebaaeb3ebdc5d1b3194ce9360d4340d7a69cb91536b7e','2025-04-24 13:44:03');
 /*!40000 ALTER TABLE `Logins` ENABLE KEYS */;
 UNLOCK TABLES;
-
---
--- Table structure for table `Logs`
---
-
 DROP TABLE IF EXISTS `Logs`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8mb4 */;
@@ -163,19 +127,10 @@ CREATE TABLE `Logs` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
---
--- Dumping data for table `Logs`
---
-
 LOCK TABLES `Logs` WRITE;
 /*!40000 ALTER TABLE `Logs` DISABLE KEYS */;
 /*!40000 ALTER TABLE `Logs` ENABLE KEYS */;
 UNLOCK TABLES;
-
---
--- Temporary table structure for view `NextRuns`
---
-
 DROP TABLE IF EXISTS `NextRuns`;
 /*!50001 DROP VIEW IF EXISTS `NextRuns`*/;
 SET @saved_cs_client     = @@character_set_client;
@@ -185,11 +140,6 @@ SET character_set_client = utf8mb4;
   1 AS `estimatedTime`,
   1 AS `classList` */;
 SET character_set_client = @saved_cs_client;
-
---
--- Temporary table structure for view `Ranking`
---
-
 DROP TABLE IF EXISTS `Ranking`;
 /*!50001 DROP VIEW IF EXISTS `Ranking`*/;
 SET @saved_cs_client     = @@character_set_client;
@@ -201,11 +151,6 @@ SET character_set_client = utf8mb4;
   1 AS `laps`,
   1 AS `isTeacher` */;
 SET character_set_client = @saved_cs_client;
-
---
--- Temporary table structure for view `RankingProfs`
---
-
 DROP TABLE IF EXISTS `RankingProfs`;
 /*!50001 DROP VIEW IF EXISTS `RankingProfs`*/;
 SET @saved_cs_client     = @@character_set_client;
@@ -217,11 +162,6 @@ SET character_set_client = utf8mb4;
   1 AS `laps`,
   1 AS `isTeacher` */;
 SET character_set_client = @saved_cs_client;
-
---
--- Table structure for table `Roles`
---
-
 DROP TABLE IF EXISTS `Roles`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8mb4 */;
@@ -232,21 +172,12 @@ CREATE TABLE `Roles` (
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
---
--- Dumping data for table `Roles`
---
-
 LOCK TABLES `Roles` WRITE;
 /*!40000 ALTER TABLE `Roles` DISABLE KEYS */;
 INSERT INTO `Roles` VALUES
 (1,'admin');
 /*!40000 ALTER TABLE `Roles` ENABLE KEYS */;
 UNLOCK TABLES;
-
---
--- Table structure for table `Runners`
---
-
 DROP TABLE IF EXISTS `Runners`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8mb4 */;
@@ -260,10 +191,6 @@ CREATE TABLE `Runners` (
   CONSTRAINT `Runners_ibfk_2` FOREIGN KEY (`theRun`) REFERENCES `Runs` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `Runners`
---
 
 LOCK TABLES `Runners` WRITE;
 /*!40000 ALTER TABLE `Runners` DISABLE KEYS */;
@@ -333,11 +260,6 @@ INSERT INTO `Runners` VALUES
 (53,13,26);
 /*!40000 ALTER TABLE `Runners` ENABLE KEYS */;
 UNLOCK TABLES;
-
---
--- Table structure for table `Runs`
---
-
 DROP TABLE IF EXISTS `Runs`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8mb4 */;
@@ -349,10 +271,6 @@ CREATE TABLE `Runs` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `Runs`
---
 
 LOCK TABLES `Runs` WRITE;
 /*!40000 ALTER TABLE `Runs` DISABLE KEYS */;
@@ -373,16 +291,7 @@ INSERT INTO `Runs` VALUES
 /*!40000 ALTER TABLE `Runs` ENABLE KEYS */;
 UNLOCK TABLES;
 
---
--- Current Database: `Solirun_2025`
---
-
 USE `Solirun_2025`;
-
---
--- Final view structure for view `AllRuns`
---
-
 /*!50001 DROP VIEW IF EXISTS `AllRuns`*/;
 /*!50001 SET @saved_cs_client          = @@character_set_client */;
 /*!50001 SET @saved_cs_results         = @@character_set_results */;
@@ -391,16 +300,11 @@ USE `Solirun_2025`;
 /*!50001 SET character_set_results     = utf8mb4 */;
 /*!50001 SET collation_connection      = utf8mb4_general_ci */;
 /*!50001 CREATE ALGORITHM=UNDEFINED */
-/*!50013 DEFINER=`solirunAdmin`@`10.37.127.1` SQL SECURITY DEFINER */
+/*!50013  SQL SECURITY DEFINER */
 /*!50001 VIEW `AllRuns` AS select `r`.`id` AS `id`,`r`.`startTime` AS `startTime`,`r`.`endTime` AS `endTime`,`r`.`estimatedTime` AS `estimatedTime`,group_concat(`c`.`id` separator ', ') AS `classIdList`,group_concat(`c`.`name` separator ', ') AS `classNameList` from ((`Runs` `r` join `Runners` `rn` on(`rn`.`theRun` = `r`.`id`)) join `Classes` `c` on(`rn`.`theClass` = `c`.`id`)) group by `r`.`id`,`r`.`estimatedTime` */;
 /*!50001 SET character_set_client      = @saved_cs_client */;
 /*!50001 SET character_set_results     = @saved_cs_results */;
 /*!50001 SET collation_connection      = @saved_col_connection */;
-
---
--- Final view structure for view `NextRuns`
---
-
 /*!50001 DROP VIEW IF EXISTS `NextRuns`*/;
 /*!50001 SET @saved_cs_client          = @@character_set_client */;
 /*!50001 SET @saved_cs_results         = @@character_set_results */;
@@ -409,16 +313,11 @@ USE `Solirun_2025`;
 /*!50001 SET character_set_results     = utf8mb4 */;
 /*!50001 SET collation_connection      = utf8mb4_general_ci */;
 /*!50001 CREATE ALGORITHM=UNDEFINED */
-/*!50013 DEFINER=`solirunAdmin`@`10.37.127.1` SQL SECURITY DEFINER */
+/*!50013  SQL SECURITY DEFINER */
 /*!50001 VIEW `NextRuns` AS select `Runs`.`id` AS `id`,`Runs`.`estimatedTime` AS `estimatedTime`,group_concat(distinct `Classes`.`name` order by `Classes`.`name` ASC separator ', ') AS `classList` from ((`Runs` join `Runners` on(`Runs`.`id` = `Runners`.`theRun`)) join `Classes` on(`Classes`.`id` = `Runners`.`theClass`)) where `Runs`.`startTime` is null group by `Runs`.`estimatedTime` order by `Runs`.`estimatedTime` */;
 /*!50001 SET character_set_client      = @saved_cs_client */;
 /*!50001 SET character_set_results     = @saved_cs_results */;
 /*!50001 SET collation_connection      = @saved_col_connection */;
-
---
--- Final view structure for view `Ranking`
---
-
 /*!50001 DROP VIEW IF EXISTS `Ranking`*/;
 /*!50001 SET @saved_cs_client          = @@character_set_client */;
 /*!50001 SET @saved_cs_results         = @@character_set_results */;
@@ -427,16 +326,11 @@ USE `Solirun_2025`;
 /*!50001 SET character_set_results     = utf8mb4 */;
 /*!50001 SET collation_connection      = utf8mb4_general_ci */;
 /*!50001 CREATE ALGORITHM=UNDEFINED */
-/*!50013 DEFINER=`solirunAdmin`@`10.37.127.1` SQL SECURITY DEFINER */
+/*!50013  SQL SECURITY DEFINER */
 /*!50001 VIEW `Ranking` AS select `Classes`.`id` AS `id`,`Classes`.`name` AS `name`,`Classes`.`nbStudents` AS `students`,sum(`Runners`.`laps`) AS `laps`,`Classes`.`isTeacher` AS `isTeacher` from (`Classes` join `Runners` on(`Classes`.`id` = `Runners`.`theClass`)) where `Runners`.`laps` > 0 group by `Classes`.`id` order by sum(`Runners`.`laps`) desc */;
 /*!50001 SET character_set_client      = @saved_cs_client */;
 /*!50001 SET character_set_results     = @saved_cs_results */;
 /*!50001 SET collation_connection      = @saved_col_connection */;
-
---
--- Final view structure for view `RankingProfs`
---
-
 /*!50001 DROP VIEW IF EXISTS `RankingProfs`*/;
 /*!50001 SET @saved_cs_client          = @@character_set_client */;
 /*!50001 SET @saved_cs_results         = @@character_set_results */;
@@ -445,7 +339,7 @@ USE `Solirun_2025`;
 /*!50001 SET character_set_results     = utf8mb4 */;
 /*!50001 SET collation_connection      = utf8mb4_general_ci */;
 /*!50001 CREATE ALGORITHM=UNDEFINED */
-/*!50013 DEFINER=`solirunAdmin`@`10.37.127.1` SQL SECURITY DEFINER */
+/*!50013  SQL SECURITY DEFINER */
 /*!50001 VIEW `RankingProfs` AS select `Classes`.`id` AS `id`,`Classes`.`name` AS `name`,`Classes`.`nbStudents` AS `students`,sum(`Runners`.`laps`) AS `laps`,`Classes`.`isTeacher` AS `isTeacher` from (`Classes` join `Runners` on(`Classes`.`id` = `Runners`.`theClass`)) where `Runners`.`laps` > 0 and `Classes`.`isTeacher` = 1 group by `Classes`.`id` order by sum(`Runners`.`laps`) desc */;
 /*!50001 SET character_set_client      = @saved_cs_client */;
 /*!50001 SET character_set_results     = @saved_cs_results */;
@@ -460,4 +354,3 @@ USE `Solirun_2025`;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-04-29  8:33:15
