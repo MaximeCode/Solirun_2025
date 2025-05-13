@@ -67,6 +67,10 @@ EXIT;
 mysql -u solirun_user -p Solirun_2025 < ./sql/solirun_dump.sql
 ```
 
+## En cas d'erreur d'imporatation du dump
+
+Si l'erreur est en rapport avec la ligne 1 qui ne comprend pas '\\\-', veuillez supprimer la premiere ligne du fichier sql
+
 ### 🔐 Connexion admin par défaut
 
 * **Utilisateur** : `admin`
@@ -141,6 +145,8 @@ Accessible par défaut sur : `http://localhost:5000` ou `http://localhost:votre_
 ## 🌐 4. Configuration et lancement de l'application frontend
 
 ### Installation des dépendances
+
+A la racine du projet :
 
 ```bash
 npm install
