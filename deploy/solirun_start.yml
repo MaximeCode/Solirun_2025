@@ -1,0 +1,39 @@
+---
+- name: Démarrage des serveurs Solirun_2025
+  hosts: localhost
+  become: yes
+  vars_files:
+    - vars.yml
+  tasks:
+    - name: Vérifier que les ports {{ api_port }}, {{ ws_port }}, {{ frontend_port }} ne sont pas déjà utilisés
+      shell: "ss -tulnp | grep -E ':{{ api_port }}|:{{ ws_port }}|:{{ frontend_port }}' || true"
+      register: ports_used
+      changed_when: false
+
+    - name: Stopper les serveurs si déjà en écoute (sécuritaire)
+      when: ports_used.stdout != ""
+      shell: |
+        ansible-playbook solirun_stop.yml
+
+    - name: Lancer le serveur API PHP (en arrière-plan)
+      shell: "nohup php -S {{ ip }}:{{ api_port }} -t {{ project_dir }}/API > /tmp/api.log 2>&1 &"
+      args:
+        executable: /bin/bash
+
+    - name: Lancer le serveur WebSocket Node.js (en arrière-plan)
+      shell: "nohup node {{ project_dir }}/NodeServeur/server.js > /tmp/ws.log 2>&1 &"
+      args:
+        executable: /bin/bash
+
+    - name: Lancer le frontend Next.js (en arrière-plan)
+      shell: "cd {{ project_dir }} && nohup npm run dev > /tmp/frontend.log 2>&1 &"
+      args:
+        executable: /bin/bash
+
+    - name: Vérifier les processus démarrés sur les ports 3030, 5000, 3000
+      shell: "ss -tulnp | grep -E ':{{ api_port }}|:{{ ws_port }}|:{{ frontend_port }}' || true"
+      register: ports_after_start
+      changed_when: false
+
+    - debug:
+        msg: "Processus en écoute après démarrage : {{ ports_after_start.stdout_lines }}"

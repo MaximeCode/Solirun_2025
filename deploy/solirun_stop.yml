@@ -1,0 +1,36 @@
+---
+- name: Arrêt des serveurs Solirun_2025
+  hosts: localhost
+  become: yes
+  vars_files:
+    - vars.yml
+
+  tasks:
+    - name: Arrêter le serveur API PHP
+      shell: |
+        PID=$(ss -tulnp | grep ':{{ api_port }}' | grep -oP 'pid=\K[0-9]+')
+        if [ -n "$PID" ]; then kill "$PID"; fi
+      ignore_errors: yes
+      failed_when: false
+
+    - name: Arrêter le serveur WebSocket Node.js
+      shell: |
+        PID=$(ss -tulnp | grep ':{{ ws_port }}' | grep -oP 'pid=\K[0-9]+')
+        if [ -n "$PID" ]; then kill "$PID"; fi
+      ignore_errors: yes
+      failed_when: false
+
+    - name: Arrêter le frontend Next.js
+      shell: |
+        PID=$(ss -tulnp | grep ':{{ frontend_port }}' | grep -oP 'pid=\K[0-9]+')
+        if [ -n "$PID" ]; then kill "$PID"; fi
+      ignore_errors: yes
+      failed_when: false
+
+    - name: Vérifier les processus écoutant sur les ports API, WS et frontend
+      shell: "ss -tulnp | grep -E ':{{ api_port }}|:{{ ws_port }}|:{{ frontend_port }}' || true"
+      register: ports_info
+      changed_when: false
+
+    - debug:
+        msg: "Processus encore en écoute : {{ ports_info.stdout_lines }}"

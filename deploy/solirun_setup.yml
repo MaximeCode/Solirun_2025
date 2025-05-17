@@ -1,0 +1,140 @@
+---
+- name: Déploiement complet de Solirun_2025
+  hosts: localhost
+  become: yes
+  vars_files:
+    - vars.yml
+
+  pre_tasks:
+    - name: Installer pip3 s’il n’est pas installé
+      apt:
+        name: python3-pip
+        state: present
+        update_cache: yes
+
+    - name: Installer PyMySQL depuis les paquets système
+      apt:
+        name: python3-pymysql
+        state: present
+
+  tasks:
+    - name: Installer les dépendances système
+      apt:
+        name:
+          - git
+          - php
+          - php-mysqli
+          - mariadb-server
+          - nodejs
+          - npm
+        state: present
+        update_cache: yes
+
+    - name: Cloner le dépôt Solirun_2025
+      git:
+        repo: "{{ repo_url }}"
+        dest: "{{ project_dir }}"
+        version: HEAD
+        force: yes
+
+    - name: Assurer que MariaDB est lancé
+      service:
+        name: mariadb
+        state: started
+        enabled: yes
+
+    - name: Initialiser MariaDB, mot de passe root et création de l’utilisateur
+      shell: |
+        mysql -u root <<EOF
+        SET PASSWORD FOR 'root'@'localhost' = PASSWORD('{{ db_root_pass }}');
+        CREATE USER IF NOT EXISTS '{{ db_user }}'@'localhost' IDENTIFIED BY '{{ db_pass }}';
+        GRANT ALL PRIVILEGES ON *.* TO '{{ db_user }}'@'localhost' WITH GRANT OPTION;
+        FLUSH PRIVILEGES;
+        EOF
+      args:
+        executable: /bin/bash
+
+    - name: Créer la base de données
+      mysql_db:
+        name: "{{ db_name }}"
+        state: present
+        encoding: utf8mb4
+        collation: utf8mb4_general_ci
+        login_user: "{{ db_user }}"
+        login_password: "{{ db_pass }}"
+
+    - name: Importer le dump SQL (1ère tentative)
+      mysql_db:
+        name: "{{ db_name }}"
+        state: import
+        target: "{{ project_dir }}/{{ sql_dump }}"
+        login_user: "{{ db_user }}"
+        login_password: "{{ db_pass }}"
+      ignore_errors: yes
+
+    - name: Corriger la ligne 1 du fichier SQL si nécessaire
+      lineinfile:
+        path: "{{ project_dir }}/{{ sql_dump }}"
+        line: "--"
+        state: absent
+      when: sql_dump is defined
+
+    - name: Re-importer le dump SQL après correction
+      mysql_db:
+        name: "{{ db_name }}"
+        state: import
+        target: "{{ project_dir }}/{{ sql_dump }}"
+        login_user: "{{ db_user }}"
+        login_password: "{{ db_pass }}"
+      when: sql_dump is defined
+
+    - name: Configurer le fichier API/config.php
+      copy:
+        dest: "{{ project_dir }}/API/config.php"
+        content: |
+          <?php
+          defined('SECURE_ACCESS') or die('Accès direct au fichier non autorisé');
+          return [
+            'DB_HOST' => 'localhost',
+            'DB_PORT' => '3306',
+            'DB_NAME' => '{{ db_name }}',
+            'DB_USER' => '{{ db_user }}',
+            'DB_PASSWORD' => '{{ db_pass }}'
+          ];
+
+    - name: Créer le fichier .env pour le WebSocket
+      copy:
+        dest: "{{ project_dir }}/NodeServeur/.env"
+        content: "PORT={{ ws_port }}"
+
+    - name: Installer les dépendances WebSocket
+      npm:
+        path: "{{ project_dir }}/NodeServeur"
+        production: no
+
+    - name: Installer les dépendances frontend
+      npm:
+        path: "{{ project_dir }}"
+        production: no
+
+    - name: Créer le fichier .env frontend
+      copy:
+        dest: "{{ project_dir }}/.env"
+        content: |
+          NEXT_PUBLIC_API_URL=http://{{ ip }}:{{ api_port }}
+          NEXT_PUBLIC_SOCKET_URL=http://{{ ip }}:{{ ws_port }}
+
+    - name: Lancer le serveur API (en arrière-plan)
+      shell: "nohup php -S {{ ip }}:{{ api_port }} -t {{ project_dir }}/API > /tmp/api.log 2>&1 &"
+      args:
+        executable: /bin/bash
+
+    - name: Lancer le serveur WebSocket (en arrière-plan)
+      shell: "nohup node {{ project_dir }}/NodeServeur/server.js > /tmp/ws.log 2>&1 &"
+      args:
+        executable: /bin/bash
+
+    - name: Lancer le frontend (en arrière-plan)
+      shell: "cd {{ project_dir }} && nohup npm run dev > /tmp/frontend.log 2>&1 &"
+      args:
+        executable: /bin/bash

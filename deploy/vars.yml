@@ -1,0 +1,20 @@
+# vars.yml — Variables utilisées pour le déploiement de Solirun_2025
+
+# 📦 Dépôt du projet
+repo_url: "https://github.com/MaximeCode/Solirun_2025"  # URL du dépôt Git
+project_dir: "/opt/Solirun_2025"                        # Chemin local de clonage
+
+# 🛢️ Base de données
+db_name: "Solirun_2025"                                 # Nom de la base de données
+db_user: "solirun_user"                                 # Nom de l'utilisateur MariaDB
+db_pass: "securepassword123"                            # Mot de passe de l'utilisateur MariaDB
+db_root_pass: "rootpassword123"                         # Mot de passe de l'utilisateur root MariaDB
+
+# 🌐 Réseau / Services
+api_port: 3030                                          # Port pour l'API PHP (php -S)
+ws_port: 5000                                           # Port pour le WebSocket Node.js
+frontend_port: 3000                                     # Port pour le frontend Next.js
+ip: "192.168.33.15"                                     # IP à utiliser pour le .env et les services
+
+# 📄 Chemin vers le dump SQL
+sql_dump: "sql/solirun_dump.sql"                        # Chemin relatif au fichier dump SQL
