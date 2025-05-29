@@ -94,6 +94,12 @@ try {
         }
         break;
 
+      case 'getTchat':
+        // Préparation de la requête sécurisée
+        $sql = "SELECT * FROM AllMsgs"; // On récupère les messages autorisés pour la course 1
+        fetchData($sql, $conn);
+        break;
+
       default:
         http_response_code(400); // Bad Request
         showPrettyJson(["error" => "Action invalide"]);
@@ -457,8 +463,107 @@ try {
         }
         break;
 
+      case 'auth':
+        if (isset($data['username']) && isset($data['mode'])) {
+          $username = $data['username'];
+          $mode = $data['mode'];
+
+          if ($mode === 'login') {
+            // Préparation de la requête sécurisée
+            $stmt = $conn->prepare("SELECT id, username FROM Logins WHERE username = ?");
+            $stmt->bind_param("s", $username);
+            $stmt->execute();
+            $result = $stmt->get_result();
+
+            if ($result->num_rows === 1) {
+              $user = $result->fetch_assoc();
+              http_response_code(200);
+              showPrettyJson($user);
+            } else {
+              http_response_code(404);
+              showPrettyJson(["error" => "Utilisateur non trouvé"]);
+            }
+          } else {
+            $stmt = $conn->prepare("INSERT INTO Logins (username, theRole) VALUES (?, 10)");
+            $stmt->bind_param("s", $username);
+            if ($stmt->execute()) {
+              $userId = $conn->insert_id; // Récupérer l'ID de l'utilisateur inséré
+              $user = [
+                "id" => $userId,
+                "username" => $username
+              ];
+              http_response_code(200);
+              showPrettyJson($user);
+            } else {
+              http_response_code(500);
+              showPrettyJson(["error" => "Erreur lors de l'ajout de l'utilisateur : " . $stmt->error]);
+            }
+          }
+
+          $stmt->close();
+        } else {
+          http_response_code(400);
+          showPrettyJson(["error" => "Paramètres manquants (username, mode)"]);
+        }
+        break;
+
+      case "AddNewTchat":
+        if (isset($data['idAuteur']) && isset($data['msg'])) {
+          var_dump($data);
+
+          // Vérification des données obligatoires
+          if (!isset($data['msg'], $data['idAuteur'])) {
+            http_response_code(400);
+            showPrettyJson(["error" => "Données manquantes pour l'ajout du message"]);
+            break;
+          }
+
+          // Préparation de la requête sécurisée
+          $stmt = $conn->prepare("INSERT INTO Msgs (msg, allowed, idAuteur, Moderateur) VALUES ( ?, ?, ?, ?)");
+          $allowed = 1; // Autorisé par défaut
+          $moderateur = 4;
+          $stmt->bind_param("siii", $data['msg'], $allowed, $data['idAuteur'], $moderateur);
+
+          if ($stmt->execute()) {
+            showPrettyJson(["success" => "Message ajouté avec succès"]);
+          } else {
+            showPrettyJson(["error" => "Erreur lors de l'ajout du message : " . $stmt->error]);
+          }
+
+          $stmt->close();
+        } else {
+          http_response_code(400);
+          showPrettyJson(["error" => "Paramètres manquants pour l'ajout du message"]);
+        }
+        break;
+
+      case 'getUserById':
+        if (isset($data['userId'])) {
+          // Préparation de la requête sécurisée
+          $stmt = $conn->prepare("SELECT id, username FROM Logins WHERE id = ?");
+          $stmt->bind_param("i", $data['userId']);
+          $stmt->execute();
+          $result = $stmt->get_result();
+
+          if ($result->num_rows === 1) {
+            $user = $result->fetch_all(MYSQLI_ASSOC)[0]; // Récupérer le premier résultat
+            http_response_code(200);
+            showPrettyJson($user);
+          } else {
+            http_response_code(404);
+            showPrettyJson(["error" => "Utilisateur non trouvé"]);
+          }
+
+          $stmt->close();
+        } else {
+          http_response_code(400);
+          showPrettyJson(["error" => "Paramètre 'userId' manquant"]);
+        }
+        break;
+
       default:
-        showPrettyJson(["error" => "Action non reconnue. Utilisez 'select', 'update', ou 'delete'"]);
+        showPrettyJson(["error" => "Action non reconnue. Utilisez 'AddNewTchat', 'insertClass', 'updateClass', 'deleteClass', 'insertRun', 'updateRun', 'deleteRun', 'login', 'verifyToken' ou 'auth'."]);
+        http_response_code(400); // Bad Request
         break;
     }
   } else {

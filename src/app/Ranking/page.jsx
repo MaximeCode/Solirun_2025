@@ -5,6 +5,9 @@ import Classement from "@/Components/Ranking";
 import ClassementReel from "@/Components/RealTimeRanking";
 import { socket } from "@/utils/socket";
 
+import ChatForm from "@/Components/ChatForm";
+import Tchat from "@/Components/Tchat";
+
 function App() {
   const [classesData, setClassesData] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -36,6 +39,13 @@ function App() {
     socket.on("updateIsRunning", (state) => {
       setIsRunning(state);
     });
+
+    // Tchat
+    socket.emit("getMsgs");
+    socket.on("updateMsgs", (msgs) => {
+      console.log("Messages reçus :", msgs);
+    });
+
     return () => {
       socket.off("updateIsRunning");
     };
@@ -46,7 +56,7 @@ function App() {
       {/* Background Animation */}
       <div className="absolute inset-0 z-0 bg-gradient-to-br from-indigo-900 via-black to-gray-900 opacity-60 blur-2xl animate-pulse"></div>
 
-      <div className="relative z-10 max-h-screen w-full p-1">
+      <div className="relative z-10 w-full p-1">
         {!isRunning ? (
           <>
             {loading && (
@@ -69,6 +79,10 @@ function App() {
           </div>
         )}
       </div>
+
+      <Tchat />
+
+      <ChatForm socket={socket} />
     </div>
   );
 }

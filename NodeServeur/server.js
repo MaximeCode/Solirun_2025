@@ -3,6 +3,9 @@ const http = require("http");
 
 const server = http.createServer();
 
+const dotenv = require("dotenv");
+dotenv.config({ path: "../.env.local" }); // Chargement des variables d'environnement depuis le fichier .env
+
 const io = new Server(server, {
 	cors: {
 		origin: "*",  // Permet toutes les origines
@@ -96,6 +99,98 @@ io.on("connection", (socket) => {
 			updateAllClients();
 		}
 	});
+
+	// 🔥 VERSION OPTIMISÉE - Gestion des messages de tchat
+	socket.on("newTchat", async (userId, message) => {
+		console.log("Nouveau message de l'utilisateur", userId, ":", message);
+
+		try {
+			// 1. Sauvegarder le message en base de données
+			const response = await fetch(`http://localhost:3030/api.php`, {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify({
+					action: "AddNewTchat",
+					idAuteur: userId,
+					msg: message,
+				}),
+			});
+
+			console.log("Réponse de l'API pour la sauvegarde du message :", response);
+
+			if (!response.ok) {
+				throw new Error(`Erreur API: ${response.status}`);
+			}
+
+			const result = response;
+
+			if (result.ok) {
+				// 2. Récupérer les informations de l'utilisateur pour le message
+				const userResponse = await fetch(`http://localhost:3030/api.php`, {
+					method: "POST",
+					headers: {
+						"Content-Type": "application/json",
+					},
+					body: JSON.stringify({
+						action: "getUserById",
+						userId: userId,
+					}),
+				});
+
+				if (userResponse.ok) {
+					const userData = await userResponse.json();
+					// console.log("Données utilisateur récupérées :", userData);
+
+					// 3. Créer l'objet message complet
+					const newMessage = {
+						id: Date.now(),
+						msg: message,
+						username: userData.username,
+						idAuteur: userId
+					};
+
+					// 4. Diffuser SEULEMENT le nouveau message à tous les clients
+					io.emit("newTchatMessage", newMessage);
+					console.log("Message diffusé :", newMessage);
+				} else {
+					console.error("Erreur lors de la récupération des données utilisateur");
+				}
+			} else {
+				console.error("Erreur lors de la sauvegarde du message:", result.error);
+			}
+
+		} catch (error) {
+			console.error("Erreur lors de la gestion du message :", error);
+
+			// En cas d'erreur, on peut quand même essayer de diffuser le message
+			// avec les informations disponibles
+			const fallbackMessage = {
+				id: Date.now(),
+				msg: message,
+				username: `User-${userId}`, // Nom de fallback
+				idAuteur: userId
+			};
+
+			io.emit("newTchatMessage", fallbackMessage);
+		}
+	});
+
+	// 🆕 Événement pour récupérer l'historique des messages (optionnel)
+	socket.on("getMsgs", async () => {
+		try {
+			const response = await fetch(`http://localhost:3030/api.php?action=getTchat`);
+			if (response.ok) {
+				const messages = await response.json();
+				socket.emit("updateMsgs", messages);
+				console.log("Messages récupérés et envoyés au client :", messages);
+			}
+		} catch (error) {
+			console.error("Erreur lors de la récupération des messages :", error);
+		}
+	});
+
 
 	socket.on("disconnect", () => {
 		console.log(`Client ${socket.id} déconnecté`);
