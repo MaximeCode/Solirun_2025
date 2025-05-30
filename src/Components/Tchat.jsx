@@ -67,11 +67,15 @@ export default function Tchat() {
     // Connexion aux événements Socket.IO
     socket.on("newTchatMessage", handleNewMessage);
     socket.on("updateMsgs", handleUpdateMessages);
+    socket.on("msgDeleted", (deletedMessageId) => {
+      socket.emit("getMsgs"); // Recharger les messages après suppression
+    });
 
     // Nettoyage à la déconnexion du composant
     return () => {
       socket.off("newTchatMessage", handleNewMessage);
       socket.off("updateMsgs", handleUpdateMessages);
+      socket.off("msgDeleted"); 
     };
   }, []);
 

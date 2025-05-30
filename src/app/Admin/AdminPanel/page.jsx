@@ -91,6 +91,9 @@ function AdminPanel() {
     // Connexion aux événements Socket.IO
     socket.on("newTchatMessage", handleNewMessage);
     socket.on("updateMsgs", handleUpdateMessages);
+    socket.on("msgDeleted", () => {
+      socket.emit("getMsgs"); // Re-fetch messages after deletion
+    });
 
     return () => {
       socket.off("updateIsRunning");
@@ -301,7 +304,6 @@ function AdminPanel() {
           <ModeratorTchat
             messages={messages}
             isLoading={isLoading}
-            fetchInitialMessages={fetchInitialMessages}
             socket={socket}
           />
         </div>

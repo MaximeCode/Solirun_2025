@@ -127,7 +127,7 @@ io.on("connection", (socket) => {
 			const result = response;
 
 			if (result.ok) {
-				// 2. Récupérer le message en bdd avce  toutes ces infos
+				// 2. Récupérer le message en bdd avec toutes ces infos
 				const newMsgResponse = await fetch(`http://localhost:3030/api.php`, {
 					method: "POST",
 					headers: {
@@ -148,7 +148,8 @@ io.on("connection", (socket) => {
 						id: Date.now(),
 						msg: message,
 						username: userData.username,
-						idAuteur: userId
+						idAuteur: userId,
+						allowed: 1,
 					};
 
 					// 4. Diffuser SEULEMENT le nouveau message à tous les clients
@@ -213,7 +214,7 @@ io.on("connection", (socket) => {
 
 			if (response.ok) {
 				console.log("Message supprimé avec succès :", msgId);
-				io.emit("msgDeleted", msgId); // Diffuser l'événement de suppression
+				io.emit("msgDeleted"); // Diffuser l'événement de suppression
 			} else {
 				console.error("Erreur lors de la suppression du message :", response.statusText);
 			}

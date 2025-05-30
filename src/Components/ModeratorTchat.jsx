@@ -6,7 +6,6 @@ import PropTypes from "prop-types";
 export default function ModeratorTchat({
   messages,
   isLoading,
-  fetchInitialMessages,
   socket,
 }) {
   const messagesEndRef = useRef(null);
@@ -30,7 +29,7 @@ export default function ModeratorTchat({
   }, [messages, isLoading]);
 
   // Fonction pour supprimer un message
-  const deleteMessage = async (messageId) => {
+  const deleteMessage = (messageId) => {
     let moderateurId = localStorage.getItem("userId");
     socket.emit("msgDeletedByModerateur", messageId, moderateurId);
   };
