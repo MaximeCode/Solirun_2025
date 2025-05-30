@@ -127,8 +127,8 @@ io.on("connection", (socket) => {
 			const result = response;
 
 			if (result.ok) {
-				// 2. Récupérer les informations de l'utilisateur pour le message
-				const userResponse = await fetch(`http://localhost:3030/api.php`, {
+				// 2. Récupérer le message en bdd avce  toutes ces infos
+				const newMsgResponse = await fetch(`http://localhost:3030/api.php`, {
 					method: "POST",
 					headers: {
 						"Content-Type": "application/json",
@@ -139,9 +139,9 @@ io.on("connection", (socket) => {
 					}),
 				});
 
-				if (userResponse.ok) {
-					const userData = await userResponse.json();
-					// console.log("Données utilisateur récupérées :", userData);
+				if (newMsgResponse.ok) {
+					const userData = await newMsgResponse.json();
+					console.log("Données utilisateur récupérées :", userData);
 
 					// 3. Créer l'objet message complet
 					const newMessage = {
@@ -177,20 +177,50 @@ io.on("connection", (socket) => {
 		}
 	});
 
-	// 🆕 Événement pour récupérer l'historique des messages (optionnel)
+	// 🆕 Événement pour récupérer l'historique des messages
 	socket.on("getMsgs", async () => {
 		try {
 			const response = await fetch(`http://localhost:3030/api.php?action=getTchat`);
 			if (response.ok) {
 				const messages = await response.json();
 				socket.emit("updateMsgs", messages);
-				console.log("Messages récupérés et envoyés au client :", messages);
+				// console.log("Messages récupérés et envoyés au client :", messages);
 			}
 		} catch (error) {
 			console.error("Erreur lors de la récupération des messages :", error);
 		}
 	});
 
+	// ❌ Message non autorisé par le modérateur
+	socket.on("msgDeletedByModerateur", async (msgId, moderateurId) => {
+		if (!msgId || !moderateurId) {
+			console.error("ID de message ou ID de modérateur manquant");
+			return;
+		}
+		try {
+			console.log(`Suppression du message ${msgId} par le modérateur ${moderateurId}`);
+			const response = await fetch(`http://localhost:3030/api.php`, {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify({
+					action: "msgNotAllowed",
+					msgId: msgId,
+					moderateurId: moderateurId,
+				}),
+			});
+
+			if (response.ok) {
+				console.log("Message supprimé avec succès :", msgId);
+				io.emit("msgDeleted", msgId); // Diffuser l'événement de suppression
+			} else {
+				console.error("Erreur lors de la suppression du message :", response.statusText);
+			}
+		} catch (error) {
+			console.error("Erreur lors de la suppression du message :", error);
+		}
+	});
 
 	socket.on("disconnect", () => {
 		console.log(`Client ${socket.id} déconnecté`);

@@ -1,14 +1,19 @@
 import { useEffect, useState, useRef } from "react";
 import { socket } from "@/utils/socket";
+import ShowMsg from "@/Components/ShowMsg";
 
 export default function Tchat() {
   const [messages, setMessages] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const messagesEndRef = useRef(null);
+  const scrollContainerRef = useRef(null);
 
   // Auto-scroll vers le bas quand de nouveaux messages arrivent
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollTop =
+        scrollContainerRef.current.scrollHeight;
+    }
   };
 
   useEffect(() => {
@@ -70,10 +75,16 @@ export default function Tchat() {
     };
   }, []);
 
-  // Auto-scroll à chaque nouveau message
+  // Auto-scroll à chaque nouveau message et au chargement initial
   useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
+    if (!isLoading) {
+      // Utiliser setTimeout pour s'assurer que le DOM est mis à jour
+      setTimeout(() => {
+        scrollToBottom();
+      }, 100);
+      console.log("tous les messages : ", messages);
+    }
+  }, [messages, isLoading]);
 
   if (isLoading) {
     return (
@@ -86,7 +97,7 @@ export default function Tchat() {
   }
 
   return (
-    <div className="w-100 max-h-96 z-10 fixed top-1 left-1 bg-gray-900 rounded-lg text-white flex flex-col opacity-75 shadow-lg transition-opacity duration-300 hover:opacity-100">
+    <div className="w-80 max-h-96 z-10 fixed top-1 right-1 bg-gray-900 rounded-lg text-white flex flex-col">
       {/* En-tête fixe */}
       <div className="p-4 pb-2 bg-gray-900 rounded-t-lg relative z-20">
         <div className="flex justify-between items-center mb-2">
@@ -100,12 +111,14 @@ export default function Tchat() {
       </div>
 
       {/* Zone de messages avec effet de fondu */}
-      <div className="flex-1 relative overflow-hidden min-h-80">
+      <div className="flex-1 relative overflow-hidden min-h-50">
         {/* Gradient de fondu en haut */}
         <div className="absolute top-0 left-0 right-0 h-6 bg-gradient-to-b from-gray-900 to-transparent z-10 pointer-events-none"></div>
 
         {/* Messages scrollables */}
-        <div className="absolute inset-0 overflow-y-auto px-4 py-1">
+        <div
+          ref={scrollContainerRef}
+          className="absolute inset-0 overflow-y-auto px-4 py-2">
           <div className="space-y-2">
             {messages.length === 0 ? (
               <div className="text-center text-gray-400 text-sm py-4">
@@ -121,7 +134,9 @@ export default function Tchat() {
                       {msg.username || `User-${msg.idAuteur}`}
                     </strong>
                   </div>
-                  <p className="text-sm text-gray-100 break-words">{msg.msg}</p>
+                  <p className="text-sm text-gray-100 break-words">
+                    <ShowMsg msg={msg} />
+                  </p>
                 </div>
               ))
             )}
@@ -132,7 +147,7 @@ export default function Tchat() {
       </div>
 
       {/* Footer avec indicateur de connexion */}
-      <div className="px-4 py-2 bg-gray-900 rounded-b-lg border-t border-gray-700 relative z-20">
+      <div className="px-4 pb-4 pt-2 bg-gray-900 rounded-b-lg border-t border-gray-700 relative z-20">
         <div className="flex items-center justify-center">
           <div className="text-xs text-gray-500">
             {messages.length} message{messages.length !== 1 ? "s" : ""}

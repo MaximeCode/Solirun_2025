@@ -96,7 +96,7 @@ try {
 
       case 'getTchat':
         // Préparation de la requête sécurisée
-        $sql = "SELECT * FROM AllMsgs"; // On récupère les messages autorisés pour la course 1
+        $sql = "SELECT * FROM AllMsgs"; // On récupère les messages autorisés par les modérateurs
         fetchData($sql, $conn);
         break;
 
@@ -509,7 +509,6 @@ try {
 
       case "AddNewTchat":
         if (isset($data['idAuteur']) && isset($data['msg'])) {
-          var_dump($data);
 
           // Vérification des données obligatoires
           if (!isset($data['msg'], $data['idAuteur'])) {
@@ -519,10 +518,9 @@ try {
           }
 
           // Préparation de la requête sécurisée
-          $stmt = $conn->prepare("INSERT INTO Msgs (msg, allowed, idAuteur, Moderateur) VALUES ( ?, ?, ?, ?)");
+          $stmt = $conn->prepare("INSERT INTO Msgs (msg, allowed, idAuteur) VALUES (?, ?, ?)");
           $allowed = 1; // Autorisé par défaut
-          $moderateur = 4;
-          $stmt->bind_param("siii", $data['msg'], $allowed, $data['idAuteur'], $moderateur);
+          $stmt->bind_param("sii", $data['msg'], $allowed, $data['idAuteur']);
 
           if ($stmt->execute()) {
             showPrettyJson(["success" => "Message ajouté avec succès"]);
@@ -534,6 +532,25 @@ try {
         } else {
           http_response_code(400);
           showPrettyJson(["error" => "Paramètres manquants pour l'ajout du message"]);
+        }
+        break;
+
+      case 'msgNotAllowed':
+        if (isset($data['msgId'], $data['moderateurId'])) {
+          // Préparation de la requête sécurisée
+          $stmt = $conn->prepare("UPDATE Msgs SET allowed = 0, Moderateur = ? WHERE id = ?");
+          $stmt->bind_param("ii", $data['moderateurId'], $data['msgId']);
+
+          if ($stmt->execute()) {
+            showPrettyJson(["success" => "Message supprimé avec succès"]);
+          } else {
+            showPrettyJson(["error" => "Erreur lors de la suppression du message : " . $stmt->error]);
+          }
+
+          $stmt->close();
+        } else {
+          http_response_code(400);
+          showPrettyJson(["error" => "Paramètre 'msgId' ou 'moderateurId' manquant"]);
         }
         break;
 

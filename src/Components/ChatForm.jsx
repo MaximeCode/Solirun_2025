@@ -5,17 +5,20 @@ import React, { useEffect, useState } from "react";
 export default function ChatForm({ socket }) {
   const [username, setUsername] = useState("");
   const [message, setMessage] = useState("");
-  const [isConnected, setIsConnected] = useState(username !== "");
+  const [isConnected, setIsConnected] = useState(false);
   const [showForm, setShowForm] = useState(false);
   const [mode, setMode] = useState("login"); // "login" ou "register"
   const [tempUsername, setTempUsername] = useState("");
 
   useEffect(() => {
-    setUsername(localStorage.getItem("usernameForTchat") || "");
-    console.log(
-      "Username from localStorage:",
-      localStorage.getItem("usernameForTchat")
-    );
+    setTimeout(() => {
+      setUsername(localStorage.getItem("usernameForTchat") || "");
+      console.log(
+        "Username from localStorage:",
+        localStorage.getItem("usernameForTchat")
+      );
+      setIsConnected(!!localStorage.getItem("userIdForTchat"));
+    }, 10);
   }, []);
 
   const handleAuth = () => {
